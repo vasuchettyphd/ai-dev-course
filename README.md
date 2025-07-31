@@ -7,7 +7,7 @@
 # 🚀 Quickstart
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/llama3-docker
+git clone https://github.com/vasuchettyphd/ai_docker.git
 cd ai_docker 
 
 # Build and start the containers
@@ -30,6 +30,8 @@ ai_docker/
 ├── jupyter/                              # Jupyter Notebook environment
 │   ├── Dockerfile                        # Builds the Jupyter container
 │   └── requirements.txt                  # Jupyter, requests, numpy, pandas, etc.
+├── notebooks/                            # The location of the notebooks
+│   └── test_model.ipynb                  # A sample notebook that uses the model server
 ```
 
 # ✨ Jupyter Notebook Example
