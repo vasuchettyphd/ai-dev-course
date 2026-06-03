@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watch an Agent Play Wordle</title>
+  <style>
+    :root {
+      --green: #6aaa64;
+      --yellow: #c9b458;
+      --gray: #787c7e;
+      --border: #d3d6da;
+      --bg: #ffffff;
+      --ink: #1a1a1b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; letter-spacing: 0.02em; }
+    p.sub { margin: 0 0 24px; color: #5b5b5b; text-align: center; max-width: 30rem; }
+    #board {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .tile {
+      width: 58px;
+      height: 58px;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ink);
+      transition: transform 0.25s ease;
+    }
+    .tile.filled { animation: pop 0.15s ease; }
+    .tile.correct { background: var(--green); border-color: var(--green); color: #fff; }
+    .tile.present { background: var(--yellow); border-color: var(--yellow); color: #fff; }
+    .tile.absent  { background: var(--gray);   border-color: var(--gray);   color: #fff; }
+    @keyframes pop { 0% { transform: scale(0.85); } 100% { transform: scale(1); } }
+    @keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+    .tile.reveal { animation: flip 0.5s ease; }
+    button {
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled { background: #9bbf96; cursor: default; }
+    #status { margin-top: 18px; min-height: 1.5rem; font-weight: 600; }
+    .hint { color: #5b5b5b; font-weight: 400; }
+  </style>
+</head>
+<body>
+  <h1>Watch an Agent Play Wordle</h1>
+  <p class="sub">
+    The agent cannot see the secret word. Click below and it will guess, read
+    the feedback, and reason its way to the answer, live.
+  </p>
+
+  <div id="board"></div>
+
+  <button id="go">Solve it</button>
+  <div id="status"><span class="hint">Idle. Press "Solve it" to start.</span></div>
+
+  <script>
+    const ROWS = 6, COLS = 5;
+    const board = document.getElementById("board");
+    const goBtn = document.getElementById("go");
+    const status = document.getElementById("status");
+
+    function buildBoard() {
+      board.innerHTML = "";
+      for (let r = 0; r < ROWS; r++) {
+        const row = document.createElement("div");
+        row.className = "row";
+        for (let c = 0; c < COLS; c++) {
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          row.appendChild(tile);
+        }
+        board.appendChild(row);
+      }
+    }
+
+    function fillRow(rowIndex, tiles) {
+      const row = board.children[rowIndex];
+      if (!row) return;
+      tiles.forEach(([letter, statusTag], i) => {
+        const tile = row.children[i];
+        // Stagger the reveal so each tile flips in turn, like real Wordle.
+        setTimeout(() => {
+          tile.textContent = letter;
+          tile.classList.add("filled", "reveal");
+          setTimeout(() => tile.classList.add(statusTag), 250);
+        }, i * 120);
+      });
+    }
+
+    buildBoard();
+    let currentRow = 0;
+
+    goBtn.addEventListener("click", () => {
+      buildBoard();
+      currentRow = 0;
+      goBtn.disabled = true;
+      status.innerHTML = '<span class="hint">The agent is thinking and guessing...</span>';
+
+      const es = new EventSource("/solve");
+
+      es.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === "guess") {
+          fillRow(currentRow, data.tiles);
+          currentRow++;
+        } else if (data.type === "done") {
+          status.textContent = data.solved
+            ? `Solved "${data.word}" in ${data.guesses} guesses.`
+            : `Did not crack it in ${data.guesses} guesses. Best guess: "${data.word}".`;
+          es.close();
+          goBtn.disabled = false;
+          goBtn.textContent = "Next word";
+        } else if (data.type === "error") {
+          status.innerHTML = `<span style="color:#b00">Error: ${data.message}</span>`;
+          es.close();
+          goBtn.disabled = false;
+          goBtn.textContent = "Try again";
+        }
+      };
+
+      es.onerror = () => {
+        // The stream ends after "done"; only flag it if nothing finished cleanly.
+        if (goBtn.disabled) {
+          status.innerHTML = '<span style="color:#b00">Connection lost. Is the server running with an API key set?</span>';
+          es.close();
+          goBtn.disabled = false;
+        }
+      };
+    });
+  </script>
+</body>
+</html>

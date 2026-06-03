@@ -1,0 +1,6 @@
+# Core agent
+pydantic-ai-slim[anthropic,openai]>=1.0
+
+# Web app (Step 9): the visual board you click to watch the agent play
+fastapi>=0.110
+uvicorn[standard]>=0.29
