@@ -221,6 +221,82 @@ One thing to watch: Superpowers likes to run its own brainstorming before buildi
 
 And you do not always need both. Use `/grill-me` alone for a decision you are not building anything for, like whether to take on a particular investment or how to price a service. Use Superpowers alone when you already know exactly what you want built.
 
+### Make the handoff automatic (optional, more technical)
+
+That "just say so" reminder works, but it is a request Claude can forget. If you find yourself getting interviewed twice, you can enforce the handoff with a **hook**, a small script Claude Code runs automatically at set moments. The rule: after a grilling session, the next brainstorming attempt in that project is skipped once, so you go straight to building.
+
+You do not have to write this yourself. The simplest path is to ask Claude Code to set it up for you:
+
+> Add hooks to my global Claude Code settings so that after a `/grill-me` session, the next `superpowers:brainstorming` call in that project is automatically skipped and sent straight to writing-plans.
+
+If you would rather do it by hand, it is two small scripts plus a settings entry.
+
+Save this as `~/.claude/hooks/grill_mark.py` (it drops a marker when you grill):
+
+```python
+import sys, json, os, hashlib, time
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+if data.get("tool_name") != "Skill":
+    sys.exit(0)
+if (data.get("tool_input") or {}).get("skill") != "mattpocock-skills:grilling":
+    sys.exit(0)
+proj = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+key = hashlib.sha256(proj.encode()).hexdigest()[:16]
+d = os.path.expanduser("~/.claude/state/grill-bridge")
+os.makedirs(d, exist_ok=True)
+open(os.path.join(d, key), "w").write(str(int(time.time())))
+```
+
+Save this as `~/.claude/hooks/grill_gate.py` (it skips the next brainstorm if you grilled within two hours):
+
+```python
+import sys, json, os, hashlib, time
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+if data.get("tool_name") != "Skill":
+    sys.exit(0)
+if (data.get("tool_input") or {}).get("skill") != "superpowers:brainstorming":
+    sys.exit(0)
+proj = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+key = hashlib.sha256(proj.encode()).hexdigest()[:16]
+marker = os.path.expanduser("~/.claude/state/grill-bridge/" + key)
+try:
+    ts = int(open(marker).read().strip())
+except Exception:
+    sys.exit(0)
+try:
+    os.remove(marker)
+except OSError:
+    pass
+if time.time() - ts > 2 * 60 * 60:
+    sys.exit(0)
+print(json.dumps({"hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Already designed in a /grill-me session. Skip brainstorming and go straight to superpowers:writing-plans, treating the grilled design as approved.",
+}}))
+```
+
+Then add this to `~/.claude/settings.json` (merge it into the file, do not overwrite what is already there):
+
+```json
+"hooks": {
+  "PostToolUse": [
+    { "matcher": "Skill", "hooks": [
+      { "type": "command", "command": "python3 ~/.claude/hooks/grill_mark.py" } ] } ],
+  "PreToolUse": [
+    { "matcher": "Skill", "hooks": [
+      { "type": "command", "command": "python3 ~/.claude/hooks/grill_gate.py" } ] } ]
+}
+```
+
+Restart Claude Code afterwards so it loads the new hooks. Two honest caveats: it only suppresses the one brainstorm that directly follows a grill, so unrelated later work is untouched, and if you ever do want a fresh brainstorm right after grilling, the marker is already used up so it just runs. This is optional. The one-line reminder above is enough for most people.
+
 ---
 
 ## 5. When something goes wrong
