@@ -1,272 +1,244 @@
-# Stop Building the Wrong Thing: `/grilling` and Superpowers in Claude Code
+# Think It Through, Then Build It: `/grill-me` and Superpowers in Claude Code
 
-Two of the most useful additions to Claude Code are not features of Claude Code itself. They are plugins from the official marketplace, written by working engineers, that change *how* Claude approaches a task before it writes a line of code.
+*A hands-on guide for people who want to use Claude Code to make money or start a business, not to become software engineers.*
 
-- **`/grill-me`** (from Matt Pocock's `mattpocock-skills`) turns Claude into a relentless interviewer that stress-tests your plan until nothing is left silently assumed. Under the hood it runs the `grilling` skill, the reusable interview engine that several of Matt's other skills also call.
-- **Superpowers** (from Jesse Vincent's `superpowers`) is a complete development methodology: brainstorm, spec, plan, then implement with subagents, test-driven development, and built-in code review.
+Claude Code will happily build you almost anything you describe. That is the problem. Describe a tool in a hurry and it builds exactly what you said, which is rarely what you meant, and you find out only after the work is done. Two free add-ins fix this from opposite ends:
 
-Both attack the same failure mode: the agent confidently builds something you did not ask for. This tutorial covers what each one does, how to install it, what a session looks like, and how to use them together.
+- **`/grill-me`** (from Matt Pocock's `mattpocock-skills`) turns Claude into a relentless interviewer. It questions your idea until every hidden assumption is on the table, before a single thing gets built. Great for a business decision on its own, and great before you build anything.
+- **Superpowers** (from Jesse Vincent's `superpowers`) is a build process. Once the plan is clear, it makes Claude work in small, tested steps and review its own work, instead of dumping a big pile of code that looks right and quietly does the wrong math.
 
-Versions covered: `mattpocock-skills` 1.2.3 and `superpowers` 6.3.0, as pinned in the official marketplace in September 2026.
+To make this concrete, we will carry one project the whole way through: **a rental property deal screener**. You feed it a listing's numbers, it tells you the monthly cash flow, the cap rate, the cash-on-cash return, and whether the deal clears your bar. First you will use `/grill-me` to pin down what a good deal even means to you. Then you will use Superpowers to build the calculator so its numbers are actually correct, because a wrong formula here is a wrong buying decision.
+
+You do not need to know how to code to follow along. That is the whole point.
+
+Versions covered: `mattpocock-skills` 1.2.3 and `superpowers` 6.3.0, from the official marketplace in September 2026.
 
 ---
 
-## 1. Installation
+## 1. Before you start
 
-Both plugins live in Anthropic's official marketplace, so there is nothing to add first. From inside a Claude Code session:
+**What you need:**
+
+- Claude Code installed and working (the tool you are already reading this in).
+- An empty folder to work in. Make one called `deal-screener` and open Claude Code inside it.
+- Nothing else. Claude will set up whatever the project needs, including the programming language, so you do not have to.
+
+**Install the two add-ins.** They live in Anthropic's official marketplace, so there is nothing to sign up for. From inside a Claude Code session, type:
 
 ```
 /plugin install mattpocock-skills@claude-plugins-official
 /plugin install superpowers@claude-plugins-official
 ```
 
-Or from your shell:
+Then restart the session. Superpowers only switches on in a fresh session, so close and reopen Claude Code once after installing.
 
-```bash
-claude plugins install mattpocock-skills
-claude plugins install superpowers
-```
+**Check they loaded.** Type `/` and start typing `grill`. You should see `/grill-me` in the list. Do the same with `superpowers`.
 
-Restart the session afterwards. Superpowers relies on a session-start hook, so it only takes effect in a fresh session.
-
-To confirm they loaded, type `/` and start typing `grill` or `superpowers`. You should see entries like `/grilling`, `/grill-me`, `/grill-with-docs`, and `/superpowers:brainstorming`.
-
-**One-time repo setup for Matt Pocock's skills.** The engineering skills in that bundle (tickets, triage, specs) want to know your issue tracker and where docs live. Run this once per repo:
-
-```
-/setup-matt-pocock-skills
-```
-
-`/grilling` itself works without it, but `/grill-with-docs` writes `CONTEXT.md` and ADRs, so it helps to have the doc location settled.
+That is the entire setup. The rest of this guide is the two tools in action.
 
 ---
 
 ## 2. `/grill-me`: the interview that will not let you hand-wave
 
-### Two names, one skill
+### What it is for
 
-You will see both `/grill-me` and `/grilling` in the plugin, and it helps to know how they relate before you type either.
+`/grill-me` interviews you about a plan, a decision, or an idea until you and Claude genuinely agree on what you are doing. You do not need a finished plan to start. Producing one is the whole point of the session, and vagueness is exactly what it feeds on.
 
-- **`grilling`** is the engine. It holds the whole interview technique, and it is *model-invoked*: Claude can reach for it on its own when a task fits, and other skills (`grill-me`, `grill-with-docs`, `triage`, `wayfinder`) call it rather than inventing their own interview.
-- **`grill-me`** is the front door. Its entire body is one line: run the `grilling` skill. It is *user-invoked only*, so it never fires by itself. You type it when you want the interview and nothing else.
+It writes no files and changes nothing. The only thing it leaves behind is a much sharper version of the idea in your own head. That makes it useful far beyond software: people point it at pricing decisions, whether to take a job, a pitch they are about to give, a property they are about to bid on.
 
-In practice, type `/grill-me`. Typing `/grilling` directly gives you the identical session, and the distinction only matters if you are building your own skill that needs an interview, in which case you call `grilling` from it.
+### Two names for the same thing
 
-### What it does
+You will see both `/grill-me` and `/grilling`. They run the identical interview. `/grill-me` is the one you type. `/grilling` is the engine underneath that Claude can also start on its own. For everyday use, just type `/grill-me` and forget the distinction exists.
 
-`/grill-me` interviews you about a plan, decision, or idea until you and Claude share the same understanding. You do not need a worked-out plan to start. Producing one is what the session is for, and vagueness is the thing it eats. It models the subject as a **design tree**: every decision branches into the smaller decisions that hang off it. The interview walks that tree until every branch is visited.
+### How it decides what to ask
 
-Three ideas carry the whole skill:
+Three ideas run the whole thing:
 
-| Term | Meaning |
+| Term | What it means |
 |---|---|
-| **Design tree** | The decisions in your plan, and the decisions that depend on them. |
-| **Frontier** | The decisions whose prerequisites are already settled. These are the only questions Claude can honestly ask right now. |
-| **Round** | One full frontier, asked in one message and answered in one reply. |
+| **Design tree** | Your idea, broken into decisions, and the smaller decisions that hang off each one. |
+| **Frontier** | The decisions it can honestly ask about right now, because everything they depend on is already settled. |
+| **Round** | One batch of questions, all from the current frontier, asked together and answered together. |
 
-The important consequence: Claude does not ask one question at a time, and it does not dump everything at once. Each round contains only questions that are independent of each other. Your answers settle those decisions, which unblocks the next layer, and the next round asks what that unlocked. Thirteen questions typically land in about three rounds rather than thirteen.
+The practical effect: it does not drip one question at a time, and it does not dump fifty at once. Each round holds only questions that do not depend on each other. Your answers unlock the next layer, and the next round asks what those answers opened up. A session with forty questions usually lands in three or four rounds, not forty.
 
-### The question format
+### What a round looks like
 
-Every question in a round arrives in a fixed shape:
+Every question comes in the same shape: a number, a short title, the question, then Claude's own recommended answer on the arrow line.
 
 ```
-❓ **Q1** - **Storage backend**: Where should rate-limit counters live? Options:
-   (a) in-process memory, (b) Redis, (c) the existing Postgres database.
+❓ **Q1** - **Your minimum return**: What is the lowest cash-on-cash return
+   you would accept before a deal is worth your time and risk? Common bars
+   for a first rental are 8% to 12%.
 
-➡️ Redis. You already run it for sessions, and in-process memory breaks
-   as soon as you have two API replicas.
+➡️ Start at 10%. It clears a savings account and index funds by enough to
+   pay you for the hassle of being a landlord, without being so strict that
+   nothing in your market qualifies.
 
 ---
 
-❓ **Q2** - **Limit scope**: Should limits apply per API key, per user, or per IP?
+❓ **Q2** - **Vacancy assumption**: Every rental sits empty sometimes. What
+   share of the year should we assume it earns nothing, so the numbers are
+   honest? Typical is 5% to 8%.
 
-➡️ Per API key. IPs are shared behind corporate NATs and users can hold
-   several keys.
+➡️ 8%. Better to be pessimistic. A deal that only works at 0% vacancy is
+   not a deal.
 ```
 
-The `➡️` line is Claude's recommended answer. Because each question is numbered, you answer the whole round by number:
+Because the questions are numbered, you answer the whole round in one line:
 
-> 1 yes. 2 per user, not per key, because our keys are per-integration and one customer can have dozens of them.
+> 1 yes, 10% is right. 2 make it 5%, my market is tight and units rarely sit empty.
 
-You do not need to quote the questions back.
+You never have to quote the question back.
 
-### Facts versus decisions
+### It looks things up so you do not have to
 
-This is the rule that makes the skill trustworthy. **Finding facts is Claude's job. Making decisions is yours.**
+Here is the rule that makes it trustworthy: **finding facts is Claude's job, making the calls is yours.**
 
-If a question needs a fact from the environment (what database you already use, whether a module exists, what a config value is), Claude dispatches a subagent to look it up rather than asking you. It does not block on that lookup: only the questions downstream of it wait, and the rest of the frontier is asked immediately.
+If a question needs a fact it can go find, like a typical property tax rate in your state or current mortgage interest rates, Claude goes and researches it rather than making you look it up. It does not stall the whole interview to do that, it only pauses the questions that actually depend on the answer.
 
-Decisions, on the other hand, are always put to you. An agent running `/grilling` that answers its own decisions has broken the skill. If you see that happen, say so, and it will reopen the branch.
+The judgment calls, though, are always handed to you. What return you require, how much risk you will take, which neighborhoods you would actually own in: those are yours, and a good session never quietly answers them for you. If you ever catch it deciding one of these on your behalf, say so and it will reopen the question.
 
-### The confirmation gate
+### It stops and waits for your sign-off
 
-The session is not over when Claude runs out of questions. It is over when **you** confirm the understanding is shared. Claude must not start building until you say so. If it does start building on its own, tell it to stop, and consider adding a line to your `CLAUDE.md` such as "Do not implement without permission."
+The interview is not over when the questions run out. It is over when **you** say the two of you agree. Claude should not run off and start building until you confirm. If it jumps ahead, tell it to stop.
 
-### Walkthrough
+### Try it yourself: grill your buy box
 
-Start with a rough idea:
+Open Claude Code in your `deal-screener` folder and type this, in your own words:
 
 ```
-/grill-me I want to add rate limiting to our public API.
+/grill-me I want to define my rules for whether a rental property is a
+good deal, so I can screen listings quickly. Help me pin down my criteria.
 ```
 
-**Round 1** asks the questions that have no prerequisites: what you are protecting against, which storage to use, what the limit is keyed on, what happens when a client exceeds it. Claude may spin up a subagent to read your middleware stack while you answer.
+**Round 1** will ask the things that stand on their own: your minimum return, how you will pay for it (all cash, or a mortgage, and on what terms), what counts as an expense, how pessimistic to be about vacancy and repairs. Claude may go research typical tax and insurance rates for your area while you answer the rest.
 
-**Round 2** only exists because of your Round 1 answers. If you chose per-user limits, it now asks how unauthenticated requests are treated. If you chose Redis, it asks about failure behavior when Redis is down. Nothing in Round 2 could have been asked before Round 1 was settled.
+**Round 2** exists only because of your Round 1 answers. If you said you will use a mortgage, it now asks about your down payment and interest rate. If you said you want appreciation to count, it asks how much yearly growth is fair to assume without kidding yourself.
 
-**Round 3** is usually short: response headers, whether to expose limits in the docs, rollout order.
+**Round 3** is usually the short one: how to rank two deals that both pass, whether to flag deals that are close but not quite, what a "no" should tell you.
 
-When the frontier is empty, Claude summarizes the design tree and asks you to confirm. Only then does implementation begin.
+When the questions run dry, Claude lays out your finished buy box and asks you to confirm it. Notice what happened: you now have a written, defensible set of rules, and you never had to stare at a blank page. That set of rules is what you will hand to the build step next.
 
-### Which entry point to use
+### Getting real value out of it
 
-`/grilling` is a **primitive**. Other skills call it, and it has two user-facing front doors:
+The difference between a session that sharpens your thinking and one that just agrees with you is you.
 
-| Situation | Use |
-|---|---|
-| You want the plain interview, no files written | `/grilling` or `/grill-me` (identical, but `/grill-me` never triggers on its own) |
-| You are in a repo and want a paper trail | `/grill-with-docs` writes `CONTEXT.md` (a project glossary) and ADRs as you go |
-| The effort is too big for one session | `/wayfinder` maps it as decision tickets and grills each one |
-| The question is about look and feel | `/prototype` builds a throwaway version instead of talking |
+- **Push back.** The failure mode is nodding along, answering "yes, yes, yes" for forty questions, and walking away with a plan Claude wrote and you rubber-stamped. If a recommendation is wrong for you, say so and say why.
+- **"I don't know" is a real answer.** Some things you genuinely cannot decide by talking, like how a property "feels" in person. Say you do not know, and treat that as a signal to go find out rather than guess.
+- **Start fresh.** Run it in a new conversation, not on top of a plan you already talked Claude into. The interview is for forming the plan, not defending one.
+- **Count rounds, not questions.** Forty questions over four rounds is normal. If it asks two hundred, your topic was too big; ask it to break the topic into pieces and grill them one at a time.
+- **Use the strongest model you have.** This skill leans on Claude's own sense of how plans fall apart, more than most. Give it your best model for the interview.
 
-`/grill-with-docs` is Matt Pocock's most recommended skill. The `CONTEXT.md` it builds gives you and the agent a shared vocabulary, which makes every later session shorter and every later prompt more precise.
+You know it worked if you disagreed with something along the way, if a question surfaced a decision you had been making without realizing it, and if you could now defend each choice to someone who was not in the room.
 
-### Getting the most out of `/grill-me`
+### Prefer one question at a time?
 
-`/grill-me` is **stateless**. It writes no files and leaves no workspace behind. The only output is a sharper version of the idea in your own head, which is exactly what makes it portable: no repo, no setup, and no assumption that the subject is software. People point it at product directions, business calls, talk outlines, and pieces of writing.
+Some people find a whole round at once overwhelming. If that is you, add this line to your global `CLAUDE.md` file and grilling will slow down to one question per message:
 
-A few habits make the difference between a session that produces decisions and one that produces confident nonsense.
+```
+When grilling, ask one question at a time.
+```
 
-- **Start it in a fresh conversation.** Do not run it on top of a plan an agent already wrote. The interview is for forming the plan, not defending one.
-- **Leave plan mode off.** Plan mode primes Claude to rush toward producing a plan, which is the opposite of staying in inquiry.
-- **Own the scope.** The skill asks the questions, but you steer. The failure mode is passivity: answering "agreed, agreed, agreed" for forty questions and coming out with a plan Claude wrote and you nodded at. It feels productive because it was long. Push back on questions pitched beneath the fidelity you need, and say when the scope drifts.
-- **"I don't know" is a real answer.** Say it and mean it. A question you cannot answer by talking is usually a sign to prototype rather than guess.
-- **Recognise the ungrillable question.** "One long form or three pages?" and "how should this interaction feel?" need something to react to. Talking through them is where sessions balloon. Stop, build the throwaway version with `/prototype`, look at it, then come back and answer in one line.
-- **Count rounds, not questions.** Forty-six questions across four rounds is an ordinary session. Two hundred questions means the scope was too large. Ask Claude to break the work up, then grill each piece.
-- **Use your best model.** Grilling leans on the model's own sense of how systems break, more than most skills do. Implementation tolerates a cheaper model; the interview does not.
-- **Do not start a fresh session before the spec.** The value of the session is the context you just built. If the idea turns out to be software, hand the same conversation straight to `/to-spec`.
-
-You know it worked if you disagreed with something along the way, if you ended up somewhere you did not expect because a question surfaced a decision you had been making implicitly, and if you could defend each choice to someone who was not there.
-
-### Tuning it
-
-- **Prefer one question at a time?** Add `When grilling, ask one question at a time.` to your global `CLAUDE.md`. This is a supported opt-out, not a hack.
-- **Want fewer questions?** There is no cap, deliberately. Tell it to wrap up, or accept the plan where it stands. If sessions run very long, the scope is probably too big: split the work and grill the pieces.
-- **The recommendation contradicts the question?** This happens. Answer the recommendation and say so.
-
-### It is working if
-
-- A round arrives as a numbered list with a `➡️` recommendation under each question.
-- Nothing in a round depends on another question in the same round.
-- Later rounds ask things the first round could not have asked.
-- Claude looks up facts itself instead of asking you.
-- It stops at the end and waits for your confirmation.
+This is a supported setting, not a workaround.
 
 ---
 
-## 3. Superpowers: a methodology, not a command
+## 3. Superpowers: a careful build process
 
 ### What it is
 
-Superpowers is a set of composable skills plus a session-start hook that makes sure Claude actually uses them. Once installed, you do not have to type anything special. From the moment Claude sees you are building something, it steps back and asks what you are really trying to do, gets a spec out of you, writes an implementation plan, and then executes it with subagents, test-driven development, and code review.
+Superpowers is a set of habits that switch on automatically once installed. From the moment Claude sees you want to build something, it stops itself from diving into code. Instead it draws the plan out of you, writes it down, breaks it into small steps, builds each step, tests it, and reviews its own work before calling anything done.
 
-There is no single `/superpowers` command. There are three ways it shows up:
+There is no single command to remember. It just changes how Claude behaves. You can also invoke a specific piece by name, like `/superpowers:brainstorming`, but most of the time you simply describe what you want and it takes over.
 
-1. **Automatically.** The `using-superpowers` skill is injected at session start (and again after `/clear` and context compaction). It instructs Claude to check for an applicable skill before any response, including clarifying questions. "Let's build X" triggers brainstorming. "Fix this bug" triggers systematic debugging.
-2. **By name.** Every skill is callable as `/superpowers:<skill>`, for example `/superpowers:brainstorming` or `/superpowers:writing-plans`.
-3. **By asking.** "Use the systematic-debugging skill on this" works too.
+### Why a business person should care
 
-### The skills
+Left alone, an AI will write a financial calculator that looks completely correct and returns the wrong number, because a formula was subtly off. You would not notice until you had passed on a good deal or bought a bad one. Superpowers' core habit, called test-driven development, forces Claude to first write a check that says "for these inputs, the answer must be exactly this," watch it fail, then write the formula, then watch the check pass. For money math, that is the difference between a tool you can trust and a toy.
 
-**The main workflow, in order:**
+### What is inside
 
-| Step | Skill | What it does |
-|---|---|---|
-| 1 | `brainstorming` | Refines a rough idea through questions, proposes approaches, presents the design in sections for approval, saves a spec. |
-| 2 | `using-git-worktrees` | Creates an isolated workspace on a new branch with a clean test baseline. |
-| 3 | `writing-plans` | Breaks the spec into tasks of 2 to 5 minutes each, with exact file paths, code, and verification steps. |
-| 4 | `subagent-driven-development` or `executing-plans` | Runs a fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints. |
-| 5 | `test-driven-development` | Enforces red, green, refactor. Code written before its test gets deleted. |
-| 6 | `requesting-code-review` | Reviews against the plan and reports issues by severity. Critical issues block progress. |
-| 7 | `finishing-a-development-branch` | Verifies tests, offers merge, PR, keep, or discard, and cleans up the worktree. |
+The build runs through these stages, in order:
 
-**Supporting skills:** `systematic-debugging` (four-phase root-cause process), `verification-before-completion` (prove it is fixed before saying so), `dispatching-parallel-agents`, `receiving-code-review`, and `writing-skills` for authoring your own.
+| Stage | What happens |
+|---|---|
+| **Brainstorming** | Claude refines your idea into a clear design and gets your approval before building anything. |
+| **Planning** | It breaks the approved design into small, specific steps. |
+| **Building with tests** | For each step it writes the test first, then the code, so wrong answers are caught immediately. |
+| **Reviewing** | It checks its own work against the plan and flags problems before you ever see them. |
+| **Finishing** | It confirms everything passes and helps you wrap up cleanly. |
 
-### Brainstorming in detail
+There is more in the box (a careful debugging process, for one), but that is the spine.
 
-Brainstorming is the skill you will meet most often, and it is the closest cousin to `/grilling`. Two things define it.
+### The one rule to know: it asks before it builds
 
-**The hard gate.** Claude may not write code, scaffold anything, or invoke an implementation skill until it has told you what it intends and you have approved it. This applies to every task, including a one-line config change. The design may be two sentences in chat, but the approval is never skipped.
+Superpowers will not write code until it has told you what it intends and you have said yes. This holds even for tiny changes. The plan it shows you might be two sentences, but the "go ahead?" never gets skipped. This is deliberate: the tasks that feel too simple to plan are exactly where wasted work comes from.
 
-**Three paths.** Before its first question, Claude classifies the request out loud so you can override it:
+It also sizes its effort to the job. A quick question gets a quick answer. A whole new tool gets the full treatment: a few proposed approaches, a design you approve piece by piece, then the build.
 
-| Path | When | Output |
-|---|---|---|
-| **Spike** | A feasibility question ("can we...?") | An answer and a recommendation. Anything built is labeled throwaway. |
-| **Bounded** | A well-scoped change to a flow that already exists in the repo | Clarifying questions, then a short design in chat, then approval, then implementation with no plan document. |
-| **Architectural** | New projects, new subsystems, interface changes | Questions one at a time, 2 to 3 proposed approaches, a sectioned design approved section by section, a written spec at `docs/superpowers/specs/`, then `writing-plans`. |
+### Try it yourself: build the deal screener
 
-When in doubt, it takes the heavier path. If hidden complexity appears mid-task, the path upgrades. Nothing downgrades.
-
-### Walkthrough
+Still in your `deal-screener` folder, and armed with the buy box you defined in the grilling session, type:
 
 ```
-Let's add rate limiting to our public API.
+Let's build the rental deal screener we just designed. I'll give it a
+listing's numbers and it should tell me monthly cash flow, cap rate,
+cash-on-cash return, and whether it passes my buy box.
 ```
 
-With Superpowers installed, Claude announces "Using brainstorming to..." and classifies the request. A new middleware layer touching every route is architectural, so it explores the repo, then asks questions **one at a time**, preferring multiple choice. After it understands purpose, constraints, and success criteria, it proposes two or three approaches with a recommendation and YAGNI applied ruthlessly.
+Here is what you should see happen, and what to do at each point:
 
-Then it presents the design in sections (architecture, components, data flow, error handling, testing) and asks after each one whether it looks right. Once you approve, it writes the spec to `docs/superpowers/specs/2026-09-17-rate-limiting-design.md`, self-reviews it for placeholders and contradictions, commits it, and asks you to review the file.
+1. **Claude proposes a design and stops.** It will describe how the tool takes inputs and what it outputs, and ask if that is right. Read it. Correct anything that does not match your buy box. Say go.
+2. **It plans, then builds in tested steps.** For the core formulas, watch it write a test first. It will state, for a specific example property, exactly what the cash-on-cash return should be, confirm the code gets that number, and only then move on. This is the part that keeps the money math honest.
+3. **It reviews its own work** and reports anything questionable before handing it back.
+4. **It shows you the finished tool** and how to run it.
 
-When you say go, it invokes `writing-plans`, and from there `subagent-driven-development` runs each task in a fresh subagent with TDD and two-stage review. It is normal for Claude to work for an hour or two without leaving the plan.
+You will end up with a working screener and, just as important, a set of tests proving its numbers are right. Change a formula later and a broken test tells you instantly.
 
-### The visual companion
+### A note on the mockup helper
 
-During architectural brainstorming, if a question would be clearer shown than described (a layout, a diagram, a side-by-side), Claude offers to open a browser tab with mockups. It only offers when a visual question actually arises, and you can decline. Note that the companion loads a logo from the author's website that carries the plugin version, which they use as a usage counter. Set `SUPERPOWERS_DISABLE_TELEMETRY=1` to switch that off.
+While designing something visual, Claude may offer to open a browser tab to show you layouts instead of describing them. Accept if a picture would help, decline if not. One heads-up: that helper quietly loads a small logo from the plugin author's website, which they use to count how many people use the plugin. If you would rather it did not, set `SUPERPOWERS_DISABLE_TELEMETRY=1` in your environment.
 
 ---
 
-## 4. Using them together
+## 4. Using both together: the full arc
 
-The two overlap on exactly one step: the interview before building. They disagree on how to run it.
+The two tools meet at one moment, the thinking that happens before building, and they handle it differently.
 
-| | `/grill-me` | Superpowers `brainstorming` |
+| | `/grill-me` | Superpowers |
 |---|---|---|
-| Question rhythm | Whole frontier per round, answered by number | One question at a time |
-| Recommendations | Always, on a `➡️` line | Conversational, for approaches rather than each question |
-| Output | Shared understanding, plus `CONTEXT.md` and ADRs with `/grill-with-docs` | A spec file, then a plan, then execution |
-| Scope | Any plan, decision, or idea, including non-code | Software features and bugs |
-| After the interview | Stops. What happens next is up to you | Flows straight into planning and subagent execution |
+| Rhythm | A whole batch of questions per round, answered by number | One question at a time, conversational |
+| Good for | Any decision, including ones with no software at all | Building and fixing software |
+| Ends by | Handing you a sharp plan, then stopping | Flowing straight into building the thing |
 
-A workflow that plays to both strengths:
+The deal screener used both in the natural order, and this is the pattern worth remembering:
 
-1. **Think with `/grill-me` or `/grill-with-docs`.** Rounds are faster for thinking through a design with many independent decisions. Use `/grill-with-docs` when you are in the repo, since you get a growing `CONTEXT.md` glossary as a side effect. Use `/grill-me` when you are not.
-2. **Confirm the shared understanding.** Do not skip the gate.
-3. **Hand off to Superpowers for execution.** Tell Claude "We've already grilled this. Treat the agreed design as the approved brainstorm and go to writing-plans." Then `/superpowers:writing-plans` followed by `/superpowers:subagent-driven-development` carries it through with TDD and review.
+1. **Think it through with `/grill-me`.** Nail down your buy box: your criteria, your assumptions, what "good" means. No code yet.
+2. **Confirm you and Claude agree.** Do not skip this. It is the whole safety of the approach.
+3. **Hand it to Superpowers to build.** Say something like: "We already worked out the design together. Treat that as approved and start building." Then let its tested, reviewed process turn your rules into a working tool.
 
-One caution: Superpowers' session-start hook tells Claude it *must* brainstorm before creative work. If you have already grilled, say so explicitly, or you will get interviewed twice. User instructions take precedence over skills, so a single sentence is enough.
+One thing to watch: Superpowers likes to run its own brainstorming before building. If you already grilled the idea, just say so ("we've already designed this, go ahead and build"), and it will not interview you a second time.
 
-Use `/grill-me` alone for anything that is not code: a hiring plan, a talk outline, an architecture decision you are not implementing today. Use Superpowers alone when the task is a well-understood feature and you want the whole pipeline with minimal ceremony.
+And you do not always need both. Use `/grill-me` alone for a decision you are not building anything for, like whether to take on a particular investment or how to price a service. Use Superpowers alone when you already know exactly what you want built.
 
 ---
 
-## 5. Troubleshooting
+## 5. When something goes wrong
 
-**`/grill-me` does nothing.** It is a one-line skill whose body is "run `/grilling`", so the `grilling` skill must be installed too. Installing the whole plugin avoids this.
+**`/grill-me` does nothing.** The full `mattpocock-skills` plugin has to be installed, not just part of it. Reinstall the whole plugin.
 
-**`/grill-with-docs` asked everything at once with no recommendations.** It did not actually load `grilling`. This is a known rough edge: a skill that names another skill does not always cause it to load. Ask "did you load the grilling and domain-modeling skills?" and it usually recovers.
+**It asked everything at once with no recommendations.** It did not fully start the interview engine. Ask it directly, "did you load the grilling skill?", and it usually recovers.
 
-**Grilling answered its own questions.** That is a bug in the run, not the design. It happens most when another skill runs grilling inside a "resolve this ticket" frame. Tell it the decisions are yours.
+**It started answering its own questions.** That is a bug in that run, not how it should work. Remind it that the decisions are yours to make, and it will hand them back.
 
-**Superpowers skills stopped triggering after a long session.** The bootstrap is re-injected after compaction in Claude Code, so this should be rare. If it happens, run `/clear` or start a fresh session.
+**Superpowers stopped being careful in a long session.** Rare, but if it happens, start a fresh session and it comes back.
 
-**Superpowers is too heavy for a trivial change.** It is meant to be. The brainstorming skill's own anti-pattern table argues that "too simple to need approval" is exactly where wasted work comes from. If you truly want it off for one task, say "skip brainstorming for this" and it will comply.
+**Superpowers feels like too much ceremony for something tiny.** That is by design; the "too simple to bother planning" jobs are where mistakes hide. If you genuinely want to skip it for one small task, say "skip brainstorming for this" and it will.
 
 ---
 
 ## 6. Where to read more
 
-- Matt Pocock's skills: https://github.com/mattpocock/skills (the `docs/` folder has a page per skill)
-- Superpowers: https://github.com/obra/superpowers and the launch post at https://blog.fsck.com/2025/10/09/superpowers/
-- Claude Code plugins: https://code.claude.com/docs/en/plugins
+- Matt Pocock's skills, with a page explaining each one: https://github.com/mattpocock/skills
+- Superpowers, and the essay behind it: https://github.com/obra/superpowers and https://blog.fsck.com/2025/10/09/superpowers/
+- Claude Code plugins in general: https://code.claude.com/docs/en/plugins
