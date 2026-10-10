@@ -1,0 +1,25 @@
+services:
+  model:
+    build: ./model_server
+    container_name: deepseek-model
+    ports:
+      - "5000:5000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
+  jupyter:
+    build: ./jupyter
+    container_name: jupyter-client
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/base/work
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
