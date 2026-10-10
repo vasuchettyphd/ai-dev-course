@@ -54,7 +54,7 @@ When you're done using the container, **exit the bash session** with:
 exit
 ```
 
-If you started `docker-compose` with `up` (not `-d`), you can also stop it with `Ctrl + C`.
+If you started `docker compose up` (not `-d`), you can also stop it with `Ctrl + C`.
 
 ---
 
