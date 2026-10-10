@@ -26,7 +26,7 @@ Tutorial 2 is the only one that needs a GPU. If you don't have one, read it for 
 
 ## API keys and cost
 
-Tutorials 3, 4 and 6 call paid model APIs. Each README says roughly what a run costs, and none needs more than a couple of dollars. Keep keys in environment variables or a local `.env` file. The `.gitignore` files already exclude `.env`, so a key never ends up in a commit.
+Tutorials 3, 4 and 6 call paid model APIs. Tutorials 3 and 6 say roughly what a run costs (a few cents and about $1-2). Tutorial 4 doesn't give a figure, so check your provider's usage page after your first game. Keep keys in environment variables or a local `.env` file. The course's `.gitignore` excludes `.env` files in every folder, so a key never ends up in a commit.
 
 ## History
 

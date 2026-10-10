@@ -1,0 +1,4 @@
+# API keys: never commit these, in any tutorial
+.env
+.env.*
+!.env.example
