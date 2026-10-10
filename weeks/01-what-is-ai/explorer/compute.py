@@ -16,6 +16,7 @@ import pathlib
 
 import huggingface_hub
 import torch
+from choose_example import best_share
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 MODEL = "Qwen/Qwen2.5-0.5B"
@@ -43,12 +44,15 @@ ATTENTION_SENTENCES = [
     "The trophy didn't fit in the suitcase because it was too big.",
     "The trophy didn't fit in the suitcase because it was too small.",
 ]
+# Third sentence: the winner picked by choose_example.py (see choose_example_results.json).
+CHOICE = json.loads((HERE / "choose_example_results.json").read_text(encoding="utf-8"))["winner"]
+ATTENTION_SENTENCES.append(CHOICE["sentence"])
 
 
 def main():
     tok = AutoTokenizer.from_pretrained(MODEL)
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL, attn_implementation="eager", torch_dtype=torch.float32
+        MODEL, attn_implementation="eager", dtype=torch.float32
     )
     model.eval()
     # Resolved snapshot commit of the downloaded weights (transformers 5 no
@@ -91,7 +95,20 @@ def main():
                 [[round(v, 4) for v in row] for row in a[0].mean(dim=0).tolist()]
                 for a in out.attentions
             ]
-            attention.append({"sentence": sentence, "tokens": pieces, "layers": layers})
+            if sentence == CHOICE["sentence"]:
+                src, tgt = CHOICE["source_index"], CHOICE["target_index"]
+                label = (f"Look at how {pieces[src].strip()!r} pays attention to "
+                         f"{pieces[tgt].strip()!r} in layer {CHOICE['layer']}.")
+            else:
+                src, tgt = len(pieces) - 2, pieces.index(" trophy")
+                label = (f"How much does {pieces[src].strip()!r} look back at 'trophy' "
+                         f"in layer {{layer}}, where it looks at it most?")
+            raw = [a[0].mean(dim=0).tolist() for a in out.attentions]
+            best = best_share(raw, src, tgt)
+            focus = {"from": src, "to": tgt, "layer": best["layer"],
+                     "label": label.replace("{layer}", str(best["layer"]))}
+            attention.append({"sentence": sentence, "tokens": pieces, "layers": layers,
+                              "focus": focus})
 
     data = {
         "model": MODEL,
