@@ -15,7 +15,7 @@ It includes:
 
 ```bash
 git clone https://github.com/vasuchettyphd/ai-dev-course.git
-cd ai-dev-course/01-dbt
+cd ai-dev-course/advanced/dbt
 ```
 
 ---
