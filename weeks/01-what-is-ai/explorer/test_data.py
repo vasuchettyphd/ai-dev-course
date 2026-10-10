@@ -108,6 +108,23 @@ class DataShape(unittest.TestCase):
         for lb, ls in zip(big["layers"], small["layers"]):
             self.assertEqual(lb[:12], ls[:12])
 
+    def test_attention_next_word(self):
+        for item in DATA["attention"]:
+            nw = item["next_word"]
+            self.assertEqual(len(nw), 5)
+            probs = [x["prob"] for x in nw]
+            self.assertEqual(probs, sorted(probs, reverse=True))
+            self.assertTrue(all(0 < p < 1 for p in probs))
+            self.assertTrue(all(isinstance(x["token"], str) and x["token"] for x in nw))
+        self.assertEqual(DATA["attention"][2]["next_word"][0]["token"], " Germany")
+
+    def test_focus_label_uses_page_layer_numbers(self):
+        for item in DATA["attention"]:
+            label = item["focus"]["label"]
+            self.assertIn(f"layer {item['focus']['layer'] + 1}", label)
+            self.assertNotIn(f"layer {item['focus']['layer']},", label)
+            self.assertFalse(label.rstrip().endswith("?"), label)
+
     def test_ascii_only(self):
         self.assertTrue(RAW.isascii())
 

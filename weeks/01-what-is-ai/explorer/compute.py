@@ -97,18 +97,25 @@ def main():
             ]
             if sentence == CHOICE["sentence"]:
                 src, tgt = CHOICE["source_index"], CHOICE["target_index"]
-                label = (f"Look at how {pieces[src].strip()!r} pays attention to "
-                         f"{pieces[tgt].strip()!r} in layer {CHOICE['layer']}.")
+                # layer numbers in labels are 1-based, matching the page's slider
+                label = (f"{pieces[src].strip()!r} pays attention to "
+                         f"{pieces[tgt].strip()!r} in layer {CHOICE['layer'] + 1}.")
             else:
                 src, tgt = len(pieces) - 2, pieces.index(" trophy")
-                label = (f"How much does {pieces[src].strip()!r} look back at 'trophy' "
-                         f"in layer {{layer}}, where it looks at it most?")
+                label = (f"{pieces[src].strip()!r} looks back at 'trophy' most "
+                         f"in layer {{layer}}.")
             raw = [a[0].mean(dim=0).tolist() for a in out.attentions]
             best = best_share(raw, src, tgt)
             focus = {"from": src, "to": tgt, "layer": best["layer"],
-                     "label": label.replace("{layer}", str(best["layer"]))}
+                     "label": label.replace("{layer}", str(best["layer"] + 1))}
+            # The model's top 5 next tokens after the full sentence (same
+            # full-vocabulary softmax as the prompts above).
+            probs = torch.softmax(out.logits[0, -1].float(), dim=-1)
+            top5 = torch.topk(probs, 5)
+            after = [{"token": tok.decode([int(i)]), "prob": round(float(probs[i]), 5)}
+                     for i in top5.indices]
             attention.append({"sentence": sentence, "tokens": pieces, "layers": layers,
-                              "focus": focus})
+                              "focus": focus, "next_word": after})
 
     data = {
         "model": MODEL,

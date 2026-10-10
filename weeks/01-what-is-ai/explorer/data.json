@@ -7109,8 +7109,30 @@
     "from": 12,
     "to": 1,
     "layer": 5,
-    "label": "How much does 'big' look back at 'trophy' in layer 5, where it looks at it most?"
-   }
+    "label": "'big' looks back at 'trophy' most in layer 6."
+   },
+   "next_word": [
+    {
+     "token": " ",
+     "prob": 0.13395
+    },
+    {
+     "token": " The",
+     "prob": 0.10365
+    },
+    {
+     "token": " It",
+     "prob": 0.08211
+    },
+    {
+     "token": " (",
+     "prob": 0.03658
+    },
+    {
+     "token": " A",
+     "prob": 0.03581
+    }
+   ]
   },
   {
    "sentence": "The trophy didn't fit in the suitcase because it was too small.",
@@ -12560,8 +12582,30 @@
     "from": 12,
     "to": 1,
     "layer": 5,
-    "label": "How much does 'small' look back at 'trophy' in layer 5, where it looks at it most?"
-   }
+    "label": "'small' looks back at 'trophy' most in layer 6."
+   },
+   "next_word": [
+    {
+     "token": " ",
+     "prob": 0.13921
+    },
+    {
+     "token": " The",
+     "prob": 0.10648
+    },
+    {
+     "token": " It",
+     "prob": 0.08798
+    },
+    {
+     "token": " (",
+     "prob": 0.03349
+    },
+    {
+     "token": " __",
+     "prob": 0.02878
+    }
+   ]
   },
   {
    "sentence": "Paris is in France and Berlin is in",
@@ -14549,8 +14593,30 @@
     "from": 7,
     "to": 5,
     "layer": 20,
-    "label": "Look at how 'in' pays attention to 'Berlin' in layer 20."
-   }
+    "label": "'in' pays attention to 'Berlin' in layer 21."
+   },
+   "next_word": [
+    {
+     "token": " Germany",
+     "prob": 0.9376
+    },
+    {
+     "token": " the",
+     "prob": 0.01913
+    },
+    {
+     "token": " Europe",
+     "prob": 0.00875
+    },
+    {
+     "token": " Berlin",
+     "prob": 0.00776
+    },
+    {
+     "token": " which",
+     "prob": 0.00375
+    }
+   ]
   }
  ]
 }
