@@ -1,0 +1,146 @@
+[
+ {
+  "claim": "A small dog is allowed.",
+  "supported": true,
+  "why": "paraphrase of 'dog under 20 kg'",
+  "p": 0.94
+ },
+ {
+  "claim": "The tenant can have two cats.",
+  "supported": false,
+  "why": "contradicted: one pet",
+  "p": 0.01
+ },
+ {
+  "claim": "Paying rent on the 4th incurs no late fee.",
+  "supported": true,
+  "why": "implied by 'after the 5th'",
+  "p": 0.97
+ },
+ {
+  "claim": "The tenant pays the water bill.",
+  "supported": false,
+  "why": "contradicted: landlord pays",
+  "p": 0.01
+ },
+ {
+  "claim": "The lease can be ended with one month's notice.",
+  "supported": false,
+  "why": "number almost matches",
+  "p": 0.01
+ },
+ {
+  "claim": "Smoking is not allowed in the flat.",
+  "supported": false,
+  "why": "not mentioned",
+  "p": 0.02
+ },
+ {
+  "claim": "Offline sync ships in 4.2.",
+  "supported": false,
+  "why": "announced, then moved",
+  "p": 0.01
+ },
+ {
+  "claim": "Dark mode is available on iPhone in 4.2.",
+  "supported": true,
+  "why": "iOS -> iPhone",
+  "p": 0.97
+ },
+ {
+  "claim": "4.2 no longer crashes on a 60 MB PDF.",
+  "supported": true,
+  "why": "instance of a general fix",
+  "p": 0.76
+ },
+ {
+  "claim": "Android 9 users can still install 4.2.",
+  "supported": true,
+  "why": "'last version that supports'",
+  "p": 0.86
+ },
+ {
+  "claim": "4.2 is faster than 4.1.",
+  "supported": false,
+  "why": "not mentioned",
+  "p": 0.02
+ },
+ {
+  "claim": "Offline sync is planned for a later version.",
+  "supported": true,
+  "why": "moved to 4.3",
+  "p": 0.97
+ },
+ {
+  "claim": "The supplement causes weight loss.",
+  "supported": false,
+  "why": "difference not significant",
+  "p": 0.06
+ },
+ {
+  "claim": "Participants on the supplement lost about a kilo more on average.",
+  "supported": true,
+  "why": "1.1 kg paraphrased",
+  "p": 0.94
+ },
+ {
+  "claim": "The trial lasted three months.",
+  "supported": true,
+  "why": "12 weeks",
+  "p": 0.97
+ },
+ {
+  "claim": "The supplement had no side effects.",
+  "supported": false,
+  "why": "mild side effects",
+  "p": 0.02
+ },
+ {
+  "claim": "The study was independently funded.",
+  "supported": false,
+  "why": "contradicted",
+  "p": 0.01
+ },
+ {
+  "claim": "More than 200 people took part.",
+  "supported": true,
+  "why": "240",
+  "p": 0.99
+ },
+ {
+  "claim": "The vegetable curry contains no animal products.",
+  "supported": true,
+  "why": "vegan, paraphrased",
+  "p": 0.98
+ },
+ {
+  "claim": "The lasagne is suitable for someone who doesn't eat pork.",
+  "supported": false,
+  "why": "implied contradiction",
+  "p": 0.01
+ },
+ {
+  "claim": "Gluten-free pasta is free of charge.",
+  "supported": false,
+  "why": "$2 charge",
+  "p": 0.01
+ },
+ {
+  "claim": "You can order food at 10:30pm.",
+  "supported": false,
+  "why": "kitchen closes at 10",
+  "p": 0.02
+ },
+ {
+  "claim": "Every main comes with a side.",
+  "supported": true,
+  "why": "rice or fries",
+  "p": 0.93
+ },
+ {
+  "claim": "The curry is spicy.",
+  "supported": false,
+  "why": "not mentioned",
+  "p": 0.03
+ }
+]
