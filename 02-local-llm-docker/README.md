@@ -35,7 +35,7 @@ This will:
 ```
 
 # ✨ Jupyter Notebook Example
-Once running, open notebooks/llama3_client.ipynb and run:
+Once running, open notebooks/test_model.ipynb and run:
 
 ```python
 import requests

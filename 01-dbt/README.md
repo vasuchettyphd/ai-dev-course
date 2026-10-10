@@ -23,7 +23,7 @@ cd ai-dev-course/01-dbt
 ### 2. 🐳 Start the Environment
 
 ```bash
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 This will:
@@ -123,12 +123,12 @@ When finished, **exit the PostgreSQL shell** with:
 
 ## 🔌 Clean Up
 
-If `docker-compose up` is running in the foreground, stop it with `Ctrl + C` first.
+If `docker compose up` is running in the foreground, stop it with `Ctrl + C` first.
 
 To stop and remove containers and volumes:
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ---
