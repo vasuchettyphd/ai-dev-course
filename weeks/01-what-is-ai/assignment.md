@@ -8,7 +8,7 @@ Use this week's ideas on your own life. You don't need to build anything.
 
 For example: "Drafting a polite reply to a customer complaint: good fit, because there are many reasonable ways to word it and I'll read it before sending." Or: "Telling me today's exchange rate: poor fit, because the model predicts likely words from text it read in the past and doesn't look anything up."
 
-**(b) One surprise.** Write one paragraph on the most surprising thing you saw in the [explorer](explorer/index.html). Quote a number from it (for example a percentage or a token count), and explain in your own words what that number shows.
+**(b) One surprise.** Write one paragraph on the most surprising thing you saw in the [explorer](https://vasuchettyphd.github.io/ai-dev-course/weeks/01-what-is-ai/explorer/). If that page won't load, use the [copy in this repository](explorer/index.html) instead. Quote a number from it (for example a percentage or a token count), and explain in your own words what that number shows.
 
 ## What to hand in
 
