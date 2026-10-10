@@ -1,6 +1,6 @@
 # AI Development Course: design
 
-Date: 2026-10-10. Status: approved in conversation, awaiting written-spec review.
+Date: 2026-10-10. Status: approved 2026-10-10.
 
 ## Goal
 

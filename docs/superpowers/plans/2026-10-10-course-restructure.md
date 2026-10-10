@@ -611,3 +611,10 @@ Push branch `docs/course-design`, which holds the spec, this plan and Tasks 1-4.
 - [ ] **Step 3: Record the work**
 
 Create and close an OpenProject task in project 4: "Restructure ai-dev-course into 14-week course layout". Update the `ai-dev-course` memory: weeks live in `weeks/`, the six tutorials in `advanced/`, the templates in `templates/`, and the checker is `scripts/check_course.py`.
+
+## Amendments during execution
+
+- Checker hardening: UTF-8 reads, skipping dot-directories, notebooks, links inside code ignored, URL forms, Total rows ignored, file list from `git ls-files`, an em-dash scan that does not depend on file suffix, and the rubric read from the table under `## Rubric`.
+- Slides are built with Marp in Docker (`marpteam/marp-cli:v4.1.2`) instead of an npm dependency, by the user's choice.
+- History is checked by ancestry and shown with `git log --graph --oneline`, because `--follow` cannot reach subtree-imported history.
+- The GitHub steps for the instructor repo were done by the controller.
