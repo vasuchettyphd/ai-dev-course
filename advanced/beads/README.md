@@ -60,7 +60,7 @@ You need git, Python 3.10+, and [Claude Code](https://claude.com/claude-code). O
 
 ```bash
 git clone https://github.com/vasuchettyphd/ai-dev-course.git
-cd ai-dev-course/06-beads
+cd ai-dev-course/advanced/beads
 scripts/install-bd.sh                 # downloads bd v1.3.1 into ./bin, verifies its checksum
 export PATH="$PWD/bin:$PATH"          # run this in every new terminal
 bd version                            # bd version 1.3.1 (...)
