@@ -97,7 +97,7 @@ footer { margin-top: 2rem; }
       <input type="range" id="temp" min="0.2" max="2" step="0.1" value="1">
       <output id="temp-out" for="temp">1.0</output></div>
   </div>
-  <p class="note">Temperature is a dial for how adventurous the model is. Low means it sticks to its favourite word. High means it spreads its bets. At 1.0 these are the model's real numbers. At other settings the page estimates them, treating all the words outside the top 50 as one group.</p>
+  <p class="note">Temperature is a dial for how adventurous the model is. Low means it sticks to its favourite word. High means it spreads its bets. At 1.0 these are the model's real numbers. At other settings the page estimates them, treating each word outside the top 50 as if it scored like the 50th word, so at high settings it understates how often rare words get picked.</p>
   <div id="next-result" aria-live="polite"></div>
 </section>
 
@@ -147,7 +147,7 @@ footer { margin-top: 2rem; }
   <p class="callout">Attention shows where the model looked when reading each word. It is not proof that the model understands the sentence.</p>
 </section>
 
-<footer class="note">Model: <span id="model-name"></span>. All numbers were computed ahead of time and are stored inside this page.</footer>
+<footer class="note">Model: <span id="model-name"></span>. The model's numbers were computed ahead of time; numbers at other temperatures are estimates made in your browser.</footer>
 </main>
 
 <script id="data" type="application/json">__DATA__</script>
@@ -162,7 +162,7 @@ function softmax(logits, temperature) {
   return exps.map(function (x) { return x / total; });
 }
 // END softmax
-if (typeof module !== "undefined") module.exports = { softmax: softmax, vis: vis, attnRow: attnRow, focusShare: focusShare, nextWordDist: nextWordDist };
+if (typeof module !== "undefined") module.exports = { softmax: softmax, vis: vis, attnRow: attnRow, focusShare: focusShare, nextWordDist: nextWordDist, nextWordBars: nextWordBars, clearCaption: clearCaption, firstWordNote: firstWordNote, guessMessage: guessMessage };
 
 // Show invisible characters so students can see them.
 function vis(tok) {
@@ -202,6 +202,33 @@ function focusShare(item) {
   return attnRow(item, f.layer, f.from, false)[f.to];
 }
 
+// The bars shown for a reveal: the top 10, the guessed word if it ranks 11 to 50, and
+// "everything else". The guessed word comes out of "everything else", so the bars add up to 100%.
+function nextWordBars(ranked, gi) {
+  var rows = ranked.slice(0, 10).map(function (r, i) { return { token: r.token, p: r.p, hit: i === gi }; });
+  if (gi >= 10) rows.push({ token: ranked[gi].token, p: ranked[gi].p, hit: true });
+  var shown = rows.reduce(function (a, r) { return a + r.p; }, 0);
+  return { rows: rows, rest: Math.max(0, 1 - shown) };
+}
+function guessMessage(guessText, ranked, gi) {
+  return gi >= 0
+    ? "Your word \"" + guessText + "\" is number " + (gi + 1) + " of the model's top 50, at " + pct(ranked[gi].p) + "."
+    : "Your word \"" + guessText + "\" is not in the model's top 50.";
+}
+// Part B wording, built from data.json: the attention share and the model's real next word.
+function clearCaption(item) {
+  var next = item.next_word[0];
+  return "About " + pct(focusShare(item), 0) + " of the last word's attention (setting aside the first word) goes to '"
+    + item.tokens[item.focus.to].trim() + "', and the model's next word here is '" + next.token.trim() + "' ("
+    + pct(next.prob, 0) + "). The attention fits the right answer, but it is not proof of why.";
+}
+function firstWordNote(item) {
+  var f = item.focus, row = attnRow(item, f.layer, f.from, true);
+  return "Here the first word is '" + item.tokens[0].trim() + "'. Tick 'Include the first word' and '"
+    + item.tokens[f.from].trim() + "' puts " + pct(row[0], 0) + " on '" + item.tokens[0].trim() + "' and "
+    + pct(row[f.to], 0) + " on '" + item.tokens[f.to].trim() + "'. The resting-place effect lands on whatever word comes first, so we set it aside.";
+}
+
 function pct(x, digits) { return (x * 100).toFixed(digits === undefined ? 1 : digits) + "%"; }
 
 if (typeof document !== "undefined" && document.getElementById) (function () {
@@ -235,23 +262,14 @@ if (typeof document !== "undefined" && document.getElementById) (function () {
     var ranked = nextWordDist(item, +temp.value).ranked;
     var g = guess.value.trim().toLowerCase();
     var gi = g ? ranked.findIndex(function (r) { return r.token.trim().toLowerCase() === g; }) : -1;
-    if (g) {
-      var msg = gi >= 0
-        ? "Your word \"" + guess.value.trim() + "\" is number " + (gi + 1) + " of the model's top 50, at " + pct(ranked[gi].p) + "."
-        : "Not in the model's top 50";
-      out.appendChild(el("p", "status", msg));
-    }
+    if (g) out.appendChild(el("p", "status", guessMessage(guess.value.trim(), ranked, gi)));
     var ul = el("ul", "bars");
-    var shown = 0;
-    ranked.slice(0, 10).forEach(function (r, i) {
-      shown += r.p;
-      ul.appendChild(barRow(tokLabel(r.token), r.p, i === gi));
-    });
-    if (gi >= 10) ul.appendChild(barRow(tokLabel(ranked[gi].token), ranked[gi].p, true));
+    var bars = nextWordBars(ranked, gi);
+    bars.rows.forEach(function (r) { ul.appendChild(barRow(tokLabel(r.token), r.p, r.hit)); });
     var rest = el("span", "", "everything else");
-    ul.appendChild(barRow(rest, Math.max(0, 1 - shown), false, "rest"));
+    ul.appendChild(barRow(rest, bars.rest, false, "rest"));
     out.appendChild(ul);
-    var blank = ranked.slice(0, 10).concat(gi >= 10 ? [ranked[gi]] : []).some(function (r) { return isBlankLine(r.token); });
+    var blank = bars.rows.some(function (r) { return isBlankLine(r.token); });
     if (blank) out.appendChild(el("p", "note", "_____ is a fill-in-the-blank line: the model learned from worksheets."));
   }
   function barRow(nameNode, p, hit, extra) {
@@ -265,6 +283,7 @@ if (typeof document !== "undefined" && document.getElementById) (function () {
   }
   pick.addEventListener("change", function () { revealed = false; renderNext(); });
   guess.addEventListener("input", function () { if (revealed) renderNext(); });
+  guess.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); revealed = true; renderNext(); } });
   temp.addEventListener("input", renderNext);
   $("reveal").addEventListener("click", function () { revealed = true; renderNext(); });
   renderNext();
@@ -362,10 +381,11 @@ if (typeof document !== "undefined" && document.getElementById) (function () {
   var clearItem = DATA.attention[clearIdx];
   var clear = makeWidget($("clear-widget"), { id: "cl", idx: clearIdx, slider: false });
   clear.setSentence(clearIdx);
-  $("clear-caption").textContent = "Here the pattern is easy to see: about half of the last word's attention (setting aside the first word) goes to \"Berlin\", which helps the model predict \"Germany\".";
+  $("clear-caption").textContent = clearCaption(clearItem);
   var share = focusShare(clearItem);
   var shareNote = el("p", "note", "In this sentence, \"" + clearItem.tokens[clearItem.focus.from].trim() + "\" gives \"" + clearItem.tokens[clearItem.focus.to].trim() + "\" " + pct(share, 0) + " of its attention at layer " + (clearItem.focus.layer + 1) + ", with the first word set aside.");
   $("att-clear").appendChild(shareNote);
+  $("att-clear").appendChild(el("p", "note", firstWordNote(clearItem)));
 
   inclFirst.addEventListener("change", function () { widgets.forEach(function (w) { w.render(); }); renderPredict(); });
 
@@ -400,9 +420,13 @@ if (typeof document !== "undefined" && document.getElementById) (function () {
     });
     res.appendChild(grid);
     var more = vals.big[0] > vals.big[1] && vals.small[0] > vals.small[1];
-    res.appendChild(el("p", "callout", (more
-      ? "In both sentences 'trophy' gets a bit more attention than 'suitcase' (" + pct(vals.big[0], 0) + " vs " + pct(vals.big[1], 0) + " for 'big', " + pct(vals.small[0], 0) + " vs " + pct(vals.small[1], 0) + " for 'small'). So the model is not using attention to work out which object 'big' or 'small' describes."
-      : "Trophy and suitcase get " + pct(vals.big[0], 0) + " and " + pct(vals.big[1], 0) + " for 'big', " + pct(vals.small[0], 0) + " and " + pct(vals.small[1], 0) + " for 'small'. The model is not clearly using attention to work out which object 'big' or 'small' describes.")
+    var shownLayer = DATA.attention[0].focus.layer + 1;
+    var nums = " (" + pct(vals.big[0], 0) + " vs " + pct(vals.big[1], 0) + " for 'big', " + pct(vals.small[0], 0) + " vs " + pct(vals.small[1], 0) + " for 'small').";
+    res.appendChild(el("p", "callout", "'big' and 'small' look back in almost the same way at every layer, so attention is not showing which object each word describes. "
+      + (more
+        ? "At layer " + shownLayer + ", for example, 'trophy' gets a bit more than 'suitcase' in both" + nums
+        : "At layer " + shownLayer + ", for example, 'trophy' and 'suitcase' get" + nums)
+      + " At some other layers suitcase gets slightly more in both. Try the slider in part C."
       + " Attention is spread across many words, and it is not a readable explanation of what the model 'thinks'."));
   }
   $("p-reveal").addEventListener("click", function () { pRevealed = true; renderPredict(); });
