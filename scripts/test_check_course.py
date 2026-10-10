@@ -81,6 +81,56 @@ class CheckCourse(unittest.TestCase):
         (self.root / "advanced" / "beads" / "run.sh").write_text("echo hi\n")
         self.assertTrue(any("eol=lf" in p for p in check(self.root)))
 
+    def test_utf8_em_dash_in_markdown_caught(self):
+        (self.root / "advanced" / "dbt" / "README.md").write_text("a \u2014 b\n", encoding="utf-8")
+        self.assertTrue(any("em dash" in p for p in check(self.root)))
+
+    def test_dot_directories_are_skipped(self):
+        (self.root / ".superpowers").mkdir()
+        (self.root / ".superpowers" / "x.md").write_text(
+            "Move `01-dbt`, see [x](weeks/99-nope/) and a \u2014 dash\n", encoding="utf-8")
+        self.assertEqual(check(self.root), [])
+
+    def test_dot_files_are_not_skipped(self):
+        (self.root / ".notes.md").write_text("a \u2014 b\n", encoding="utf-8")
+        self.assertTrue(any("em dash" in p for p in check(self.root)))
+
+    def test_notebook_em_dash_caught(self):
+        (self.root / "advanced" / "dbt" / "analysis.ipynb").write_text(
+            '{"cells": [{"source": "a \u2014 b"}]}\n', encoding="utf-8")
+        self.assertTrue(any("em dash" in p for p in check(self.root)))
+
+    def test_link_inside_code_fence_not_checked(self):
+        (self.root / "README.md").write_text("```\n[w](weeks/99-nope/)\n```\n")
+        self.assertEqual(check(self.root), [])
+
+    def test_link_inside_inline_code_not_checked(self):
+        (self.root / "README.md").write_text("Use `[w](weeks/99-nope/)` syntax.\n")
+        self.assertEqual(check(self.root), [])
+
+    def test_percent_encoded_link_resolves_to_decoded_name(self):
+        (self.root / "README.md").write_text("[a](my%20file.md)\n")
+        self.assertTrue(any("my file.md" in p for p in check(self.root)))
+        (self.root / "my file.md").write_text("# hi\n")
+        self.assertEqual(check(self.root), [])
+
+    def test_root_relative_link_resolves_against_repo_root(self):
+        (self.root / "advanced" / "dbt" / "README.md").write_text("[b](/README.md)\n")
+        self.assertEqual(check(self.root), [])
+        (self.root / "advanced" / "dbt" / "README.md").write_text("[b](/nope.md)\n")
+        self.assertTrue(any("/nope.md" in p for p in check(self.root)))
+
+    def test_scheme_links_are_skipped_case_insensitively(self):
+        (self.root / "README.md").write_text("[c](HTTP://x.y) [m](mailto:a@b.c)\n")
+        self.assertEqual(check(self.root), [])
+
+    def test_total_row_is_ignored_in_rubric(self):
+        w = self.root / "weeks" / "01-what-is-ai"
+        (w / "README.md").write_text("# Week 1\n")
+        (w / "slides.md").write_text("# s\n")
+        (w / "assignment.md").write_text(RUBRIC10 + "| Total | 10 |\n")
+        self.assertEqual(check(self.root), [])
+
 
 if __name__ == "__main__":
     unittest.main()
