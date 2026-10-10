@@ -7,8 +7,8 @@
 # 🚀 Quickstart
 ```bash
 # Clone the repo
-git clone https://github.com/vasuchettyphd/ai_docker.git
-cd ai_docker 
+git clone https://github.com/vasuchettyphd/ai-dev-course.git
+cd ai-dev-course/02-local-llm-docker
 
 # Build and start the containers
 docker compose up --build
@@ -21,7 +21,7 @@ This will:
 
 # 📁 Project Structure
 ```bash
-ai_docker/
+02-local-llm-docker/
 ├── docker-compose.yml                    # Top-level Compose config
 ├── model_server/                         # LLaMA model server container
 │   ├── app.py                            # Flask app exposing the /generate endpoint

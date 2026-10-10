@@ -14,8 +14,8 @@ It includes:
 ### 1. ✅ Clone the Repository
 
 ```bash
-git clone https://github.com/vasuchettyphd/dbt_tutorial.git
-cd dbt_tutorial
+git clone https://github.com/vasuchettyphd/ai-dev-course.git
+cd ai-dev-course/01-dbt
 ```
 
 ---
