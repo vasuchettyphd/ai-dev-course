@@ -30,4 +30,4 @@ Tutorials 3, 4 and 6 call paid model APIs. Each README says roughly what a run c
 
 ## History
 
-Each tutorial started as its own repository and was merged in here with its commit history kept, so `git log -- <folder>` shows how it was built.
+Each tutorial started as its own repository and was merged in here with git subtree, which keeps its full commit history. Run `git log --graph --oneline` to see each tutorial's commits join the course.
