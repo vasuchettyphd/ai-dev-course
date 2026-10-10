@@ -19,7 +19,7 @@ AI Development Course
 
 - What a language model actually does: predict the next word
 - Temperature: how adventurous it is
-- Tokens: how it sees text
+- Tokens and embeddings: how it sees text
 - Attention, and the 2017 paper behind today's AI
 - Training vs. using a model
 - Why models make things up
@@ -129,6 +129,18 @@ A dot (`·`) marks a space at the start of a piece.
 
 ---
 
+## From tokens to lists of numbers
+
+Each token is turned into a long list of numbers: an **embedding**.
+
+Words used in similar ways end up with similar lists.
+
+So the model can treat "refund" and "money back" alike, with no letters in common.
+
+**Week 10** builds a search tool on this: finding text by meaning, not exact words.
+
+---
+
 ## The 2017 paper
 
 ### *Attention Is All You Need*
@@ -151,7 +163,7 @@ BEFORE: one word at a time, passing a running summary along
   The  ->  trophy  ->  didn't  ->  fit  ->  ...  ->  it
            (each step waits for the one before it)
 
-AFTER (Transformer): each word looks straight back at earlier words
+AFTER (models like the explorer's): each word looks back at earlier words
 
   The   trophy   didn't   fit   ...   it
    ^      ^        ^       ^           |
@@ -173,12 +185,12 @@ At "it", the model hasn't seen "big" or "small" yet, so its attention at "it" is
 
 After you press **Reveal**:
 
-| At layer 6 | trophy | suitcase |
+| Layer 6, one example | trophy | suitcase |
 |---|---|---|
 | big | 25.4% | 17.9% |
 | small | 27.9% | 16.5% |
 
-Trophy gets a bit more in **both**.
+"big" and "small" look back **almost the same at every layer**. Here trophy is a bit higher in both; at some other layers suitcase is slightly higher in both.
 
 ---
 
@@ -186,11 +198,13 @@ Trophy gets a bit more in **both**.
 
 **B.** "Paris is in France and Berlin is in"
 
-At layer 21, the last "in" gives **50.7%** of its attention to "Berlin". That helps predict "Germany".
+At layer 21, the last "in" gives **50.7%** of its attention to "Berlin". The model's next word: "Germany" (93.8%). The attention fits the right answer, but it is not proof of why.
+
+The hidden first word here is "Paris". Include it and "in" puts **64.3%** on "Paris", 18.1% on "Berlin".
 
 **C.** Pick a sentence, click a word, move the layer slider.
 
-<p class="small">Numbers set the first word aside. Models park a lot of attention there as a resting place: "big" puts 52.8% on it at layer 6. Tick "Include the first word" to see it.</p>
+<p class="small">Numbers set the first word aside: models park a lot of attention there as a resting place, whatever the word is ("big" puts 52.8% on "The" at layer 6). Tick "Include the first word" to see it.</p>
 
 ---
 

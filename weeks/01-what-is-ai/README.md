@@ -44,7 +44,7 @@ Leave the temperature at 1.0 for now. At 1.0 the numbers are the model's own. He
 Notice three things:
 
 - **No single answer.** For the small business sentence, even the favourite word gets only 6.4%. The model spreads its bets across many reasonable words.
-- **It learned from real text, including worksheets.** After "The capital of France is", the second choice is a blank line. Somewhere in what it read, that sentence was a quiz question waiting for a student to fill in.
+- **It learned from real text, including worksheets.** After "The capital of France is", the second choice is a blank line. Somewhere in what it read, that sentence probably appeared as a quiz question waiting for a student to fill in.
 - **Likely is not the same as true.** After "Two plus two equals", the model gives "three" 10.9% and "five" 6.0%. Together that's about 17 tries in 100, roughly 1 in 6, picking a wrong number.
 
 **Discussion question:** Why might the model pick a likely word that's false?
@@ -75,15 +75,17 @@ The model doesn't read letters or whole words. It first chops text into pieces c
 
 **What this means for cost.** Services that let your own code call a model, like the ones you'll use in weeks 9-11, charge by the token, for both what you send and what comes back. Numbers, unusual words and some languages use more tokens for the same idea, so they cost more and fill up the model's reading space faster.
 
+**From tokens to lists of numbers.** The model can't do anything with a chip of text as it is. So each token is turned into a long list of numbers, called an **embedding**. Words that are used in similar ways end up with similar lists. That is how a model can treat "refund" and "money back" alike, even though they share no letters. In week 10 you'll build a search tool on this idea: finding text by what it means, not by its exact words.
+
 ### 4. Attention, and *Attention Is All You Need*
 
-In 2017, eight researchers, who did the work at Google Brain and Google Research, published a paper called *Attention Is All You Need*. It appeared at NIPS 2017, one of the main conferences in AI research. The paper introduced a new design for a language model, which it named the **Transformer**.
+In 2017, eight researchers, who did the work at Google Brain and Google Research, published a paper called *Attention Is All You Need*. It appeared at NIPS 2017, one of the main conferences in AI research. The paper introduced a new design for AI that works with text, first tested on translation, which it named the **Transformer**.
 
 Before this paper, many of the best models for jobs like translation read a sentence one word at a time, passing a running summary from each word to the next. That step-by-step reading is slow to train, because each step has to wait for the one before it. Those models already used **attention** as a helper: a way to look directly at any other word and decide how much each one matters. The paper's idea was to drop the step-by-step machinery entirely and rely on attention alone. That is the title: attention is all you need. The authors tested it on translating English to German and English to French, and reported that it translated better while taking much less time to train.
 
 The model in the explorer is a Transformer too. It has 24 layers, stacked one after another, and each layer does its own round of attention.
 
-One more thing about how this kind of model reads: it goes **left to right**. At each word, it can look back at the words before it, but never ahead.
+One more thing about how the explorer's model reads: it goes **left to right**. At each word, it can look back at the words before it, but never ahead.
 
 **Try it.** Go to section 3 of the explorer, "Where the model looks". It has three parts.
 
@@ -101,11 +103,13 @@ What about at "big" and "small" themselves? Choose trophy or suitcase for each, 
 | big | 25.4% | 17.9% |
 | small | 27.9% | 16.5% |
 
-(The page rounds these to whole numbers: 25%, 18%, 28%, 17%.) "Trophy" gets a bit more in **both** sentences. So attention is not showing which object "big" or "small" describes. The rest of the attention is spread over many other words. Attention is not a readable explanation of what the model "thinks".
+(The page rounds these to whole numbers: 25%, 18%, 28%, 17%.) "Big" and "small" look back in almost the same way at every layer, so attention is not showing which object each word describes. Layer 6 is one example: there "trophy" gets a bit more in **both** sentences. At some other layers suitcase gets slightly more in both. Try the slider in part C. The rest of the attention is spread over many other words. Attention is not a readable explanation of what the model "thinks".
 
 **About the first word.** These numbers set the first word, "The", aside. Models park a lot of attention on the first word as a kind of resting place: at layer 6, "big" puts 52.8% of its attention there. The page hides the first word by default so you can see the rest. Tick **Include the first word** to see it.
 
-**B. A pattern that is easy to see.** We tested a few sentences and picked the clearest one: "Paris is in France and Berlin is in". At layer 21, the last "in" gives 50.7% of its attention to "Berlin" (with the first word set aside; the page shows 51%). That helps the model predict the next word, "Germany".
+**B. A pattern that is easy to see.** We tested a few sentences and picked the clearest one: "Paris is in France and Berlin is in". At layer 21, the last "in" gives 50.7% of its attention to "Berlin" (with the first word set aside; the page shows 51%), and the model's next word here is "Germany" (93.8%; the page shows 94%). The attention fits the right answer, but it is not proof of why.
+
+Here the first word is "Paris", and the page hides it just as it hid "The" in part A. Tick **Include the first word** and "in" puts 64.3% on "Paris" and 18.1% on "Berlin" (the page shows 64% and 18%). The resting-place effect lands on whatever word comes first, so we set it aside.
 
 **C. Explore on your own.** Pick any of the three sentences, click any word, and move the layer slider through all 24 layers. Darker shading means more attention.
 
