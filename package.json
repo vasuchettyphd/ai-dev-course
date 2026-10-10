@@ -1,0 +1,9 @@
+{
+  "name": "ai-dev-course",
+  "private": true,
+  "description": "Build tooling for the course slides (Marp, run in Docker)",
+  "scripts": {
+    "slides": "sh scripts/build-slides.sh",
+    "slides:template": "sh scripts/build-slides.sh templates/slides.md"
+  }
+}
