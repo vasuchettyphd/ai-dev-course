@@ -1,6 +1,6 @@
 # scripts/check_course.py
 """Check the course layout and style rules. Usage: python3 scripts/check_course.py [root]"""
-import pathlib, re, sys, urllib.parse
+import pathlib, re, subprocess, sys, urllib.parse
 
 WEEKS = [
     "01-what-is-ai", "02-claude-code-setup", "03-git-and-github", "04-planning",
@@ -9,24 +9,47 @@ WEEKS = [
     "13-security-and-responsible-use", "14-final-demos",
 ]
 ADVANCED = ["dbt", "local-llm-docker", "jev", "wordle-agent", "grill-me-superpowers", "beads"]
-TEXT = {".md", ".py", ".sh", ".json", ".yml", ".yaml", ".sql", ".txt", ".html", ".js", ".css", ".toml", ".csv", ".ipynb"}
 SKIP = {".git", "node_modules", "__pycache__", ".venv", "venv"}
 LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 FENCE = re.compile(r"```.*?```", re.S)
 INLINE_CODE = re.compile(r"`[^`\n]*`")
 SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.I)
 OLD_PATH = re.compile(r"\b0[1-6]-(dbt|local-llm-docker|jev|wordle-agent|grill-me-superpowers|beads)\b")
-POINTS = re.compile(r"^\|[^|]+\|\s*(\d+)\s*\|\s*$")
 
 
 def read(p):
     return p.read_text(encoding="utf-8", errors="replace")
 
 
-def files(root):
+def git_files(root):
+    """Tracked plus untracked-not-ignored files, or None if root is not in a git work tree."""
+    try:
+        r = subprocess.run(["git", "-C", str(root), "ls-files", "-co", "--exclude-standard", "-z"],
+                           capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-prefix"], capture_output=True, text=True)
+    if top.returncode != 0 or top.stdout.strip():
+        return None  # root is a subfolder of a repo: scan it directly
+    names = [n for n in r.stdout.decode("utf-8", errors="replace").split("\0") if n]
+    return [root / n for n in names if (root / n).is_file()]
+
+
+def walk_files(root):
     for p in sorted(root.rglob("*")):
         if not p.is_file():
             continue
+        parts = p.relative_to(root).parts
+        if any(part in SKIP for part in parts):
+            continue
+        yield p
+
+
+def files(root):
+    listed = git_files(root)
+    if listed is None:
+        listed = walk_files(root)
+    for p in sorted(listed):
         parts = p.relative_to(root).parts
         if any(part in SKIP for part in parts):
             continue
@@ -36,15 +59,25 @@ def files(root):
 
 
 def rubric_total(text):
-    total = 0
-    for line in text.splitlines():
-        m = POINTS.match(line.strip())
-        if not m:
+    """Sum the points (last cell) of the table under '## Rubric'. None if there is no such table."""
+    lines = text.splitlines()
+    start = next((i for i, l in enumerate(lines) if re.match(r"^##\s+Rubric\s*$", l.strip())), None)
+    if start is None:
+        return None
+    total, found = 0, False
+    for line in lines[start + 1:]:
+        line = line.strip()
+        if line.startswith("#"):
+            break
+        if not line.startswith("|"):
             continue
-        first_cell = line.strip().strip("|").split("|")[0].strip().lower()
-        if first_cell != "total":
-            total += int(m.group(1))
-    return total
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 2 or not re.fullmatch(r"\d+", cells[-1]):
+            continue
+        found = True
+        if cells[0].replace("*", "").strip().lower() != "total":
+            total += int(cells[-1])
+    return total if found else None
 
 
 def link_targets(text):
@@ -73,7 +106,9 @@ def check(root):
         if a.is_file():
             want = 30 if w == "14-final-demos" else 10
             got = rubric_total(read(a))
-            if got != want:
+            if got is None:
+                problems.append(f"weeks/{w}/assignment.md: no ## Rubric table")
+            elif got != want:
                 problems.append(f"weeks/{w}/assignment.md: rubric total {got}, expected {want}")
     for a in ADVANCED:
         if not (root / "advanced" / a / "README.md").is_file():
@@ -84,9 +119,10 @@ def check(root):
         rel = p.relative_to(root)
         if p.suffix == ".sh" and not lf_rule:
             problems.append(f"{rel}: shell script not covered by '*.sh text eol=lf' in .gitattributes")
-        if p.suffix not in TEXT:
+        try:
+            text = p.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
             continue
-        text = read(p)
         if "\u2014" in text:
             problems.append(f"{rel}: contains an em dash")
         if p.suffix == ".md" and rel.parts[0] != "docs":
