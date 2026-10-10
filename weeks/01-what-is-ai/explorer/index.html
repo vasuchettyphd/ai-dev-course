@@ -162,7 +162,7 @@ function softmax(logits, temperature) {
   return exps.map(function (x) { return x / total; });
 }
 // END softmax
-if (typeof module !== "undefined") module.exports = { softmax: softmax, vis: vis, attnRow: attnRow, focusShare: focusShare, nextWordDist: nextWordDist, nextWordBars: nextWordBars, clearCaption: clearCaption, firstWordNote: firstWordNote, guessMessage: guessMessage };
+if (typeof module !== "undefined") module.exports = { softmax: softmax, vis: vis, attnRow: attnRow, focusShare: focusShare, nextWordDist: nextWordDist, nextWordBars: nextWordBars, clearCaption: clearCaption, firstWordNote: firstWordNote, guessMessage: guessMessage, suitcaseLayers: suitcaseLayers };
 
 // Show invisible characters so students can see them.
 function vis(tok) {
@@ -227,6 +227,21 @@ function firstWordNote(item) {
   return "Here the first word is '" + item.tokens[0].trim() + "'. Tick 'Include the first word' and '"
     + item.tokens[f.from].trim() + "' puts " + pct(row[0], 0) + " on '" + item.tokens[0].trim() + "' and "
     + pct(row[f.to], 0) + " on '" + item.tokens[f.to].trim() + "'. The resting-place effect lands on whatever word comes first, so we set it aside.";
+}
+
+// The two layers where 'suitcase' gets the most more than 'trophy' in both trophy sentences
+// (first word set aside), in layer order. 0-based layers.
+function suitcaseLayers(big, small) {
+  var n = big.layers.length, out = [], L;
+  for (L = 0; L < n; L++) {
+    var lead = Math.min.apply(null, [big, small].map(function (it) {
+      var row = attnRow(it, L, it.focus.from, false);
+      return row[it.tokens.indexOf(" suitcase")] - row[it.tokens.indexOf(" trophy")];
+    }));
+    if (lead > 0) out.push({ layer: L, lead: lead });
+  }
+  return out.sort(function (a, b) { return b.lead - a.lead; }).slice(0, 2)
+    .sort(function (a, b) { return a.layer - b.layer; });
 }
 
 function pct(x, digits) { return (x * 100).toFixed(digits === undefined ? 1 : digits) + "%"; }
@@ -422,11 +437,22 @@ if (typeof document !== "undefined" && document.getElementById) (function () {
     var more = vals.big[0] > vals.big[1] && vals.small[0] > vals.small[1];
     var shownLayer = DATA.attention[0].focus.layer + 1;
     var nums = " (" + pct(vals.big[0], 0) + " vs " + pct(vals.big[1], 0) + " for 'big', " + pct(vals.small[0], 0) + " vs " + pct(vals.small[1], 0) + " for 'small').";
+    var other = suitcaseLayers(DATA.attention[0], DATA.attention[1]);
+    var otherText = "";
+    if (other.length) {
+      var L0 = other[0].layer, sv = [0, 1].map(function (k) {
+        var it = DATA.attention[k], row = attnRow(it, L0, it.focus.from, inclFirst.checked);
+        return [row[it.tokens.indexOf(" suitcase")], row[it.tokens.indexOf(" trophy")]];
+      });
+      otherText = " At layer" + (other.length > 1 ? "s " : " ") + other.map(function (x) { return x.layer + 1; }).join(" and ")
+        + " 'suitcase' gets about as much more in both (at layer " + (L0 + 1) + ": " + pct(sv[0][0], 0) + " vs " + pct(sv[0][1], 0)
+        + " for 'big', " + pct(sv[1][0], 0) + " vs " + pct(sv[1][1], 0) + " for 'small').";
+    }
     res.appendChild(el("p", "callout", "'big' and 'small' look back in almost the same way at every layer, so attention is not showing which object each word describes. "
       + (more
         ? "At layer " + shownLayer + ", for example, 'trophy' gets a bit more than 'suitcase' in both" + nums
         : "At layer " + shownLayer + ", for example, 'trophy' and 'suitcase' get" + nums)
-      + " At some other layers suitcase gets slightly more in both. Try the slider in part C."
+      + otherText + " Try the slider in part C."
       + " Attention is spread across many words, and it is not a readable explanation of what the model 'thinks'."));
   }
   $("p-reveal").addEventListener("click", function () { pRevealed = true; renderPredict(); });

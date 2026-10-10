@@ -58,4 +58,16 @@ assert.ok(note.includes("64% on 'Paris'") && note.includes("18% on 'Berlin'"), n
 // G8: a guess outside the top 50 is echoed back, with a full stop.
 assert.equal(guessMessage("zebra", [], -1), "Your word \"zebra\" is not in the model's top 50.");
 
+// G5 follow-up: the layers where suitcase gets more in both trophy sentences are found from the data.
+const { suitcaseLayers } = m.exports;
+assert.equal(typeof suitcaseLayers, "function", "page must export suitcaseLayers");
+const sl = suitcaseLayers(data.attention[0], data.attention[1]);
+assert.deepEqual(sl.map(x => x.layer + 1), [7, 10]);
+for (const x of sl) {
+  for (const k of [0, 1]) {
+    const it = data.attention[k], row = m.exports.attnRow(it, x.layer, it.focus.from, false);
+    assert.ok(row[it.tokens.indexOf(" suitcase")] > row[it.tokens.indexOf(" trophy")]);
+  }
+}
+
 console.log("numbers OK");

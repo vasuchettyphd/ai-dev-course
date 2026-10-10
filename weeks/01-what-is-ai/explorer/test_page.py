@@ -39,7 +39,9 @@ class Page(unittest.TestCase):
     def test_trophy_takeaway_honest_across_layers(self):
         self.assertIn("'big' and 'small' look back in almost the same way at every layer, "
                       "so attention is not showing which object each word describes.", HTML)
-        self.assertIn("At some other layers suitcase gets slightly more in both. Try the slider in part C.", HTML)
+        self.assertIn("' gets about as much more in both", HTML)
+        self.assertIn("Try the slider in part C.", HTML)
+        self.assertNotIn("slightly more", HTML)
 
     def test_part_b_not_causal(self):
         self.assertNotIn("helps the model predict", HTML)
