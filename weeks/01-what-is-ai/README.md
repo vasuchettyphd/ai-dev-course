@@ -45,7 +45,7 @@ Notice three things:
 
 - **No single answer.** For the small business sentence, even the favourite word gets only 6.4%. The model spreads its bets across many reasonable words.
 - **It learned from real text, including worksheets.** After "The capital of France is", the second choice is a blank line. Somewhere in what it read, that sentence was a quiz question waiting for a student to fill in.
-- **Likely is not the same as true.** After "Two plus two equals", the model gives "three" 10.9% and "five" 6.0%. Together that's 16.9%, roughly 1 try in 6 picking a wrong number.
+- **Likely is not the same as true.** After "Two plus two equals", the model gives "three" 10.9% and "five" 6.0%. Together that's about 17 tries in 100, roughly 1 in 6, picking a wrong number.
 
 **Discussion question:** Why might the model pick a likely word that's false?
 

@@ -63,7 +63,7 @@ A chatbot does this over and over, one piece at a time.
 - three: 10.9%
 - five: 6.0%
 
-"three" or "five": **16.9%**, roughly 1 try in 6.
+"three" or "five": about **17 tries in 100**, roughly 1 in 6.
 
 **Why might the model pick a likely word that's false?**
 
