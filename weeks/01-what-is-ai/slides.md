@@ -190,7 +190,7 @@ After you press **Reveal**:
 | big | 25.4% | 17.9% |
 | small | 27.9% | 16.5% |
 
-"big" and "small" look back **almost the same at every layer**. Here trophy is a bit higher in both; at some other layers suitcase is slightly higher in both.
+"big" and "small" look back **almost the same at every layer**. At layer 6 trophy gets a bit more in both; at layers 7 and 10 suitcase gets about as much more in both.
 
 ---
 

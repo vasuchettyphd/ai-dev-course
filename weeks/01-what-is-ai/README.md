@@ -103,7 +103,7 @@ What about at "big" and "small" themselves? Choose trophy or suitcase for each, 
 | big | 25.4% | 17.9% |
 | small | 27.9% | 16.5% |
 
-(The page rounds these to whole numbers: 25%, 18%, 28%, 17%.) "Big" and "small" look back in almost the same way at every layer, so attention is not showing which object each word describes. Layer 6 is one example: there "trophy" gets a bit more in **both** sentences. At some other layers suitcase gets slightly more in both. Try the slider in part C. The rest of the attention is spread over many other words. Attention is not a readable explanation of what the model "thinks".
+(The page rounds these to whole numbers: 25%, 18%, 28%, 17%.) "Big" and "small" look back in almost the same way at every layer, so attention is not showing which object each word describes. At layer 6 "trophy" gets a bit more in **both** sentences; at layers 7 and 10 "suitcase" gets about as much more in both (at layer 7: 18.5% vs 11.3% for "big", 20.2% vs 12.4% for "small"). Try the slider in part C. The rest of the attention is spread over many other words. Attention is not a readable explanation of what the model "thinks".
 
 **About the first word.** These numbers set the first word, "The", aside. Models park a lot of attention on the first word as a kind of resting place: at layer 6, "big" puts 52.8% of its attention there. The page hides the first word by default so you can see the rest. Tick **Include the first word** to see it.
 
