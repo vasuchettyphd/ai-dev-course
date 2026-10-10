@@ -1,0 +1,10 @@
+jupyterlab
+notebook
+ipykernel
+ipywidgets
+matplotlib
+numpy
+pandas
+seaborn
+scikit-learn
+requests
