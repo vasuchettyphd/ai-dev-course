@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What AI is: an explorer</title>
+<style>
+:root {
+  --bg: #f6f7fb; --card: #ffffff; --ink: #1b1f24; --muted: #4a5360; --line: #c9cfdb;
+  --accent: #1d4ed8; --accent-ink: #ffffff; --bar: #3b6fe0; --hit: #fff1b8; --hit-line: #8a6100;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 1.0625rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 64rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+h1 { font-size: 2rem; margin: 0 0 .5rem; }
+h2 { font-size: 1.5rem; margin: 0 0 .25rem; }
+h3 { font-size: 1.15rem; margin: 0 0 .5rem; }
+p { margin: .5rem 0; }
+section { background: var(--card); border: 1px solid var(--line); border-radius: .75rem; padding: 1.25rem; margin-top: 1.5rem; }
+.lead { font-size: 1.15rem; max-width: 46rem; }
+.muted, .note { color: var(--muted); font-size: .95rem; }
+.mono, .tok { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+label { font-weight: 600; }
+select, input[type=text], button { font: inherit; color: var(--ink); background: #fff; border: 2px solid #6b7488; border-radius: .5rem; padding: .45rem .7rem; min-height: 2.75rem; }
+input[type=text] { width: 100%; max-width: 20rem; }
+select { max-width: 100%; }
+button { cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+:focus-visible { outline: 3px solid #b45309; outline-offset: 2px; }
+.controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: .9rem; margin: 1rem 0; }
+.row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+input[type=range] { width: 16rem; max-width: 100%; min-height: 2.25rem; accent-color: var(--accent); }
+fieldset { border: 1px solid var(--line); border-radius: .5rem; margin: .5rem 0; padding: .5rem .9rem .7rem; }
+legend { font-weight: 600; padding: 0 .3rem; }
+fieldset label { font-weight: 400; margin-right: 1.25rem; display: inline-block; min-height: 2rem; }
+.bars { list-style: none; margin: .75rem 0; padding: 0; display: grid; gap: .3rem; }
+.bars li { display: grid; grid-template-columns: 8.5rem 1fr 4.5rem; gap: .6rem; align-items: center; padding: .15rem .35rem; border-radius: .4rem; }
+.bars li.hit { background: var(--hit); outline: 2px solid var(--hit-line); }
+.bars .name { overflow-wrap: anywhere; }
+.bars .name .tok { white-space: pre-wrap; }
+.track, .fill { display: block; }
+.track { background: #e4e8f1; border-radius: .3rem; height: 1.15rem; overflow: hidden; }
+.fill { background: var(--bar); height: 100%; min-width: 2px; }
+.bars .pct { text-align: right; font-variant-numeric: tabular-nums; }
+.bars li.rest .fill { background: #6b7488; }
+.status { margin: .5rem 0; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .4rem 0 .2rem; }
+.chip { padding: .2rem .45rem; border-radius: .35rem; border: 1px solid rgba(0,0,0,.35); color: #111; }
+.c0 { background: #cfe3ff; } .c1 { background: #ffd9b8; } .c2 { background: #cdeed2; } .c3 { background: #f4cfe6; } .c4 { background: #e6dcff; } .c5 { background: #fdf0a8; }
+.textrow { padding: .7rem 0; border-top: 1px solid var(--line); }
+.textrow:first-child { border-top: 0; }
+.original { font-weight: 600; overflow-wrap: anywhere; }
+.count { color: var(--muted); font-size: .95rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.sub { border-top: 2px solid var(--line); margin-top: 1.5rem; padding-top: 1rem; }
+.atoks { display: flex; flex-wrap: wrap; gap: .45rem; margin: .75rem 0; }
+.atok { display: inline-flex; flex-direction: column; align-items: center; padding: .3rem .5rem; min-width: 2.75rem; border: 2px solid #6b7488; border-radius: .45rem; background: #fff; color: #111; cursor: pointer; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+.atok small { font-size: .78rem; color: #111; min-height: 1.1em; font-family: system-ui, sans-serif; }
+.atok[aria-pressed=true] { border-color: #111; box-shadow: 0 0 0 3px #b45309; font-weight: 700; }
+.atok.dead { cursor: default; background: #eceff5; color: #3d4452; border-style: dashed; }
+.atok.dead small { color: #3d4452; }
+.callout { background: #eef3ff; border-left: 4px solid var(--accent); padding: .5rem .8rem; border-radius: .3rem; }
+.hidden { display: none; }
+footer { margin-top: 2rem; }
+@media (max-width: 600px) {
+  main { padding: 1rem .75rem 2.5rem; }
+  h1 { font-size: 1.6rem; }
+  section { padding: 1rem .8rem; }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .row { flex-direction: column; align-items: stretch; gap: .35rem; }
+  select { width: 100%; }
+  .row > * { min-width: 0; }
+  .row.keep-row { flex-direction: row; align-items: center; }
+  .bars li { grid-template-columns: 5.5rem 1fr 3.8rem; gap: .4rem; }
+  input[type=range], input[type=text] { width: 100%; max-width: none; }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>What AI is: an explorer</h1>
+  <p class="lead">Everything on this page comes from a real AI model (Qwen2.5-0.5B, a small open model). Nothing here is made up. Try the three activities below. You do not need to install anything, and you do not need to be online.</p>
+</header>
+
+<section id="next-word" aria-labelledby="h-next">
+  <h2 id="h-next">1. Guessing the next word</h2>
+  <p>A language model does one thing: it scores every possible next piece of text. Pick a sentence start, type the word <em>you</em> think comes next, then press Reveal to see what the model thought.</p>
+  <div class="controls">
+    <div class="row"><label for="prompt-pick">Sentence start</label>
+      <select id="prompt-pick"></select></div>
+    <p class="status mono" id="prompt-text" style="white-space:normal"></p>
+    <div class="row"><label for="guess">Type the word you think comes next</label>
+      <input type="text" id="guess" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="row"><button type="button" id="reveal" class="primary">Reveal</button></div>
+    <div class="row"><label for="temp">Temperature</label>
+      <input type="range" id="temp" min="0.2" max="2" step="0.1" value="1">
+      <output id="temp-out" for="temp">1.0</output></div>
+  </div>
+  <p class="note">Temperature is a dial for how adventurous the model is. Low means it sticks to its favourite word. High means it spreads its bets. At 1.0 these are the model's real numbers. At other settings the page estimates them, treating each word outside the top 50 as if it scored like the 50th word, so at high settings it understates how often rare words get picked.</p>
+  <div id="next-result" aria-live="polite"></div>
+</section>
+
+<section id="tokens" aria-labelledby="h-tokens">
+  <h2 id="h-tokens">2. How the model sees text</h2>
+  <p>Before a model reads anything, it chops the text into pieces called tokens. Each coloured chip below is one token. A dot (<span class="mono">&middot;</span>) marks a space at the start of a piece.</p>
+  <div id="token-list"></div>
+  <p class="callout">Models read tokens, not letters or words. That's why counting the r's in strawberry can trip them up.</p>
+</section>
+
+<section id="attention" aria-labelledby="h-att">
+  <h2 id="h-att">3. Where the model looks</h2>
+  <p>While reading a sentence, the model decides how much each earlier word matters to the word it is on. That is called attention. Three small experiments follow.</p>
+  <div class="row keep-row">
+    <input type="checkbox" id="incl-first" style="width:1.4rem;height:1.4rem">
+    <label for="incl-first">Include the first word</label>
+  </div>
+  <p class="note">Models park a lot of attention on the first word as a kind of resting place; we hide it by default so the rest is easier to see.</p>
+
+  <div class="sub" id="att-predict">
+    <h3>A. Make a prediction first</h3>
+    <p>When the model reads &quot;big&quot;, which earlier word do you expect it to look at most: trophy or suitcase? And for &quot;small&quot;?</p>
+    <div class="grid2">
+      <fieldset><legend>The trophy didn't fit in the suitcase because it was too <b>big</b>.</legend>
+        <label><input type="radio" name="p-big" value="trophy"> trophy</label>
+        <label><input type="radio" name="p-big" value="suitcase"> suitcase</label></fieldset>
+      <fieldset><legend>The trophy didn't fit in the suitcase because it was too <b>small</b>.</legend>
+        <label><input type="radio" name="p-small" value="trophy"> trophy</label>
+        <label><input type="radio" name="p-small" value="suitcase"> suitcase</label></fieldset>
+    </div>
+    <div class="row"><button type="button" id="p-reveal" class="primary">Reveal</button></div>
+    <div id="p-result" aria-live="polite"></div>
+  </div>
+
+  <div class="sub" id="att-clear">
+    <h3>B. A pattern that is easy to see</h3>
+    <div id="clear-widget"></div>
+    <p class="callout" id="clear-caption"></p>
+  </div>
+
+  <div class="sub" id="att-explore">
+    <h3>C. Explore on your own</h3>
+    <p>Pick a sentence, click any word, and the words before it are shaded by how much attention it gives them. The layer slider moves through the model's 24 layers, from early to late.</p>
+    <fieldset id="sent-pick"><legend>Sentence</legend></fieldset>
+    <div id="explore-widget"></div>
+  </div>
+  <p class="callout">Attention shows where the model looked when reading each word. It is not proof that the model understands the sentence.</p>
+</section>
+
+<footer class="note">Model: <span id="model-name"></span>. The model's numbers were computed ahead of time; numbers at other temperatures are estimates made in your browser.</footer>
+</main>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+// BEGIN softmax
+function softmax(logits, temperature) {
+  var t = temperature > 0 ? temperature : 1e-6;
+  var scaled = logits.map(function (x) { return x / t; });
+  var m = Math.max.apply(null, scaled);
+  var exps = scaled.map(function (x) { return Math.exp(x - m); });
+  var total = exps.reduce(function (a, b) { return a + b; }, 0);
+  return exps.map(function (x) { return x / total; });
+}
+// END softmax
+if (typeof module !== "undefined") module.exports = { softmax: softmax, vis: vis, attnRow: attnRow, focusShare: focusShare, nextWordDist: nextWordDist, nextWordBars: nextWordBars, clearCaption: clearCaption, firstWordNote: firstWordNote, guessMessage: guessMessage, suitcaseLayers: suitcaseLayers };
+
+// Show invisible characters so students can see them.
+function vis(tok) {
+  return tok.replace(/ /g, "·").replace(/\n/g, "↵").replace(/\t/g, "→");
+}
+function isBlankLine(tok) { return /^_+$/.test(tok.trim()) && tok.indexOf("_") >= 0; }
+
+// Next-word probabilities at a temperature. The words outside the stored top 50 are one extra
+// "everything else" group, so at temperature 1 these are the model's real numbers.
+function nextWordDist(item, temp) {
+  var c = item.candidates;
+  var logZ = c[0].logit - Math.log(c[0].prob);
+  var seen = c.reduce(function (a, x) { return a + x.prob; }, 0);
+  // The outside words are many words, each scored no higher than the lowest stored one (lo).
+  // Their total weight at temperature 1 is exactly what is left over, and it shrinks when the
+  // model gets pickier (low temperature) and grows when it gets looser (high temperature).
+  var lo = Math.min.apply(null, c.map(function (x) { return x.logit; }));
+  var logRest = logZ + Math.log(Math.max(1 - seen, 1e-12));
+  var restLogit = lo + temp * (logRest - lo);
+  var p = softmax(c.map(function (x) { return x.logit; }).concat([restLogit]), temp);
+  var ranked = c.map(function (x, i) { return { token: x.token, p: p[i] }; })
+    .sort(function (a, b) { return b.p - a.p; });
+  return { ranked: ranked, rest: p[c.length] };
+}
+
+// Attention weights for token `from` (0-based layer). Earlier tokens and itself only.
+// Without the first word: drop column 0 and renormalise the rest.
+function attnRow(item, layer, from, includeFirst) {
+  var row = item.layers[layer][from].slice(0, from + 1);
+  var start = includeFirst || from === 0 ? 0 : 1;
+  var sum = 0, i;
+  for (i = start; i < row.length; i++) sum += row[i];
+  return row.map(function (w, j) { return j < start ? null : (sum > 0 ? w / sum : 0); });
+}
+function focusShare(item) {
+  var f = item.focus;
+  return attnRow(item, f.layer, f.from, false)[f.to];
+}
+
+// The bars shown for a reveal: the top 10, the guessed word if it ranks 11 to 50, and
+// "everything else". The guessed word comes out of "everything else", so the bars add up to 100%.
+function nextWordBars(ranked, gi) {
+  var rows = ranked.slice(0, 10).map(function (r, i) { return { token: r.token, p: r.p, hit: i === gi }; });
+  if (gi >= 10) rows.push({ token: ranked[gi].token, p: ranked[gi].p, hit: true });
+  var shown = rows.reduce(function (a, r) { return a + r.p; }, 0);
+  return { rows: rows, rest: Math.max(0, 1 - shown) };
+}
+function guessMessage(guessText, ranked, gi) {
+  return gi >= 0
+    ? "Your word \"" + guessText + "\" is number " + (gi + 1) + " of the model's top 50, at " + pct(ranked[gi].p) + "."
+    : "Your word \"" + guessText + "\" is not in the model's top 50.";
+}
+// Part B wording, built from data.json: the attention share and the model's real next word.
+function clearCaption(item) {
+  var next = item.next_word[0];
+  return "About " + pct(focusShare(item), 0) + " of the last word's attention (setting aside the first word) goes to '"
+    + item.tokens[item.focus.to].trim() + "', and the model's next word here is '" + next.token.trim() + "' ("
+    + pct(next.prob, 0) + "). The attention fits the right answer, but it is not proof of why.";
+}
+function firstWordNote(item) {
+  var f = item.focus, row = attnRow(item, f.layer, f.from, true);
+  return "Here the first word is '" + item.tokens[0].trim() + "'. Tick 'Include the first word' and '"
+    + item.tokens[f.from].trim() + "' puts " + pct(row[0], 0) + " on '" + item.tokens[0].trim() + "' and "
+    + pct(row[f.to], 0) + " on '" + item.tokens[f.to].trim() + "'. The resting-place effect lands on whatever word comes first, so we set it aside.";
+}
+
+// The two layers where 'suitcase' gets the most more than 'trophy' in both trophy sentences
+// (first word set aside), in layer order. 0-based layers.
+function suitcaseLayers(big, small) {
+  var n = big.layers.length, out = [], L;
+  for (L = 0; L < n; L++) {
+    var lead = Math.min.apply(null, [big, small].map(function (it) {
+      var row = attnRow(it, L, it.focus.from, false);
+      return row[it.tokens.indexOf(" suitcase")] - row[it.tokens.indexOf(" trophy")];
+    }));
+    if (lead > 0) out.push({ layer: L, lead: lead });
+  }
+  return out.sort(function (a, b) { return b.lead - a.lead; }).slice(0, 2)
+    .sort(function (a, b) { return a.layer - b.layer; });
+}
+
+function pct(x, digits) { return (x * 100).toFixed(digits === undefined ? 1 : digits) + "%"; }
+
+if (typeof document !== "undefined" && document.getElementById) (function () {
+  var DATA = JSON.parse(document.getElementById("data").textContent);
+  var $ = function (id) { return document.getElementById(id); };
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function tokLabel(tok) {
+    var s = el("span", "tok", vis(tok));
+    if (isBlankLine(tok)) { s.title = "a fill-in-the-blank line, the model saw worksheets"; }
+    return s;
+  }
+  $("model-name").textContent = DATA.model;
+
+  /* ---------- 1. next word ---------- */
+  var pick = $("prompt-pick"), guess = $("guess"), temp = $("temp"), out = $("next-result");
+  var revealed = false;
+  DATA.next_word.forEach(function (n, i) {
+    var o = el("option", "", n.prompt); o.value = i; pick.appendChild(o);
+  });
+  function renderNext() {
+    var item = DATA.next_word[+pick.value];
+    $("prompt-text").textContent = item.prompt + " ...";
+    $("temp-out").textContent = (+temp.value).toFixed(1);
+    out.textContent = "";
+    if (!revealed) return;
+    var ranked = nextWordDist(item, +temp.value).ranked;
+    var g = guess.value.trim().toLowerCase();
+    var gi = g ? ranked.findIndex(function (r) { return r.token.trim().toLowerCase() === g; }) : -1;
+    if (g) out.appendChild(el("p", "status", guessMessage(guess.value.trim(), ranked, gi)));
+    var ul = el("ul", "bars");
+    var bars = nextWordBars(ranked, gi);
+    bars.rows.forEach(function (r) { ul.appendChild(barRow(tokLabel(r.token), r.p, r.hit)); });
+    var rest = el("span", "", "everything else");
+    ul.appendChild(barRow(rest, bars.rest, false, "rest"));
+    out.appendChild(ul);
+    var blank = bars.rows.some(function (r) { return isBlankLine(r.token); });
+    if (blank) out.appendChild(el("p", "note", "_____ is a fill-in-the-blank line: the model learned from worksheets."));
+  }
+  function barRow(nameNode, p, hit, extra) {
+    var li = el("li", (hit ? "hit " : "") + (extra || ""));
+    var name = el("span", "name"); name.appendChild(nameNode);
+    var track = el("span", "track"), fill = el("span", "fill");
+    fill.style.width = (p * 100).toFixed(2) + "%";
+    track.appendChild(fill);
+    li.appendChild(name); li.appendChild(track); li.appendChild(el("span", "pct", pct(p)));
+    return li;
+  }
+  pick.addEventListener("change", function () { revealed = false; renderNext(); });
+  guess.addEventListener("input", function () { if (revealed) renderNext(); });
+  guess.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); revealed = true; renderNext(); } });
+  temp.addEventListener("input", renderNext);
+  $("reveal").addEventListener("click", function () { revealed = true; renderNext(); });
+  renderNext();
+
+  /* ---------- 2. tokens ---------- */
+  var tl = $("token-list");
+  DATA.tokens.forEach(function (t) {
+    var row = el("div", "textrow");
+    row.appendChild(el("div", "original", t.text));
+    var chips = el("div", "chips");
+    t.pieces.forEach(function (p, i) {
+      var c = el("span", "chip tok c" + (i % 6), vis(p));
+      chips.appendChild(c);
+    });
+    row.appendChild(chips);
+    row.appendChild(el("div", "count", t.count + (t.count === 1 ? " token" : " tokens")));
+    tl.appendChild(row);
+  });
+
+  /* ---------- 3. attention ---------- */
+  var inclFirst = $("incl-first");
+  var widgets = [];
+
+  // A widget shows one sentence; click a token to shade the earlier ones.
+  function makeWidget(host, opts) {
+    var w = { idx: opts.idx, sel: -1, layer: 0 };
+    var toks = el("div", "atoks"), info = el("p", "note");
+    var slider = null, layerOut = null;
+    if (opts.slider) {
+      var row = el("div", "row");
+      var lab = el("label", "", "Layer"); lab.htmlFor = opts.id + "-layer";
+      slider = el("input"); slider.type = "range"; slider.id = opts.id + "-layer"; slider.min = 1;
+      layerOut = el("output", "", "");
+      row.appendChild(lab); row.appendChild(slider); row.appendChild(layerOut);
+      host.appendChild(row);
+      slider.addEventListener("input", function () { w.layer = +slider.value - 1; w.render(); });
+    }
+    host.appendChild(toks); host.appendChild(info);
+    w.setSentence = function (idx) {
+      w.idx = idx;
+      var item = DATA.attention[idx];
+      w.layer = item.focus.layer;
+      w.sel = item.focus.from;
+      if (opts.slider) { slider.max = item.layers.length; slider.value = w.layer + 1; }
+      w.render();
+    };
+    w.render = function () {
+      var item = DATA.attention[w.idx];
+      var row = w.sel >= 0 ? attnRow(item, w.layer, w.sel, inclFirst.checked) : [];
+      var mx = Math.max.apply(null, row.map(function (v) { return v === null ? 0 : v; }).concat([1e-9]));
+      toks.textContent = "";
+      item.tokens.forEach(function (t, j) {
+        var b = el("button", "atok");
+        b.type = "button";
+        b.setAttribute("aria-pressed", j === w.sel ? "true" : "false");
+        b.appendChild(el("span", "", vis(t)));
+        var small = el("small", "", "");
+        var v = j < row.length ? row[j] : undefined;
+        if (v === null) { b.classList.add("dead"); small.textContent = "hidden"; b.title = "first word hidden (see the checkbox above)"; }
+        else if (v !== undefined) {
+          small.textContent = pct(v, 0);
+          // white to a mid blue; dark text keeps contrast above 4.5:1
+          var a = v / mx;
+          var r = Math.round(255 - a * (255 - 110)), g = Math.round(255 - a * (255 - 165)), bl = 255;
+          b.style.background = "rgb(" + r + "," + g + "," + bl + ")";
+        }
+        b.appendChild(small);
+        b.addEventListener("click", function () { w.sel = j; w.render(); toks.children[j].focus(); });
+        toks.appendChild(b);
+      });
+      if (opts.slider) layerOut.textContent = (w.layer + 1) + " of " + item.layers.length;
+      info.textContent = w.sel >= 0
+        ? "Showing how \"" + item.tokens[w.sel].trim() + "\" spreads its attention over the words up to and including itself, at layer " + (w.layer + 1) + ". Darker means more." + (inclFirst.checked ? "" : " The first word is hidden and the rest are rescaled to add up to 100%.")
+        : "Click a word.";
+    };
+    widgets.push(w);
+    return w;
+  }
+
+  // C. explore
+  var sp = $("sent-pick");
+  DATA.attention.forEach(function (a, i) {
+    var l = el("label"), r = el("input");
+    r.type = "radio"; r.name = "sent"; r.value = i; if (i === 0) r.checked = true;
+    l.appendChild(r); l.appendChild(document.createTextNode(" " + a.sentence));
+    l.style.display = "block";
+    sp.appendChild(l);
+  });
+  var explore = makeWidget($("explore-widget"), { id: "ex", idx: 0, slider: true });
+  explore.setSentence(0);
+  sp.addEventListener("change", function (e) { explore.setSentence(+e.target.value); });
+
+  // B. clear example (the last sentence)
+  var clearIdx = DATA.attention.length - 1;
+  var clearItem = DATA.attention[clearIdx];
+  var clear = makeWidget($("clear-widget"), { id: "cl", idx: clearIdx, slider: false });
+  clear.setSentence(clearIdx);
+  $("clear-caption").textContent = clearCaption(clearItem);
+  var share = focusShare(clearItem);
+  var shareNote = el("p", "note", "In this sentence, \"" + clearItem.tokens[clearItem.focus.from].trim() + "\" gives \"" + clearItem.tokens[clearItem.focus.to].trim() + "\" " + pct(share, 0) + " of its attention at layer " + (clearItem.focus.layer + 1) + ", with the first word set aside.");
+  $("att-clear").appendChild(shareNote);
+  $("att-clear").appendChild(el("p", "note", firstWordNote(clearItem)));
+
+  inclFirst.addEventListener("change", function () { widgets.forEach(function (w) { w.render(); }); renderPredict(); });
+
+  // A. predict then reveal
+  var pRevealed = false;
+  function renderPredict() {
+    var res = $("p-result"); res.textContent = "";
+    if (!pRevealed) return;
+    var grid = el("div", "grid2"), vals = {};
+    [["big", 0], ["small", 1]].forEach(function (pair) {
+      var item = DATA.attention[pair[1]], f = item.focus;
+      var row = attnRow(item, f.layer, f.from, inclFirst.checked);
+      var box = el("div");
+      box.appendChild(el("h3", "", "\"" + pair[0] + "\" at layer " + (f.layer + 1)));
+      box.appendChild(el("p", "note", "Layer " + (f.layer + 1) + " is the layer where this word looks at 'trophy' the most."));
+      var ul = el("ul", "bars");
+      row.forEach(function (v, j) {
+        if (v === null || j === f.from) return;
+        var isKey = item.tokens[j].trim() === "trophy" || item.tokens[j].trim() === "suitcase";
+        ul.appendChild(barRow(tokLabel(item.tokens[j]), v, isKey));
+      });
+      box.appendChild(ul);
+      box.appendChild(el("p", "note", "The word itself is left out, so these bars add up to less than 100%."));
+      var tw = row[item.tokens.indexOf(" trophy")], sw = row[item.tokens.indexOf(" suitcase")];
+      vals[pair[0]] = [tw, sw];
+      var chosen = document.querySelector("input[name=p-" + pair[0] + "]:checked");
+      var text = "trophy " + pct(tw, 0) + ", suitcase " + pct(sw, 0) + ".";
+      if (chosen) text = "You expected " + chosen.value + ". The model gave " + text;
+      else text = "The model gave " + text;
+      box.appendChild(el("p", "status", text));
+      grid.appendChild(box);
+    });
+    res.appendChild(grid);
+    var more = vals.big[0] > vals.big[1] && vals.small[0] > vals.small[1];
+    var shownLayer = DATA.attention[0].focus.layer + 1;
+    var nums = " (" + pct(vals.big[0], 0) + " vs " + pct(vals.big[1], 0) + " for 'big', " + pct(vals.small[0], 0) + " vs " + pct(vals.small[1], 0) + " for 'small').";
+    var other = suitcaseLayers(DATA.attention[0], DATA.attention[1]);
+    var otherText = "";
+    if (other.length) {
+      var L0 = other[0].layer, sv = [0, 1].map(function (k) {
+        var it = DATA.attention[k], row = attnRow(it, L0, it.focus.from, inclFirst.checked);
+        return [row[it.tokens.indexOf(" suitcase")], row[it.tokens.indexOf(" trophy")]];
+      });
+      otherText = " At layer" + (other.length > 1 ? "s " : " ") + other.map(function (x) { return x.layer + 1; }).join(" and ")
+        + " 'suitcase' gets about as much more in both (at layer " + (L0 + 1) + ": " + pct(sv[0][0], 0) + " vs " + pct(sv[0][1], 0)
+        + " for 'big', " + pct(sv[1][0], 0) + " vs " + pct(sv[1][1], 0) + " for 'small').";
+    }
+    res.appendChild(el("p", "callout", "'big' and 'small' look back in almost the same way at every layer, so attention is not showing which object each word describes. "
+      + (more
+        ? "At layer " + shownLayer + ", for example, 'trophy' gets a bit more than 'suitcase' in both" + nums
+        : "At layer " + shownLayer + ", for example, 'trophy' and 'suitcase' get" + nums)
+      + otherText + " Try the slider in part C."
+      + " Attention is spread across many words, and it is not a readable explanation of what the model 'thinks'."));
+  }
+  $("p-reveal").addEventListener("click", function () { pRevealed = true; renderPredict(); });
+})();
+</script>
+</body>
+</html>

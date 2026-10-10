@@ -1,0 +1,168 @@
+{
+ "model": "Qwen/Qwen2.5-0.5B",
+ "candidates": [
+  {
+   "sentence": "Maria paid the bill because she",
+   "tokens": [
+    "Maria",
+    " paid",
+    " the",
+    " bill",
+    " because",
+    " she"
+   ],
+   "source_index": 5,
+   "target_index": 0,
+   "source": " she",
+   "target": "Maria",
+   "layer": null,
+   "share": null,
+   "margin": null,
+   "note": "target is the first token (excluded as attention sink) or not before the source"
+  },
+  {
+   "sentence": "The keys were on the table, so I picked up the",
+   "tokens": [
+    "The",
+    " keys",
+    " were",
+    " on",
+    " the",
+    " table",
+    ",",
+    " so",
+    " I",
+    " picked",
+    " up",
+    " the"
+   ],
+   "source_index": 11,
+   "target_index": 1,
+   "source": " the",
+   "target": " keys",
+   "layer": 20,
+   "share": 0.2434,
+   "margin": -0.008,
+   "note": ""
+  },
+  {
+   "sentence": "Apples are red and bananas are yellow, so a banana is",
+   "tokens": [
+    "App",
+    "les",
+    " are",
+    " red",
+    " and",
+    " bananas",
+    " are",
+    " yellow",
+    ",",
+    " so",
+    " a",
+    " banana",
+    " is"
+   ],
+   "source_index": 12,
+   "target_index": 7,
+   "source": " is",
+   "target": " yellow",
+   "layer": 16,
+   "share": 0.3192,
+   "margin": 0.1472,
+   "note": ""
+  },
+  {
+   "sentence": "My sister Anna loves jazz. Every Friday, Anna",
+   "tokens": [
+    "My",
+    " sister",
+    " Anna",
+    " loves",
+    " jazz",
+    ".",
+    " Every",
+    " Friday",
+    ",",
+    " Anna"
+   ],
+   "source_index": 9,
+   "target_index": 2,
+   "source": " Anna",
+   "target": " Anna",
+   "layer": 7,
+   "share": 0.3783,
+   "margin": 0.2077,
+   "note": ""
+  },
+  {
+   "sentence": "Paris is in France and Berlin is in",
+   "tokens": [
+    "Paris",
+    " is",
+    " in",
+    " France",
+    " and",
+    " Berlin",
+    " is",
+    " in"
+   ],
+   "source_index": 7,
+   "target_index": 5,
+   "source": " in",
+   "target": " Berlin",
+   "layer": 20,
+   "share": 0.5071,
+   "margin": 0.3651,
+   "note": ""
+  },
+  {
+   "sentence": "The password is tulip. Later, I typed the password: tulip",
+   "tokens": [
+    "The",
+    " password",
+    " is",
+    " tul",
+    "ip",
+    ".",
+    " Later",
+    ",",
+    " I",
+    " typed",
+    " the",
+    " password",
+    ":",
+    " tul",
+    "ip"
+   ],
+   "source_index": 14,
+   "target_index": 4,
+   "source": "ip",
+   "target": "ip",
+   "layer": 7,
+   "share": 0.2659,
+   "margin": -0.0097,
+   "note": ""
+  }
+ ],
+ "winner": {
+  "sentence": "Paris is in France and Berlin is in",
+  "tokens": [
+   "Paris",
+   " is",
+   " in",
+   " France",
+   " and",
+   " Berlin",
+   " is",
+   " in"
+  ],
+  "source_index": 7,
+  "target_index": 5,
+  "source": " in",
+  "target": " Berlin",
+  "layer": 20,
+  "share": 0.5071,
+  "margin": 0.3651,
+  "note": ""
+ }
+}
