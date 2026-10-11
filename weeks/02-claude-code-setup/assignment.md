@@ -8,7 +8,7 @@ Follow the [week 2 README](README.md) on your own laptop, then collect four thin
 
 **(b) First session.** A screenshot of your first session showing a permission prompt: the moment Claude Code asks you to approve creating `hello.md` (or another action). The choices (Yes, No and so on) should be visible.
 
-**(c) Your CLAUDE.md.** Copy and paste the text of `~/my-first-project/CLAUDE.md`, including your three preferences. To get the text, open the folder as in step 4j of the README (`open .` on a Mac, `explorer.exe .` on Windows) and open `CLAUDE.md` in a text editor, or ask Claude Code "Show me the contents of CLAUDE.md" and copy it from the terminal.
+**(c) Your CLAUDE.md.** Copy and paste the text of `~/my-first-project/CLAUDE.md`, including your three preferences. To get the text, open the folder as in step 4j of the README (`open .` on a Mac, `explorer.exe .` on Windows) and open `CLAUDE.md` in a text editor (if it asks which app to use, pick TextEdit on a Mac or Notepad on Windows), or ask Claude Code "Show me the contents of CLAUDE.md" and copy it from the terminal.
 
 Make the preferences **meaningful**: specific, and about how you want Claude Code to work with you (how you like explanations, what it must check with you first, how long answers should be). Filler like "Be helpful" or "Do a good job" doesn't count. The README's examples are fine; your own are better.
 
