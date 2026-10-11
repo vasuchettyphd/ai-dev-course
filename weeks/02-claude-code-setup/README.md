@@ -2,7 +2,7 @@
 
 **Goal:** install Claude Code on your own laptop, run your first session, approve (or refuse) its requests with confidence, and give it a CLAUDE.md file with your own preferences.
 
-**Time:** about 90 minutes, plus a restart on Windows. **Cost:** a Claude Pro subscription, about $20/month (see step 1).
+**Time:** plan for about 90 minutes, plus a restart on Windows; your first install may take longer. **Cost:** a Claude Pro subscription, about $20/month (see step 1).
 
 **Tested with:** Claude Code 2.1.296, 10 October 2026, on Ubuntu Linux (the same system Windows students use inside WSL). The Mac and Windows steps are being tested on real laptops.
 
@@ -12,7 +12,7 @@ You need:
 
 - A laptop with **macOS 13 or later**, or **Windows 10 version 2004 (build 19041) or later**, or **Windows 11**. To check: on a Mac, Apple menu > About This Mac; on Windows, press `Win + R`, type `winver` and press Enter.
 - At least **4 GB of memory (RAM)** and an internet connection.
-- About 90 minutes where you can restart your laptop (Windows).
+- About 90 minutes (your first install may take longer), at a time when you can restart your laptop (Windows).
 
 Nothing from week 1 is needed. This is your first time in a terminal, and that's fine: every command is below, exactly as you type it, with what you should see.
 
@@ -73,7 +73,7 @@ Leave the window open and wait; it can take a minute or two. When it finishes, l
 ✔ Claude Code successfully installed!
 ```
 
-Above or below it you may also see a "Setup notes" warning that `~/.local/bin` is not in your PATH. If you do, that's fine for now; step c deals with it. (In our test the installer printed its messages twice. That's harmless.)
+Above or below it you may also see a "Setup notes" warning that `~/.local/bin` is not in your PATH. If you do, that's fine for now; step c deals with it. (In our Linux test the installer printed its messages twice. If yours does too, that's harmless.)
 
 If a window pops up asking to install Apple's "command line developer tools", click Install, wait for it to finish, then run the install line again.
 
@@ -91,7 +91,7 @@ You should see a version number followed by `(Claude Code)`. In our test it was:
 
 Your number will probably be higher, because Claude Code updates itself. Any number is fine.
 
-If instead you see `zsh: command not found: claude`, run these two lines in Terminal, then try `claude --version` again:
+If instead you see something like `zsh: command not found: claude`, run these two lines in Terminal, then try `claude --version` again:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
@@ -114,7 +114,15 @@ On Windows you'll run Claude Code inside **WSL**, the Windows Subsystem for Linu
 wsl --install
 ```
 
-This turns on WSL and installs Ubuntu. It can take several minutes. If you see a help text instead of an install, WSL is already there: skip to step d.
+This turns on WSL and installs Ubuntu. It can take several minutes.
+
+If Windows says WSL is already installed (or prints a long help text instead of installing; this wording is being tested), click Start and type `Ubuntu`. If Ubuntu is there, open it and go to step d. If there is no Ubuntu, run this in PowerShell as administrator, then continue with step c:
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+If that fails too, bring your laptop to office hours.
 
 **c. Restart your computer** when it finishes.
 
@@ -139,9 +147,9 @@ Wait. When it finishes, look for:
 ✔ Claude Code successfully installed!
 ```
 
-You may also see a "Setup notes" warning that `~/.local/bin` is not in your PATH; step f deals with it. In our test the messages printed twice, which is harmless.
+You may also see a "Setup notes" warning that `~/.local/bin` is not in your PATH; step f deals with it. In our Linux test the messages printed twice, which is harmless.
 
-If you see `curl: command not found` instead, run this in the Ubuntu window, then run the install line again:
+If you see something like `curl: command not found` instead, run this in the Ubuntu window, then run the install line again:
 
 ```bash
 sudo apt update && sudo apt install -y curl
@@ -163,7 +171,7 @@ You should see a version number followed by `(Claude Code)`. In our test:
 
 Your number will probably be higher; any number is fine.
 
-If you see `bash: claude: command not found`, run this in the Ubuntu window, then try `claude --version` again:
+If you see something like `bash: claude: command not found`, run this in the Ubuntu window, then try `claude --version` again:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
@@ -237,7 +245,7 @@ Create a file called hello.md with three tips for staying organised, then explai
 | **Yes, and don't ask again for ...** | Do this, and stop asking about this kind of action. For file edits this lasts until you end the session; for some commands it is saved for this folder. |
 | **No** | Don't do it. Claude Code stops and you can tell it what to do differently. |
 
-A fourth choice, "Yes, and switch to auto mode", may also appear.
+A fourth choice, "Yes, and switch to auto mode", may also appear. The exact wording changes with the action (running a command vs editing a file); the meanings are the same.
 
 Use the arrow keys to pick **Yes** and press Enter. Note what the prompt showed you; the assignment asks about it. Claude Code creates `hello.md` and explains what it did.
 
@@ -258,6 +266,8 @@ Press `Shift + Tab` at any time to switch. While you're learning, **manual** is 
 
 ### 5. CLAUDE.md: your standing instructions
 
+> **Being tested:** These steps are being tested on real Mac and Windows laptops. If something looks different, tell your instructor.
+
 Every Claude Code session starts fresh: it doesn't remember your last conversation. **CLAUDE.md** is a plain text file where you write instructions that it reads at the start of every session in that folder. Think of it as a note you leave for a new assistant each morning.
 
 Where it lives:
@@ -271,7 +281,13 @@ Where it lives:
 /init
 ```
 
-Claude Code looks at what's in the folder and creates a starting `CLAUDE.md`. It may ask permission to create the file; read the prompt and say Yes.
+Claude Code looks at what's in the folder and creates a starting `CLAUDE.md`. It may ask you a few questions, ask permission to create the file (read the prompt and say Yes), or write a longer file than you expect. That's fine: keep the file, and make sure your three preferences end up in it (step b).
+
+If `/init` doesn't do anything useful, skip it and type this instead:
+
+```text
+Create a CLAUDE.md with these three rules: Explain things in plain English. Ask before deleting files. Keep answers short.
+```
 
 **b. Add three personal preferences.** Type this (change the three preferences to your own if you like) and press Enter:
 
@@ -293,7 +309,7 @@ claude
 Explain what a CSV file is
 ```
 
-The answer should follow your preferences: plain English and short. You can also ask "What preferences do you have for working with me?" and it should list your three. Leave with `/exit`.
+The answer should follow your preferences: plain English and short. If it doesn't seem to, ask "What preferences do you have for working with me?"; it should list your three. Leave with `/exit`.
 
 ### 6. Cost and safety
 
@@ -303,7 +319,7 @@ The answer should follow your preferences: plain English and short. You can also
 /usage
 ```
 
-It shows your plan's usage bars. Limits depend on your plan; see <https://claude.com/pricing>. If you hit a limit, Claude Code tells you. Starting a fresh conversation with `/clear` between unrelated tasks helps your usage go further.
+It shows your plan's usage bars. The numbers are counted from this laptop's history, so use on other devices or on claude.ai isn't included. Limits depend on your plan; see <https://claude.com/pricing>. If you reach one, Claude Code shows a message such as "You've hit your session limit" (there is also a weekly limit). Starting a fresh conversation with `/clear` between unrelated tasks helps your usage go further.
 
 **Safety.** Claude Code can change real files on your laptop, so:
 
@@ -326,7 +342,8 @@ The [assignment](assignment.md) asks for screenshots of the first two and the te
 
 | What you see | What to do |
 |---|---|
-| `zsh: command not found: claude` (Mac) or `bash: claude: command not found` (Ubuntu) after installing | Close the terminal and open a new one, then try again. Still there? Mac: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc` then `source ~/.zshrc`. Ubuntu: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc`. Then `claude --version` again. |
+| `zsh: command not found: claude` (Mac) or `bash: claude: command not found` (Ubuntu) after installing | First try a new terminal: close it, open a new one, and run `claude --version` again. If it's still missing, run the fix. Mac: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc` then `source ~/.zshrc`. Ubuntu: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc`. Then `claude --version` again. |
+| `mkdir` says something like `File exists` (or the folder is already there from an earlier try) | That's fine, the folder exists. Run `cd ~/my-first-project && claude` instead. |
 | An error after pasting `curl -fsSL https://claude.ai/install.sh \| bash` on Windows, and the line starts with `PS C:\` | You're in PowerShell, not Ubuntu. Close it, open **Ubuntu** from the Start menu, and paste the line there. PowerShell is only for `wsl --install` and the WSL fixes below. |
 | `wsl --install` fails, or mentions virtualization | Virtualization is turned off in your laptop's settings (BIOS or UEFI). See Microsoft's guide at <https://learn.microsoft.com/en-us/windows/wsl/troubleshooting> and come to office hours; we'll do it together. |
 | `cannot execute binary file: Exec format error` when you run `claude` in Ubuntu | You're on WSL 1. In **PowerShell**, run `wsl -l -v` to see your Ubuntu's name (for example `Ubuntu`) and its VERSION. Then run `wsl --set-version Ubuntu 2`, using the name you saw. Open a new Ubuntu window and try `claude` again. |
