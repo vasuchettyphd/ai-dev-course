@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296, 10 October 2026. Mac and Windows steps are being tested on real laptops.</p>
+<p class="small">Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026, up to the sign-in screen. Everything after sign-in follows Anthropic's docs and is being tested on real Mac and Windows laptops.</p>
 
 ---
 
@@ -130,6 +130,8 @@ wsl -l -v
 wsl --set-version Ubuntu 2
 ```
 
+<p class="small">Use the name you saw in <code>wsl -l -v</code> instead of Ubuntu if it differs.</p>
+
 ---
 
 ## Live demo: first session
@@ -204,8 +206,8 @@ You can always say No, then ask **"What would that do?"**
 
 | Bottom line | Without asking, it... |
 |---|---|
-| `manual mode on` | only reads. Asks before every change. |
-| `accept edits on` | reads and edits files |
+| `manual mode on` | only reads. Asks before every change and most commands. |
+| `accept edits on` | reads and edits files, and creates, moves or deletes files in this folder. Asks for the rest. |
 | `plan mode on` | only reads and plans, changes nothing |
 | `auto mode on` | does most things, with safety checks |
 
