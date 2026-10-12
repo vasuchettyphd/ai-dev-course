@@ -88,7 +88,7 @@ docker run -it --rm dealscreener
 
 It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program; `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
 
-The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`) and any `.env` file of secrets. It also leaves out `docs` and `REVIEW.md`: people read them, but the program doesn't need them.
+The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs` and `REVIEW.md`: people read them, but the program doesn't need them.
 
 The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user.
 

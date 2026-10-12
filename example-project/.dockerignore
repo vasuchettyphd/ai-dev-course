@@ -1,20 +1,29 @@
 # Files Docker leaves out of the image. One pattern per line; lines starting with # are notes.
+# A pattern starting with **/ matches in this folder or any folder below it.
 
 # Git's history and settings: the program doesn't need them, and they can hold old secrets.
 .git
 
-# Python and Node.js add-on folders: big, and rebuilt inside the image if a project needs them.
-.venv
-venv
+# Python and Node.js add-on folders, in any folder: big, and rebuilt inside the image if needed.
+**/.venv
+**/venv
 node_modules
 
-# Python's saved bytecode, in any folder (**/ means "in this folder or any folder below it").
+# Python's saved bytecode, in any folder.
 **/__pycache__
 **/*.pyc
 
 # Secret files such as API keys, in any folder: they must never go into an image.
 **/.env
 **/.env.*
+
+# Key files and logs, in any folder: keys are secrets, and logs can hold private details.
+**/*.pem
+**/*.key
+**/*.log
+
+# Spreadsheet exports, in any folder: they can hold real listings, and this version reads none.
+**/*.csv
 
 # Claude Code and Superpowers settings, used while building, not while running.
 .claude
