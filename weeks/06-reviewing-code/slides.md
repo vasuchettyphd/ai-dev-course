@@ -65,14 +65,14 @@ This week: **your own three reviewers, which can't change anything.**
 
 ---
 
-## Read a diff (being tested)
+## Read a diff
 
 On your week 5 pull request, click **Files changed**.
 
 - One box per file
-- `+` lines (green): added. `-` lines (red): removed
+- `+` lines (green): added. `-` lines (red): removed (being tested)
 - Settings gear: **unified** (one column) or **split** (old beside new)
-- `...` menu on a file: **View file** for the whole file
+- `...` menu on a file: **View file** for the whole file (being tested)
 
 Don't follow a part? Copy it, then in Claude Code:
 
@@ -80,7 +80,7 @@ Don't follow a part? Copy it, then in Claude Code:
 Explain this change in plain English: <paste>
 ```
 
-<p class="small">Deal screener's week 6 changes, once week 6 is published: github.com/vasuchettyphd/ai-dev-course/compare/week-05...week-06</p>
+<p class="small">Deal screener's week 6 changes (works once week 6 is published): github.com/vasuchettyphd/ai-dev-course/compare/week-05...week-06</p>
 
 ---
 
@@ -115,7 +115,7 @@ ls .claude/agents
 
 `does-it-work.md  plain-english.md  safe-and-private.md`
 
-<p class="small">Already cloned? cd ~/ai-dev-course && git pull, then copy.</p>
+<p class="small">Second window: Mac Cmd + N; Windows, open Ubuntu again (not PowerShell). Already cloned, or ls shows nothing? cd ~/ai-dev-course && git pull, then copy again.</p>
 
 **Restart Claude Code once:** `/exit`, then `claude`. A new `agents` folder is only noticed at start. After that, edits are picked up in seconds.
 
@@ -166,7 +166,7 @@ and keep the tools line exactly as it is: tools: Read, Grep, Glob. Then
 show me what you changed in each file.
 ```
 
-Edit prompts for the three files: **Yes**. Read what changed.
+Edit prompts for the three files: plain **Yes** (not "don't ask again"). A prompt to change a `tools:` line: **No**. Read what changed.
 
 ---
 
@@ -217,7 +217,7 @@ Then: "Commit the three files in .claude/agents/ on this branch ..."
 
 ## Run all three (being tested)
 
-`/usage` first: write it down. Then one prompt:
+`/usage` first: write it down and keep it. Then one prompt:
 
 ```text
 Run the does-it-work, safe-and-private and plain-english reviewers in
@@ -257,7 +257,7 @@ Then read `REVIEW.md`, and commit it: "Review of the week 5 build".
 ## Usage (being tested)
 
 - Every subagent sends its own requests, which "count toward the same usage limits as your main conversation"
-- So three reviewers use **more** than one conversation. No published number: it depends on your project
+- So three reviewers use **more** than one conversation. We have no published number for how much more
 - `/usage` again: compare with before. It shows the **subagents' share** (`d` / `w`)
 - Its `Prompt cache (main)` line counts the main conversation only, not subagents
 - At a limit: wait for the reset, as in week 5
@@ -266,7 +266,7 @@ Then read `REVIEW.md`, and commit it: "Review of the week 5 build".
 
 ---
 
-## Triage: you decide
+## Triage: you decide (being tested)
 
 Every finding gets a **Decision** (`Fix` or `Won't fix`) and a **Reason**.
 
@@ -328,7 +328,7 @@ Deal screener #8: new tests failed first (`ImportError: cannot import name 'perc
    main titled "Review fixes".
    ```
 3. **Files changed:** only `.claude/agents/`, `REVIEW.md` and your fixes. Read each fix's green and red lines **yourself**
-4. **Merge pull request**, **Confirm merge**, then "Switch back to main and pull the latest changes from GitHub."
+4. **Merge pull request**, **Confirm merge** (or **Squash and merge**; being tested), then "Switch back to main and pull the latest changes from GitHub."
 
 <p class="small">Deal screener after its fixes: Ran 39 tests, OK. Committed to main? Week 5's rescue steps.</p>
 

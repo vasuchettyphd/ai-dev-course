@@ -4,7 +4,14 @@
 
 **Time:** plan for about 2 hours of your own time (an estimate): the three reviewers run for a while by themselves, and each fix is built and tested one at a time. **Cost:** nothing beyond your Claude plan. Nothing new to install, so the steps are **the same on a Mac (Apple chip or Intel) and on Windows (WSL)**.
 
-**Tested with:** Claude Code 2.1.296 on Ubuntu 24.04 Linux (in a container), 12 October 2026, and the deal screener example with Python 3.14.4 and Python 3.9.25 (39 tests). The optional `pr-review-toolkit` in step 1 was tested at marketplace commit `f359d43b4060`. These are the versions tested; yours may be newer. We tested, without signing in to Claude: making a reviewer file in a project's `.claude/agents/` folder, copying the deal screener's three reviewer files, installing `pr-review-toolkit` from the terminal, and the deal screener's tests and program. The instructor ran the three deal screener reviewers on the week 5 code, and the result is in [`example-project/REVIEW.md`](../../example-project/REVIEW.md). Everything inside a signed-in Claude Code session in your own project (checking that Claude can use the reviewers, running them, the fixes, `/usage`), everything on GitHub, and every step on a Mac or in Windows (WSL) follow the official docs and are being tested on real Mac and Windows laptops.
+**Tested with** (12 October 2026; these are the versions tested, yours may be newer):
+
+- Claude Code 2.1.296 on Ubuntu 24.04 Linux (in a container), without signing in to Claude.
+- The deal screener example with Python 3.14.4 and Python 3.9.25 (39 tests).
+- The optional `pr-review-toolkit` (step 1) at marketplace commit `f359d43b4060`.
+- Tested: making a reviewer file in a project's `.claude/agents/` folder, copying the deal screener's three reviewer files, installing `pr-review-toolkit` from the terminal, and the deal screener's tests and program.
+- The instructor ran the three deal screener reviewers on the week 5 code; the result is in [`example-project/REVIEW.md`](../../example-project/REVIEW.md).
+- Being tested on real Mac and Windows laptops: everything inside a signed-in Claude Code session in your own project (checking that Claude can use the reviewers, running them, the fixes, `/usage`), everything on GitHub, and every step on a Mac or in Windows (WSL). These follow the official docs.
 
 ## Before you start
 
@@ -46,7 +53,7 @@ Each reviewer **only reports**. It can read your files but has no way to change 
 
 For how Superpowers' own reviewers work, see [the `/grill-me` and Superpowers tutorial](../../advanced/grill-me-superpowers/).
 
-**The ready-made version (optional, for later).** Anthropic publishes a plugin with six reviewers, `pr-review-toolkit`: they look at code comments, test gaps, errors that fail silently, type design, general code quality, and simplifying code. Your instructor shows it in class. You don't need it this week. If you want to try it after the assignment, install it the week 5 way, in Claude Code:
+**The ready-made version (optional, for later).** Anthropic publishes a plugin with six reviewers, `pr-review-toolkit`: they look at code comments, test gaps, errors that fail silently, type design, general code quality, and simplifying code. Your instructor may show it in class. You don't need it this week. If you want to try it after the assignment, install it the week 5 way, in Claude Code:
 
 ```text
 /plugin install pr-review-toolkit@claude-plugins-official
@@ -70,7 +77,7 @@ A **diff** is a list of what changed between two versions: lines added, lines re
 Explain this change in plain English: <paste>
 ```
 
-**The deal screener's fixes, as an example.** Once week 6 is published, this page shows every week 6 change to the class example: <https://github.com/vasuchettyphd/ai-dev-course/compare/week-05...week-06>. Find `example-project/dealscreener/buybox.py`. The fix for review finding #8 added one green line to `money()`:
+**The deal screener's fixes, as an example.** This page shows every week 6 change to the class example (the link works once week 6 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-05...week-06>. Find `example-project/dealscreener/buybox.py`. The fix for review finding #8 added one green line to `money()`:
 
 ```text
 +    amount = round(amount, 2)  # so -0.004 shows as $0.00, not -$0.00
@@ -102,7 +109,7 @@ Switch to main and pull the latest changes from GitHub. Then make a new branch c
 
 It will probably run `git switch main`, `git pull` and `git switch -c review-fixes`. Plain **Yes**. Check: ask "What branch am I on?". It should say `review-fixes`. (If that name is taken, use `review-fixes-2`, here and everywhere this README says `review-fixes`.)
 
-**b. Copy the deal screener's three reviewers.** They are your starting point. You copy them yourself, in a **second terminal window**. First get the course repo, or update it if you already have it:
+**b. Copy the deal screener's three reviewers.** They are your starting point. You copy them yourself, in a **second terminal window** (as in week 5): on a Mac, click Terminal and press `Cmd + N`; on Windows, open **Ubuntu** again from the Start menu (not PowerShell). A new window starts in your home folder, `~`. First get the course repo, or update it if you already have it:
 
 ```bash
 cd ~ && git clone https://github.com/vasuchettyphd/ai-dev-course.git
@@ -117,7 +124,7 @@ cp ~/ai-dev-course/example-project/.claude/agents/*.md .claude/agents/
 ls .claude/agents
 ```
 
-`ls` should list the three files: `does-it-work.md`, `plain-english.md` and `safe-and-private.md`. A project's reviewer agents live in its `.claude/agents/` folder, and they go to GitHub with the rest of the project.
+`ls` should list the three files: `does-it-work.md`, `plain-english.md` and `safe-and-private.md`. If `ls` shows nothing, run `git pull` in `~/ai-dev-course` and try again. A project's reviewer agents live in its `.claude/agents/` folder, and they go to GitHub with the rest of the project.
 
 **c. Restart Claude Code.** Claude Code notices new and changed agent files by itself, but only in an `agents` folder that already existed when the session started. Yours is new, so restart once. In Claude Code (the first window), type `/exit`, then in that terminal:
 
@@ -133,7 +140,7 @@ Press `Shift + Tab` until `manual mode on`, and check "What branch am I on?" sti
 Read PLAN.md and the three reviewer files in .claude/agents/ (does-it-work.md, safe-and-private.md and plain-english.md). They were written for another project, a rental deal screener. Adapt each one to my project: keep its one question, the line "Report only. Never change any file.", the three labels and the way each finding is written, and change the "Look for" list so it fits what PLAN.md says my project does and the data it uses. Keep the name and description lines as they are, and keep the tools line exactly as it is: tools: Read, Grep, Glob. Then show me what you changed in each file.
 ```
 
-**What Claude Code will probably do:** read the four files, then ask to edit each agent file (an edit prompt; **Yes**), and list the changes. Read them. If a change doesn't fit your project, say so, for example: "In does-it-work, also check ...".
+**What Claude Code will probably do:** read the four files, then ask to edit each agent file (an edit prompt; plain **Yes**, not the "don't ask again" option), and list the changes. If any prompt asks to change a `tools:` line, answer **No**. Read them. If a change doesn't fit your project, say so, for example: "In does-it-work, also check ...".
 
 **e. Check each reviewer can only read.** This is the most important check this week. Open each of the three files (or ask "Show me the first five lines of each file in .claude/agents/"). Each starts with a block like this one, from the deal screener:
 
@@ -159,7 +166,7 @@ If any file has no `tools` line, or lists anything else (`Edit`, `Write`, `Bash`
 Which subagents can you use in this project?
 ```
 
-It should name `does-it-work`, `safe-and-private` and `plain-english` (among a few built-in ones). Two things that **don't** work for this: in Claude Code 2.1.296, `/agents` only prints a reminder to ask Claude or edit the `.claude/agents/` folder; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
+It should name `does-it-work`, `safe-and-private` and `plain-english`. Two things that **don't** work for this: in Claude Code 2.1.296, `/agents` only prints a reminder to ask Claude or edit the `.claude/agents/` folder; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
 
 **g. Check a reviewer really can't edit** (being tested). In Claude Code, type:
 
@@ -181,7 +188,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 > **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used this prompt; your run in a signed-in session is being tested.
 
-**a. Check your usage first.** In Claude Code, type `/usage` and write down what it shows. You'll compare it after the review (step 4e).
+**a. Check your usage first.** In Claude Code, type `/usage` and write down what it shows. Keep these numbers; you'll compare them in step 4e, and bring them to next week's class.
 
 **b. Run the review.** One prompt runs the three reviewers at the same time, then combines their reports into one file, `REVIEW.md`. In Claude Code, type:
 
@@ -208,9 +215,9 @@ Commit REVIEW.md on this branch with the message "Review of the week 5 build".
 
 Plain **Yes**.
 
-**e. Usage.** Type `/usage` again and compare with step 4a. Every subagent sends its own requests, which "count toward the same usage limits as your main conversation" (<https://code.claude.com/docs/en/sub-agents>), so three reviewers use more than one conversation. Nobody publishes how much more: it depends on the size of your project. On a Pro plan, `/usage` shows which share of your recent usage went to subagents (press `d` or `w` for day or week). Its `Prompt cache (main)` line counts the main conversation only, not the subagents (<https://code.claude.com/docs/en/costs>), so don't judge the reviewers by it. If you hit a usage limit, wait for the reset, as in [week 5](../05-building-with-ai/) step 6.
+**e. Usage.** Type `/usage` again and compare with step 4a. Every subagent sends its own requests, which "count toward the same usage limits as your main conversation" (<https://code.claude.com/docs/en/sub-agents>), so three reviewers use more than one conversation. We have no published number for how much more: it depends on the size of your project. On a Pro plan, `/usage` shows which share of your recent usage went to subagents (press `d` or `w` for day or week). Its `Prompt cache (main)` line counts the main conversation only, not the subagents (<https://code.claude.com/docs/en/costs>), so don't judge the reviewers by it. If you hit a usage limit, wait for the reset, as in [week 5](../05-building-with-ai/) step 6.
 
-### 5. Triage: decide on every finding
+### 5. Triage: decide on every finding (being tested)
 
 **Triage** means deciding, finding by finding, what to do. You decide, not Claude. Each finding gets a **Decision**, `Fix` or `Won't fix`, and a **Reason** of one plain sentence.
 
@@ -289,7 +296,7 @@ It will probably run `git push -u origin review-fixes` and `gh pr create ...`. P
 
 **d. Read Files changed yourself, before you merge.** Open the address and click **Files changed** (step 2). You should see the three files in `.claude/agents/`, `REVIEW.md`, and the code and tests your fixes changed: nothing else. Go file by file. For each fix, find its green and red lines and check they do what the finding asked. For any part you don't follow, use "Explain this change in plain English: <paste>" (step 2). If something is there that shouldn't be, don't merge: ask Claude what it is and why.
 
-**e. Merge on GitHub, then pull.** On the **Conversation** tab click **Merge pull request** and **Confirm merge** (or "Squash and merge"; the exact label is being tested), as in [week 3](../03-git-and-github/) step 7. Then, in Claude Code:
+**e. Merge on GitHub, then pull.** On the **Conversation** tab click **Merge pull request** and **Confirm merge** (or **Squash and merge**; the exact labels are being tested), as in [week 3](../03-git-and-github/) step 7. Then, in Claude Code:
 
 ```text
 Switch back to main and pull the latest changes from GitHub.

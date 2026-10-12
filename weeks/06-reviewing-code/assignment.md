@@ -8,7 +8,7 @@ Follow the [week 6 README](README.md) on your own laptop, in your private `semes
 
 - your three reviewer files in `.claude/agents/`, each with `tools: Read, Grep, Glob` and its own focus (does it work, safe and private, plain English);
 - `REVIEW.md`, with a Decision (`Fix` or `Won't fix`) and a Reason for every finding;
-- the fixes: every Must fix done (or a reasoned `Won't fix` because the finding was wrong), each in a commit named `Fix review #N: ...`.
+- the fixes: every Must fix done (or a reasoned `Won't fix` because the finding was wrong), each in a commit whose message starts `Fix review` (several small fixes may share one commit).
 
 The repo stays **private**, with `vasuchettyphd` as a collaborator, so your instructor can open it.
 
