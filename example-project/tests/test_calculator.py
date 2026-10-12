@@ -47,6 +47,17 @@ class ListingBTest(unittest.TestCase):
         self.assertAlmostEqual(results.cash_on_cash_pct, 11.877, delta=0.001)
 
 
+class HoaTest(unittest.TestCase):
+    def test_listing_a_with_a_150_dollar_hoa_matches_the_hand_worked_numbers(self):
+        # Costs go up by $150 a month, to 300 + 150 + 144 = 594, so cash flow
+        # drops by exactly $150: 1710 - 594 - 997.95 = 118.05.
+        results = analyse(make_listing(monthly_hoa=150), ASSUMPTIONS)
+        self.assertAlmostEqual(results.monthly_mortgage, 997.95, delta=0.01)
+        self.assertAlmostEqual(results.monthly_cash_flow, 118.05, delta=0.01)
+        self.assertAlmostEqual(results.cap_rate_pct, 6.696, delta=0.001)
+        self.assertAlmostEqual(results.cash_on_cash_pct, 2.530, delta=0.001)
+
+
 class EdgeCaseTest(unittest.TestCase):
     def test_default_assumptions_are_5_percent_vacancy_and_8_percent_repairs(self):
         self.assertEqual(Assumptions(), ASSUMPTIONS)
