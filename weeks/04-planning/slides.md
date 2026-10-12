@@ -270,23 +270,22 @@ Back in Claude Code: "Switch back to main and pull the latest changes from GitHu
 
 ## Trying them yourself (optional)
 
-Both write many files: use a **throwaway folder**, never your project repo.
+Only **after your `PLAN.md` PR is merged**, in a **throwaway folder**:
 
-Superpowers, in Claude Code:
-
-```text
-/plugin install superpowers@claude-plugins-official
-/superpowers:brainstorming I want to plan ...
+```bash
+mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init
 ```
 
-AI-DLC, in your terminal (Windows: the Ubuntu window):
+**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. User scope means it's on in **every** folder, so remove it afterwards: `claude plugin uninstall superpowers@claude-plugins-official`
+
+**AI-DLC** (Windows: the Ubuntu window). It lets Claude edit any file in the folder without asking.
 
 ```bash
 curl -fsSL https://github.com/awslabs/aidlc-workflows/releases/latest/download/install.sh | sh
 aidlc config --harness claude && aidlc doctor
 ```
 
-Then `/aidlc ...` in Claude Code. (Runs are being tested.)
+<p class="small">Then /aidlc ... in Claude Code. Runs are being tested.</p>
 
 ---
 
@@ -301,7 +300,7 @@ One document with:
 | Criterion | Points |
 |---|---|
 | Repo private (screenshot) and collaborator added | 3 |
-| `PLAN.md` follows the outline, specific, merged by PR | 4 |
+| `PLAN.md`: outline (1), specific (1), merged by PR (2) | 4 |
 | Three grilling questions, answers, and what changed | 3 |
 
 ---

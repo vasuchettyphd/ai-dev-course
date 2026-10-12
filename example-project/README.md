@@ -22,7 +22,7 @@ The class builds this project up week by week, alongside your own:
 | 4 | [`PLAN.md`](PLAN.md): the plan, in the course's fixed outline |
 | 5 onward | the tool itself, step by step, following the plan |
 
-At the end of each week, starting with week 4, the finished state is marked with a **git tag** named after the week (`week-04`, `week-05`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state will be marked with a **git tag** named after the week: this week's state will get the tag `week-04` once week 4 is published, and later weeks follow (`week-05`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
 ## What's here now
 

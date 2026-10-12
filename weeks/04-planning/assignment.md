@@ -23,5 +23,5 @@ Submit it the way your course site says.
 | Criterion | Points |
 |---|---|
 | The repo is private (screenshot shows the **Private** label) and `vasuchettyphd` is added as a collaborator | 3 |
-| `PLAN.md` follows the seven-heading outline, is specific and free of sensitive data, and was merged through a pull request | 4 |
+| `PLAN.md` follows the seven-heading outline (1 point), is specific and free of sensitive data (1 point), and was merged through a pull request from a branch (2 points) | 4 |
 | Three real `/grill-me` questions with your answers, and a clear account of how one of them changed your plan | 3 |

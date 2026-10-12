@@ -304,7 +304,7 @@ You don't need either of these for the assignment. Your instructor demonstrates 
 | **What it produces** | Nothing by itself; you ask for `PLAN.md` | A design file and a step-by-step build plan, saved under `docs/superpowers/` and committed to git | A folder of records for each stage under `aidlc/`, plus a `.claude/` folder with about 40 AI-DLC skills |
 | **When to use it** | Any idea, even with no software at all. Best for deciding what to build | When you're ready to build software and want it built in small, tested steps | Team software projects that want a full, documented process |
 
-Both Superpowers and AI-DLC are made for building software, and both write many files. **If you try either, use a throwaway folder, never your project repo this week.** For example, in your terminal: `cd ~ && mkdir planning-sandbox && cd planning-sandbox`.
+Both Superpowers and AI-DLC are made for building software, and both write many files. **If you try either, use a throwaway folder, never your project repo this week**, and only after your `PLAN.md` pull request is merged.
 
 **Next week you build with Superpowers**, so you'll install it then anyway.
 
@@ -312,19 +312,35 @@ Both Superpowers and AI-DLC are made for building software, and both write many 
 
 > **Being tested:** Running Superpowers needs a signed-in session and is being tested.
 
-In Claude Code, in your throwaway folder, install it the same way as `mattpocock-skills` (choose **Install for you (user scope)**, then `/reload-plugins` if asked):
+**Try it only after your `PLAN.md` pull request is merged.** A plugin installed "for you" (user scope) is switched on in **every** folder, including `semester-project`, and Superpowers' brainstorming can start by itself whenever you ask Claude to build or change something. So try it, then remove it until next week (see the end of this part).
+
+**a. Make a throwaway folder and start Claude Code there.** In your terminal:
+
+```bash
+mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
+```
+
+**b. Install it,** the same way as `mattpocock-skills` (choose **Install for you (user scope)**, then `/reload-plugins` if asked). In Claude Code:
 
 ```text
 /plugin install superpowers@claude-plugins-official
 ```
 
-Then type:
+**c. Try it.** In Claude Code, type:
 
 ```text
 /superpowers:brainstorming I want to plan a tool that turns my weekly sales spreadsheet into a one-page summary.
 ```
 
 It asks one question at a time, then writes a design file to `docs/superpowers/specs/` and asks you to review it. Source: <https://github.com/obra/superpowers>. The [advanced tutorial](../../advanced/grill-me-superpowers/) shows a full run.
+
+**d. Remove it when you're done.** In Claude Code, type `/plugin uninstall superpowers@claude-plugins-official` (it opens the plugin screen; choose to uninstall it there, being tested), or in your terminal:
+
+```bash
+claude plugin uninstall superpowers@claude-plugins-official
+```
+
+In our test it printed `✔ Successfully uninstalled plugin: superpowers (scope: user)`. If Claude Code is open, type `/reload-plugins`. You install it again next week.
 
 #### Try AI-DLC
 
@@ -345,11 +361,14 @@ PASS installed AI-DLC 2.11.0 with all harness runtimes
 Next: aidlc config
 ```
 
-**b. Set it up in your throwaway folder.** In your terminal:
+**b. Set it up in a throwaway folder.** In your terminal, make the folder (if you haven't already) and set AI-DLC up in it:
 
 ```bash
-cd ~/planning-sandbox && git init && aidlc config --harness claude && aidlc doctor
+mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init
+aidlc config --harness claude && aidlc doctor
 ```
+
+`aidlc config` writes its files (`aidlc/` and `.claude/`) into this folder.
 
 In our test, `aidlc config` printed `configured /home/student/proj for Claude Code 2.11.0; next: open Claude Code in this project ...` and `aidlc doctor` ended with:
 
@@ -385,7 +404,7 @@ The [assignment](assignment.md) asks for the repo's address, a screenshot, the m
 | `/grill-me` isn't in the list when you type `/grill` | Type `/reload-plugins`, then try again. Still missing? Type `/mattpocock-skills:grill-me`. Still missing? In your terminal, type `claude plugin list` and check `mattpocock-skills` is there and enabled; if not, do step 5a again. |
 | `Plugin "mattpocock-skills" not found in marketplace "claude-plugins-official"` | Add the official marketplace first: in your terminal, `claude plugin marketplace add anthropics/claude-plugins-official`, then install again (step 5a). |
 | (being tested) The `/plugin` screen asks where to install | Choose **Install for you (user scope)**, not project scope. |
-| (being tested) In plan mode, Claude asks to edit or create a file | Choose **No**. Check the bottom line says `plan mode on`. Plan mode shouldn't edit files until you approve a plan. |
+| (being tested) In plan mode, Claude asks to edit or create a file in your project folder | Choose **No**. Check the bottom line says `plan mode on`. Plan mode shouldn't edit files until you approve a plan. |
 | You approved the plan by mistake, and Claude is building | Press `Esc` to stop it. Choose **No** to any edit prompt. Then ask: "What files did you create or change? Don't change anything else." If it made changes you don't want, ask in office hours before you delete anything. |
 | The grilling goes on and on | Type `Stop grilling, summarise the decisions so far`. If it keeps opening new topics round after round, your idea is probably too big: go back to the too-big test in step 2. |
 | (being tested) It answers its own questions, or decides for you | Tell it: "The decisions are mine. Ask me, with your recommendation." |
@@ -398,4 +417,4 @@ The [assignment](assignment.md) asks for the repo's address, a screenshot, the m
 | `PLAN.md` has headings missing or in a different order | Ask Claude Code: "Rewrite PLAN.md with exactly these seven headings, in this order: ..." and paste the outline from step 6. |
 | `! [rejected]        main -> main (fetch first)` | You merged on GitHub and didn't pull. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
 | (being tested) `aidlc: command not found` | Close your terminal and open it again, then try again. On Windows, check you're in the **Ubuntu window**, not PowerShell. |
-| You tried Superpowers or AI-DLC in your project repo | Ask Claude Code: "Show me git status." Don't commit those files. Ask in office hours how to remove them safely. |
+| You tried Superpowers or AI-DLC in your project repo, or Superpowers started brainstorming there (new files under `docs/superpowers/`) | Ask Claude Code: "Show me git status." Don't commit those files. Ask in office hours how to remove them safely. To stop Superpowers starting by itself this week, remove it (step 7, Try Superpowers, part d). |
