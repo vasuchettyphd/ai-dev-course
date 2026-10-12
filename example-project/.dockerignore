@@ -1,0 +1,25 @@
+# Files Docker leaves out of the image. One pattern per line; lines starting with # are notes.
+
+# Git's history and settings: the program doesn't need them, and they can hold old secrets.
+.git
+
+# Python and Node.js add-on folders: big, and rebuilt inside the image if a project needs them.
+.venv
+venv
+node_modules
+
+# Python's saved bytecode, in any folder (**/ means "in this folder or any folder below it").
+**/__pycache__
+**/*.pyc
+
+# Secret files such as API keys, in any folder: they must never go into an image.
+**/.env
+**/.env.*
+
+# Claude Code and Superpowers settings, used while building, not while running.
+.claude
+.superpowers
+
+# The task plans and the code review: people read them, the program doesn't need them.
+docs
+REVIEW.md

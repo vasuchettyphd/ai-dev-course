@@ -22,17 +22,20 @@ The class builds this project up week by week, alongside your own:
 | 4 | [`PLAN.md`](PLAN.md): the plan, in the course's fixed outline |
 | 5 | the first three build steps: the calculator, the buy-box check and a program you run, each built test first from a [Superpowers plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) |
 | 6 | a code review: three reviewer agents in [`.claude/agents/`](.claude/agents/), their findings and the decision on each in [`REVIEW.md`](REVIEW.md), and the fix commits, each named after its finding's number |
-| 7 onward | more of the tool, step by step, following the plan |
+| 7 | a [`Dockerfile`](Dockerfile) and [`.dockerignore`](.dockerignore), so the program and its tests run the same way inside a Docker container |
+| 8 onward | more of the tool, step by step, following the plan |
 
 Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, the week 6 state will get the tag `week-06` once week 6 is published, and later weeks follow (`week-07`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 6)
+## What's here now (week 7)
 
 - `README.md`: this page.
 - `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
 - `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the instructor's task plan, written in the format Superpowers' `writing-plans` produces, from the plan's first three build steps. Compare it with your own.
 - `.claude/agents/`: the three reviewer agents from week 6 (`does-it-work`, `safe-and-private` and `plain-english`). Each can only read files, never change them.
 - `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one). Find those commits on the Commits tab of the week 6 pull request on the course repo.
+- `Dockerfile`: the recipe Docker follows to build an image of the program, with a plain-English note above every line.
+- `.dockerignore`: the files Docker leaves out of the image, with the reason for each group.
 - `dealscreener/`: the code.
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.
@@ -57,6 +60,37 @@ python3 -m dealscreener
 ```
 
 It asks for each number in turn. Type the number and press Enter. If you type something that isn't a sensible number, it says what to type and asks again. Try listing B from the [task plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) (price 150000, rent 1700, tax 2400, insurance 1200, HOA 0, down payment 25, interest rate 7, loan term 30, closing costs 6000): the monthly cash flow should be $430.53 and the deal should pass.
+
+## How to run with Docker
+
+From week 7 you can also run the program inside a Docker container, so it runs the same way on every computer. You need Docker Desktop installed and running (see week 7). Python doesn't need to be installed for this: the image brings its own (Python 3.12).
+
+Open the Terminal (Mac) or, on Windows, the Ubuntu window, go to the folder where you cloned the course repo, and type:
+
+```
+cd example-project
+docker build -t dealscreener .
+```
+
+This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so it takes a minute; later builds are quick.
+
+To run the tests inside the container, type:
+
+```
+docker run --rm dealscreener python -m unittest
+```
+
+The last line should say `OK`, just as on your own computer. To screen a listing, type:
+
+```
+docker run -it --rm dealscreener
+```
+
+It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program; `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
+
+The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`) and any `.env` file of secrets. It also leaves out `docs` and `REVIEW.md`: people read them, but the program doesn't need them.
+
+The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user.
 
 ## What the numbers mean
 
