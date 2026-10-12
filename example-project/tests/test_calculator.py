@@ -58,6 +58,17 @@ class HoaTest(unittest.TestCase):
         self.assertAlmostEqual(results.cash_on_cash_pct, 2.530, delta=0.001)
 
 
+class OtherAssumptionsTest(unittest.TestCase):
+    def test_listing_a_with_10_percent_vacancy_and_5_percent_repairs(self):
+        # Rent kept: 1800 x 0.90 = 1620. Repairs: 1800 x 0.05 = 90, so costs
+        # are 300 + 0 + 90 = 390. Cash flow: 1620 - 390 - 997.95 = 232.05.
+        results = analyse(make_listing(), Assumptions(vacancy_pct=10, repairs_reserve_pct=5))
+        self.assertAlmostEqual(results.monthly_mortgage, 997.95, delta=0.01)
+        self.assertAlmostEqual(results.monthly_cash_flow, 232.05, delta=0.01)
+        self.assertAlmostEqual(results.cap_rate_pct, 7.380, delta=0.001)
+        self.assertAlmostEqual(results.cash_on_cash_pct, 4.972, delta=0.001)
+
+
 class EdgeCaseTest(unittest.TestCase):
     def test_default_assumptions_are_5_percent_vacancy_and_8_percent_repairs(self):
         self.assertEqual(Assumptions(), ASSUMPTIONS)
