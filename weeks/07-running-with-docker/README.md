@@ -124,15 +124,15 @@ Then do 2e.
    - "Windows 11 64-bit: Enterprise, Pro, or Education version 23H2 (build 22631) or higher".
    - "8GB system RAM", "WSL version 2.1.5 or later", and "Enable hardware virtualization in BIOS/UEFI" (you needed virtualization for WSL in week 2 too).
 
-   To see your **edition**, open **Settings > System > About** and look at **Edition** (being tested). Docker's list names Enterprise, Pro and Education, **not Home**; elsewhere the page says "Windows Home or Education editions only allow you to run Linux containers", which is all this course needs. **If yours says Home, ask your instructor before you install:** Home is being tested.
+   To see your **edition**, open **Settings > System > About** and look at **Edition** (being tested). Docker's list names Enterprise, Pro and Education, **not Home**; elsewhere the page says "Windows Home or Education editions only allow you to run Linux containers". Docker's page does not list Home as supported, so Home is being tested. **If yours says Home, ask your instructor before you install.**
 2. **Check WSL** (being tested). In **PowerShell** (Start, type `PowerShell`, open **Windows PowerShell**), type:
 
    ```powershell
    wsl --version
    ```
 
-   The first line shows the WSL version; it must be 2.1.5 or later. If it's older, or `wsl --version` isn't recognised, type `wsl --update` and try again. Then type `wsl.exe -l -v`: your `Ubuntu` must show VERSION `2` (if it shows `1`, see week 2's Troubleshooting).
-3. **Download and install.** On Docker's Windows page, download Docker Desktop for Windows (the x86_64 one, for the Intel and AMD chips most Windows laptops have; if your laptop has an Arm chip such as Snapdragon, ask your instructor first). In **Downloads**, double-click `Docker Desktop Installer.exe`.
+   The first line shows the WSL version; it must be 2.1.5 or later. If it's older, or `wsl --version` isn't recognised, type `wsl --update` and try again. Then type `wsl.exe -l -v`: your `Ubuntu` must show VERSION `2` (if it shows `1`, type `wsl --set-version Ubuntu 2` in PowerShell, as in week 2's Troubleshooting row for `Exec format error`).
+3. **Download and install.** On Docker's Windows page, download Docker Desktop for Windows with the download button on that page (the x86_64 one, for the Intel and AMD chips most Windows laptops have; if your laptop has an Arm chip such as Snapdragon, ask your instructor first; being tested). In **Downloads**, double-click `Docker Desktop Installer.exe`.
    - If it asks how to install, choose **per-user**: Docker's page says "Per-user is recommended and needs no administrator privileges".
    - On the **Configuration** page, make sure **Use WSL 2 instead of Hyper-V** is selected.
    - Follow the steps, then click **Close**.
@@ -151,7 +151,7 @@ From here on, every `docker` command goes in the **Ubuntu window**, never in Pow
 docker --version
 ```
 
-It prints a version, such as `Docker version 29.8.0, build 88096ef` in our test (yours will be newer). Then type:
+It prints a version, such as `Docker version 29.8.0, build 88096ef` in our test (yours will probably differ). Then type:
 
 ```bash
 docker run hello-world
@@ -206,10 +206,10 @@ ls -a
 **c. Make them fit your project.** The copied `Dockerfile` runs the deal screener, not your program. In Claude Code (the first window), type:
 
 ```text
-I copied Dockerfile and .dockerignore from a Python project, a rental deal screener, as a model. Read them, then read PLAN.md, README.md and my code, and adapt both files to my project. Rules: start from an official image on Docker Hub for my language, pinned to a version, never latest (if my project is Python, use python:3.12-slim, as the model does), and a slim version if there is one. If my project needs packages, copy its package list and install them before COPY . ., as the model's comment says. The last line must start my program the way my README says. Never copy a .env file, passwords, keys or other secrets into the image, and keep .dockerignore leaving out .git, .venv, venv, node_modules, __pycache__ and .env files, with the **/ patterns the model uses, plus .claude, .superpowers, docs and REVIEW.md. Keep USER nobody unless my program writes files inside the container; if it does, tell me. Don't add --privileged, ports or folders from my laptop. Keep a plain-English comment above every line. Don't build or run anything yet, and don't commit. Show me both files when you're done.
+I copied Dockerfile and .dockerignore from a Python project, a rental deal screener, as a model. Read them, then read PLAN.md, README.md and my code, and adapt both files to my project. Rules: start from an official image on Docker Hub for my language, pinned to a version, never latest (if my project is Python, use python:3.12-slim, as the model does), and a slim version if there is one. If my project needs packages, copy its package list and install them before COPY . ., as the model's comment says. The last line must start my program the way my README says. Never copy a .env file, passwords, keys or other secrets into the image, and keep .dockerignore leaving out .git, .venv, venv, node_modules, __pycache__ and .env files, with the **/ patterns the model uses, plus .claude, .superpowers, docs and REVIEW.md. If my program reads data files (such as CSV or JSON), tell me which ones and keep only those in the image, without copying anything private. Keep USER nobody unless my program writes files inside the container; if it does, tell me. Don't add --privileged, ports or folders from my laptop. Keep a plain-English comment above every line. Don't build or run anything yet, and don't commit. Show me both files when you're done.
 ```
 
-**What Claude Code will probably do:** read your files, then ask to edit `Dockerfile` and `.dockerignore` (plain **Yes**), and show them. Check the `FROM` line: it names an official image with a version, such as `python:3.12-slim`, and no `latest`. If anything in the table under "How you'll work this week" says **No**, answer No.
+**What Claude Code will probably do:** read your files, then ask to edit `Dockerfile` and `.dockerignore` (plain **Yes**), and show them. Check the `FROM` line: it names an official image with a version, such as `python:3.12-slim`, and no `latest`. If anything in the table under "How you'll work this week" says **No**, answer No. The model `.dockerignore` leaves out every CSV file (`**/*.csv`) because the deal screener reads none; if your program needs a data file, Claude should keep that one in.
 
 **d. Read the Dockerfile.** You don't need to write Dockerfiles, but you should know what yours does. In Claude Code:
 
@@ -227,7 +227,7 @@ Compare with the five lines in step 1. If a line is there that you don't follow,
 
 > **Being tested:** The commands, and the deal screener's output below, were tested on Docker Engine 29.8.0. Docker Desktop on a Mac or Windows, and your own project, are being tested.
 
-Type these **yourself**, in your **second terminal window**, in `~/semester-project`, with Docker Desktop running. You see the output directly, and you can type into your program.
+Type these **yourself**, in your **second terminal window** (`cd ~/semester-project` first), with Docker Desktop running. To open one: on a Mac, click Terminal and press `Cmd + N`; on Windows, open **Ubuntu** again from the Start menu (don't type `wsl` in PowerShell). You see the output directly, and you can type into your program.
 
 **a. Build the image.**
 
@@ -247,6 +247,8 @@ docker run -it --rm semester-project
 
 - `-it` lets you type into the program: `-i` keeps your typing connected to it, `-t` makes it act like a terminal. If you leave it out, a program that asks questions can't read what you type. The deal screener then prints `Stopped before all the numbers were typed.` and stops.
 - `--rm` deletes the container when the program ends, so stopped containers don't pile up. The image stays, so you can run it again.
+
+If your program isn't something you type into (for example a web page), ask Claude how to start it in the container before you run it.
 
 Type in your **hand-worked example from week 5** and compare the answer with yours. It should match, as it did outside the container (to the cent, for money). Take a **screenshot** of the answer with your hand-worked answer beside it: the assignment asks for it. For the deal screener, listing B (price 150000, rent 1700, tax 2400, insurance 1200, HOA 0, down payment 25, interest rate 7, loan term 30, closing costs 6000) gives in the container the same answer as outside it:
 
@@ -288,7 +290,7 @@ Yours will show your own number of tests, in your language's words. Take a **scr
 docker run --rm semester-project ls -a
 ```
 
-This lists the files in the container's working folder (`/app` in the deal screener's `Dockerfile`). For the deal screener:
+This lists the files in the container's working folder (`/app` in the deal screener's `Dockerfile`). It shows the top folder only, not the folders inside it. For the deal screener:
 
 ```text
 .
@@ -301,7 +303,15 @@ dealscreener
 tests
 ```
 
-Check there's **no** `.env`, `.git`, `.venv`, `venv`, `.claude` or `__pycache__`. (`node_modules` is fine **only** if your `Dockerfile` installs packages itself, inside the image.) Anything that shouldn't be there? See Troubleshooting. To see the image's size, type `docker image ls semester-project` (its columns vary between Docker versions).
+Check there's **no** `.env`, `.git`, `.venv`, `venv`, `.claude` or `__pycache__`. (`node_modules` is fine **only** if your `Dockerfile` installs packages itself, inside the image.) Anything that shouldn't be there? See Troubleshooting. To also look inside every folder (optional; tested on the deal screener only, being tested for other projects), type:
+
+```bash
+docker run --rm semester-project find . -name ".env*" -o -name ".git" -o -name ".venv"
+```
+
+It should print nothing.
+
+To see the image's size, type `docker image ls semester-project` (its columns vary between Docker versions).
 
 **e. Commit.** When the program, the tests and the `ls -a` check are all right, in Claude Code:
 
@@ -336,7 +346,11 @@ Commit REVIEW.md on this branch with the message "Review of the Dockerfile".
 | D2 | Nice to have | `.venv` and `venv` in `.dockerignore` match only at the top folder | Fix | Correct: a bare name only matches at the top folder, so these now use `**/` |
 | D3 | Nice to have | The `FROM` line uses a tag, not a digest, so the image can change on rebuild | Won't fix | A digest freezes the image exactly, so it stops security fixes arriving; `3.12-slim` is the course's pin |
 
-Record your decisions (edit `REVIEW.md` yourself, or tell Claude exactly what to write, one finding at a time), then commit: "Commit REVIEW.md on this branch with the message "Triage the Dockerfile review"."
+Record your decisions (edit `REVIEW.md` yourself, or tell Claude exactly what to write, one finding at a time), then commit. In Claude Code:
+
+```text
+Commit REVIEW.md on this branch with the message "Triage the Dockerfile review".
+```
 
 **c. Fix, one finding at a time.** In Claude Code, with the finding's number and a few words about it:
 
@@ -404,19 +418,20 @@ The [assignment](assignment.md) asks for the pull request's address, two screens
 
 | What you see | What to do |
 |---|---|
-| (being tested) `Cannot connect to the Docker daemon ...` or a similar "is the docker daemon running?" message | Most likely Docker Desktop isn't running. Start it (Mac: **Applications > Docker**; Windows: Start, search **Docker**, choose **Docker Desktop**), wait a minute for it to finish starting, then type the command again. |
+| (being tested) `Cannot connect to the Docker daemon ...` or a similar "is the docker daemon running?" message | Most likely Docker Desktop isn't running. Start it (Mac: **Applications > Docker**; Windows: Start, search **Docker**, choose **Docker Desktop**), wait until Docker Desktop says it is running, then type the command again. |
 | (being tested) `docker: command not found` in the Ubuntu window | Most likely Ubuntu isn't connected to Docker Desktop. Check Docker Desktop is running, then **Settings > Resources > WSL Integration**: switch **Ubuntu** on, click **Apply**, close the Ubuntu window and open a new one (step 2d.6). No **WSL Integration** there? Right-click the Docker icon in the taskbar and choose **Switch to Linux containers**. |
 | The line you typed on starts with `PS C:\` | You're in PowerShell. Open **Ubuntu** from the Start menu and type the `docker` command there. PowerShell is only for the WSL checks in step 2d. |
 | `Docker Desktop - Unexpected WSL error`, with a code such as `HCS_E_HYPERV_NOT_INSTALLED` or `ERROR_NOT_SUPPORTED` | Virtualization is most likely turned off. Docker's troubleshooting page, <https://docs.docker.com/desktop/troubleshoot-and-support/troubleshoot/topics/>, says to check the **Performance** tab in Task Manager, and to turn it on in your laptop's BIOS or UEFI settings. That's the same fix as week 2's `wsl --install` row; come to office hours and we'll do it together. |
 | `Docker Desktop - Access Denied` (Windows) | Docker's troubleshooting page says your user isn't in the `docker-users` group. That needs an administrator: come to office hours, or ask whoever manages your laptop. |
 | Docker Desktop won't start until you accept something | Accept the **Docker Subscription Service Agreement** (step 2): "Docker Desktop won't run if you do not agree to the terms." |
 | Your Windows edition is **Home** | Ask your instructor before installing (step 2d.1). Home is being tested. |
-| (being tested) `no space left on device`, or your disk is nearly full | In your terminal: `docker image ls` to see your images, then `docker image prune` (step 6e) to delete unused leftovers. Delete any test image you don't need with `docker image rm <name>`. **No** to `docker system prune -a`. |
+| (being tested) `no space left on device`, or your disk is nearly full | In your terminal: `docker image ls` to see your images, then `docker image prune` (step 6e) to delete unused leftovers. Delete any test image you don't need with `docker image rm <name>` (as in our test). **No** to `docker system prune -a`. |
 | The build stops at an install line (an error from `pip`, `npm` or `apt-get`) | Copy the last 20 lines into Claude Code: "My docker build failed with this error: <paste>. Explain it in plain English, then fix the Dockerfile. Keep an official image with a pinned version, never latest, and don't change my code." Then build again. |
 | (being tested) `failed to read dockerfile` or `no such file or directory` when you build | You're not in your project folder, or the `Dockerfile` isn't there. `cd ~/semester-project`, check `ls` shows `Dockerfile`, and build again. |
 | `Stopped before all the numbers were typed.`, or your own program stops with an "end of file" error such as Python's `EOFError` (being tested) | You left out `-it`, so the program couldn't read your typing. Use `docker run -it --rm semester-project`. |
 | (being tested) The program waits and nothing happens | It may be waiting for you to type. If you typed `docker run` without `-it`, press `Ctrl + C` and use `docker run -it --rm semester-project`. If it still seems stuck, press `Ctrl + C` and ask Claude: "My program waits forever in the container. Explain why in plain English." |
-| (being tested) `exec format error`, or `no matching manifest` with `arm64` or `amd64` in the message | Something in the image was made for another kind of chip. The official `python` image comes for both kinds (`amd64` for Intel and AMD, `arm64v8` for Apple chips), so it's usually a package or a non-official image. Ask Claude: "This error mentions my chip: <paste>. I'm on [a Mac with an Apple chip / an Intel Mac / Windows]. Use only official images and package versions made for my chip, and explain the change first." |
+| (being tested) `exec format error`, or `no matching manifest` with `arm64` or `amd64` in the message | Something in the image was made for another kind of chip. The official `python` image page lists both kinds (`amd64` for Intel and AMD, `arm64v8` for Apple chips; each tag is being tested), so it's usually a package or a non-official image. Ask Claude: "This error mentions my chip: <paste>. I'm on [a Mac with an Apple chip / an Intel Mac / Windows]. Use only official images and package versions made for my chip, and explain the change first." |
+| (being tested) The program can't find a file in the container (for example `No such file or directory` or `FileNotFoundError`) | `.dockerignore` probably left it out. Ask Claude: "My program can't find <file> in the container. Which files does it need? Change .dockerignore so only those go in, without copying anything private." Then build again. |
 | `Permission denied` when your program saves a file | The `USER nobody` line stops writing inside `/app`. Remove that line from the `Dockerfile`, or ask Claude: "My program gets Permission denied when it saves a file in the container. Fix the Dockerfile, and explain the change." Then build again. |
 | `ls -a` (step 4d) shows `.env`, `.git`, `.venv`, `venv`, `.claude` or `__pycache__` | Don't commit or push yet. In Claude Code: "The image contains <name>. Add it to .dockerignore with a **/ pattern, and change nothing else." Build again and check `ls -a` again. If it was a `.env` file, also ask "Is .env in git? Don't change anything." and tell your instructor if it is. |
 | The program in the container gives a different answer from your hand-worked example | Check your hand working first. Then tell Claude: "For this input [your input], I worked out [your answer] by hand, but the container says [its answer], and outside the container it says [answer]. Find out why before changing anything." |

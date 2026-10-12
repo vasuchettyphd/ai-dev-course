@@ -286,7 +286,7 @@ docker run --rm semester-project ls -a
 
 No `.env`, `.git`, `.venv`, `.claude`, `__pycache__`. Then commit: "Run the project in Docker".
 
-<p class="small">Deal screener output (ls -a prints one name per line). Node.js: maybe npm test (being tested).</p>
+<p class="small">Deal screener output (its image is called dealscreener; ls -a prints one name per line). Node.js: maybe npm test (being tested).</p>
 
 ---
 
@@ -349,7 +349,7 @@ Tidy up, optional, typed yourself: `docker image prune` deletes only unused left
 
 | What you see | Most likely |
 |---|---|
-| `Cannot connect to the Docker daemon` (being tested) | Docker Desktop isn't running: start it, wait, try again |
+| `Cannot connect to the Docker daemon` (being tested) | Docker Desktop isn't running: start it, wait until it says it is running, try again |
 | `docker: command not found` in Ubuntu (being tested) | **WSL Integration**: Ubuntu on, **Apply**, new Ubuntu window |
 | Line starts `PS C:\` | You're in PowerShell: use the Ubuntu window |
 | `Unexpected WSL error` | Virtualization off in BIOS/UEFI: office hours |
@@ -371,7 +371,7 @@ Tidy up, optional, typed yourself: `docker image prune` deletes only unused left
 
 | Criterion | Points |
 |---|---|
-| Dockerfile and `.dockerignore` merged by PR: pinned official base, nothing secret or unneeded copied in | 4 |
+| Dockerfile and `.dockerignore` merged by PR: pinned official base, last line runs your program, nothing secret or unneeded copied in | 4 |
 | Tests and program in the container, screenshots, hand-worked comparison | 3 |
 | Reflection | 3 |
 
