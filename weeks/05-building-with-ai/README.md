@@ -17,6 +17,8 @@ You need:
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows, as in weeks 2 to 4. Every command below says where to type it: **in your terminal**, or **in Claude Code** (the `claude` session). On Windows, nothing this week goes in PowerShell.
 
+Some steps say **in a second terminal window**: that means a new window, so Claude Code keeps running in the first one. On a Mac, click Terminal and press `Cmd + N`. On Windows, open **Ubuntu** again from the Start menu (don't type `wsl` in PowerShell). Then type `cd ~/semester-project` in the new window before anything else.
+
 ### How you'll work this week
 
 As in weeks 3 and 4, you ask Claude Code in plain English. For each step this README shows **the prompt** to type, **what Claude Code will probably do** (its exact words will differ), and **what to check** afterwards.
@@ -82,9 +84,9 @@ It opens the plugin's details. Choose **Install for you (user scope)**, not proj
 claude plugin install superpowers@claude-plugins-official
 ```
 
-In our test it ended with `Successfully installed plugin: superpowers@claude-plugins-official (scope: user)`. If it says the plugin was **not found in marketplace**, add Anthropic's official marketplace first (in your terminal, `claude plugin marketplace add anthropics/claude-plugins-official`), then run the install again. If you installed from the terminal while Claude Code was open, type `/reload-plugins` in Claude Code.
+In our test it ended with `Successfully installed plugin: superpowers@claude-plugins-official (scope: user)`. If it says the plugin was **not found in marketplace**, add Anthropic's official marketplace first (in a second terminal window, `claude plugin marketplace add anthropics/claude-plugins-official`), then run the install again. If you installed from the terminal while Claude Code was open, type `/reload-plugins` in Claude Code.
 
-**c. Check it's installed.** In Claude Code, type `/plugin` and look for `superpowers` among your installed plugins (the exact screen is being tested; press `Esc` to close it). Or, in your terminal, type `claude plugin list`. In our test it showed:
+**c. Check it's installed.** In Claude Code, type `/plugin` and look for `superpowers` among your installed plugins (the exact screen is being tested; press `Esc` to close it). Or, in a second terminal window, type `claude plugin list`. In our test it showed:
 
 ```text
 Installed plugins:
@@ -96,11 +98,25 @@ Installed plugins:
 
 Your version number may be higher. Superpowers stays installed from now on: you use it again in later weeks.
 
+**d. Start a branch, before Claude writes anything.** You build on a branch, never on `main`, and you make the branch now, before step 3, so nothing Claude writes this week can land on `main`. First check that nothing is waiting to be saved. In Claude Code, type:
+
+```text
+Show me git status.
+```
+
+It should say `nothing to commit, working tree clean`. If it lists files, don't go on: ask "What are these files, and where did they come from? Don't change anything.", and ask in office hours if you're not sure. When it's clean, type:
+
+```text
+Switch to main and pull the latest changes from GitHub. Then make a new branch called build-first-steps and switch to it.
+```
+
+It will probably run `git switch main`, `git pull` and `git switch -c build-first-steps`. Plain **Yes**. Check: ask "What branch am I on?". It should say `build-first-steps`. (If it says a branch with that name already exists, use `build-first-steps-2` instead, here and everywhere this README says `build-first-steps`.)
+
 ### 3. Pick your tools
 
 Your plan says **what** to build, but not which programming language and tools to build it with. Let Claude recommend them, with guardrails: it must run on a Mac and in WSL, and it must explain every install before it runs.
 
-**a. Ask for a recommendation.** In Claude Code (still in `~/semester-project`, `manual mode on`), type this, with your own laptop in the brackets:
+**a. Ask for a recommendation.** In Claude Code (still in `~/semester-project`, on `build-first-steps`, `manual mode on`), type this, with your own laptop in the brackets:
 
 ```text
 Read PLAN.md. Recommend the simplest programming language and tools for building its first three build steps. I'm not a programmer. It must run on a Mac and on Windows in WSL (Ubuntu), and my laptop is [a Mac with an Apple chip / an Intel Mac / Windows with WSL Ubuntu]. Prefer what's already installed, as few installs as possible, and tests I can run with one command. Check what's already installed first. Before you run any install command, explain in one or two sentences what it installs and why, and wait for me to say go. Don't create or change any files yet.
@@ -122,14 +138,14 @@ If Superpowers starts **brainstorming** (asking design questions one at a time),
 | Intel Mac | a `.pkg` installer you download yourself from the official links below | `brew` (no Homebrew on an Intel Mac in this course), `apt`, `apt-get`, `winget`, `choco`, `.exe`, `.msi` |
 | Windows (WSL) | `sudo apt install ...`, and the Node.js commands below | `brew`, `winget`, `choco`, PowerShell commands, anything with `.exe`, `.msi` or `.pkg` |
 
-Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` or `sudo pip`, to a `curl ... | bash` from a site that isn't one of the official links below, and to anything you don't understand. Saying No is always safe: Claude stops and asks what to do instead. Choose plain **Yes** for installs, never "don't ask again".
+Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` or `sudo pip`, to any `curl ... | bash` (the one exception is the Node.js line in step 3d, on Windows only, which you type yourself), and to anything you don't understand. Saying No is always safe: Claude stops and asks what to do instead. Choose plain **Yes** for installs, never "don't ask again".
 
-**Commands that start with `sudo`** ask for your password. On Windows that's the Ubuntu password you made in week 2; on a Mac, your Mac login password. Typing it shows nothing; that's normal. Run `sudo` commands **yourself, in your terminal**, so the password goes to your laptop and never to Claude: choose **No**, type "I'll run that myself", copy the command into a second terminal window, and tell Claude when it's done (being tested). **Never type a password into Claude Code.**
+**On Windows (WSL), commands that start with `sudo`** ask for the Ubuntu password you made in week 2 (typing it shows nothing; that's normal). Run them **yourself, in a second Ubuntu window**, so the password goes to Ubuntu and never to Claude: when Claude asks to run one, choose **No**, type "I'll run that myself", copy the command into the second window, and tell Claude when it's done (being tested). **On a Mac,** the `.pkg` installers below ask for your Mac password in their own window. **Never type a password into Claude Code.**
 
-**c. Install Python, if you need it.** Check first: in your terminal, type `python3 --version`.
+**c. Install Python, if you need it.** Check first: in a second terminal window, type `python3 --version`.
 
-- **Mac (Apple chip or Intel):** if it prints `Python 3.9` or any higher number, you already have it: it came with Apple's Command Line Tools in week 3. If it's lower, or a window offers to install the Command Line Tools, get the installer from python.org's Mac page, <https://www.python.org/downloads/macos/>: under "Latest Python 3 Release" (Python 3.15.0 when we checked), download the **macOS installer** (`python-3.15.0-macos11.pkg`; your number may be higher). The same installer works on Apple chip and Intel Macs; Python's docs say it "runs natively on all Macs (Apple Silicon and Intel)" (<https://docs.python.org/3/using/mac.html>). Double-click it in **Downloads** and follow the steps. Then close Terminal (`Cmd + Q`), open it again, and type `python3 --version` (being tested).
-- **Windows (WSL):** if it prints a version, you have it. If it says `command not found`, in the **Ubuntu window** type:
+- **Mac (Apple chip or Intel):** if it prints `Python 3.9` or any higher number, you already have it: it came with Apple's Command Line Tools in week 3. If it's lower, or a window offers to install the Command Line Tools, get the installer from python.org's Mac page, <https://www.python.org/downloads/macos/>: under "Latest Python 3 Release" (Python 3.15.0 when we checked), download the **macOS installer** (`python-3.15.0-macos11.pkg`; your number may be higher). The same installer works on Apple chip and Intel Macs; Python's docs say it "runs natively on all Macs (Apple Silicon and Intel)" (<https://docs.python.org/3/using/mac.html>). Double-click it in **Downloads** and follow the steps. Then come back as in "After an install" below, and type `python3 --version` (being tested).
+- **Windows (WSL):** if it prints a version, you have it. If it says `command not found`, type this yourself in the second **Ubuntu window**:
 
   ```bash
   sudo apt update && sudo apt install -y python3 python3-venv
@@ -137,12 +153,12 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
 
   In our test (Ubuntu 24.04) this installed Python 3.12.3, and `python3 --version` then printed `Python 3.12.3`. If Python is there but Claude's plan needs extra Python packages, also install `python3-venv` this way (being tested on real WSL).
 
-**Extra Python packages.** If the plan needs packages from outside Python (installed with `pip`), ask Claude to put them in a **virtual environment** in your project: "Use a virtual environment in .venv for any Python packages." On Windows, plain `pip install` outside one is blocked by Ubuntu 24.04 (an `externally-managed-environment` error), so say **No** to `--break-system-packages`. In WSL, a virtual environment needs `python3-venv` (above). Being tested. The deal screener needs no extra packages at all.
+**Extra Python packages.** If the plan needs packages from outside Python (installed with `pip`), ask Claude to put them in a **virtual environment** in your project: "Use a virtual environment in .venv for any Python packages." In WSL (Ubuntu 24.04) and with Homebrew's Python on a Mac, plain `pip install` outside one is blocked (an `externally-managed-environment` error), so say **No** to `--break-system-packages`. In WSL, a virtual environment needs `python3-venv` (above). Being tested. The deal screener needs no extra packages at all.
 
 **d. Install Node.js, if Claude chose it.** The official page is <https://nodejs.org/en/download> (Node.js 24.21.0 was the LTS, "long-term support", version when we checked; pick the LTS one). Being tested:
 
-- **Mac (Apple chip or Intel):** on that page, download the **macOS Installer** (`.pkg`), double-click it in **Downloads** and follow the steps. Then close Terminal (`Cmd + Q`) and open it again.
-- **Windows (WSL):** nodejs.org's Linux instructions use **nvm**, a Node.js version manager. In the **Ubuntu window**, run these three lines, one at a time (they come from nodejs.org's own download instructions):
+- **Mac (Apple chip or Intel):** on that page, download the **macOS Installer** (`.pkg`), double-click it in **Downloads** and follow the steps. Then come back as in "After an install" below.
+- **Windows (WSL):** nodejs.org's Linux instructions use **nvm**, a Node.js version manager. Type these three lines yourself in a second **Ubuntu window**, one at a time, exactly as shown (they come from nodejs.org's own download instructions). The first line is this course's one exception to "say No to `curl ... | bash`": only on Windows (WSL), only this line, and you type it yourself:
 
   ```bash
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
@@ -150,9 +166,16 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
   nvm install 24
   ```
 
-  Then close the Ubuntu window and open it again.
+  Then come back as in "After an install" below.
 
-**e. Check what was installed.** In your terminal, type the line for your language:
+**After an install,** your terminal has to be closed and opened again before it finds the new tool, and closing it also closes Claude Code. So:
+
+1. In Claude Code, type `/exit`.
+2. Close the window: on a Mac, quit Terminal (`Cmd + Q`); on Windows, close every Ubuntu window. Then open it again.
+3. Type `cd ~/semester-project && claude`, and press `Shift + Tab` until the bottom line says `manual mode on`.
+4. Tell Claude: "We chose [Python / Node.js]. It's installed. We're on the build-first-steps branch."
+
+**e. Check what was installed.** In a second terminal window, type the line for your language:
 
 ```bash
 python3 --version
@@ -162,19 +185,19 @@ python3 --version
 node --version && npm --version
 ```
 
-Each prints a version number. `command not found`? Close your terminal, open it again, and try once more; then see Troubleshooting. Tell Claude what they printed: "Python 3.12.3 is installed now."
+Each prints a version number. `command not found`? Do "After an install" (step 3d) and try once more; then see Troubleshooting. Tell Claude what they printed, for example: "Python 3.12.3 is installed now."
 
 ### 4. Plan the first three steps
 
 > **Being tested:** This step needs a signed-in session and is being tested. What the plan contains comes from the `writing-plans` skill's own instructions (Superpowers 6.4.1).
 
-**a. Start a branch.** You build on a branch, never on `main`. In Claude Code, type:
+**a. Keep tool folders out of git.** Some tools make big folders inside your project (`.venv/` for a Python virtual environment, `node_modules/` for Node.js, `__pycache__/` for Python's own scratch files). They must never go to GitHub. Still on `build-first-steps`, in Claude Code, type:
 
 ```text
-Switch to main and pull the latest changes from GitHub. Then make a new branch called build-first-steps and switch to it.
+Add .venv/, node_modules/ and __pycache__/ to .gitignore (create it if it doesn't exist), and commit .gitignore on this branch.
 ```
 
-It will probably run `git switch main`, `git pull` and `git switch -c build-first-steps`. Plain **Yes**. Check: ask "What branch am I on?". It should say `build-first-steps`.
+It edits or creates `.gitignore` (an edit prompt) and commits it. Plain **Yes**.
 
 **b. Ask for the plan.** In Claude Code, type:
 
@@ -267,18 +290,19 @@ Its first line is `# SDD ledger`, followed by the plan's path, and it gets a lin
 | Create or edit files inside your project folder | **Yes** |
 | Run the tests (for example `python3 -m unittest` or `npm test`) | **Yes** |
 | `git add` or `git commit` on `build-first-steps` | plain **Yes** |
-| An install it explained in step 3 | plain **Yes** (`sudo`: run it yourself, step 3b) |
+| An install it explained in step 3 | plain **Yes**, except a `sudo` command on Windows: **No**, and run it yourself (step 3b) |
 | An install it didn't explain | **No**, then "Explain this command first" |
-| Anything with `main` in a git command (`git switch main`, `git merge`, `git push origin main`) | **No** |
+| Anything that **changes** `main` (`git switch main`, `git checkout main`, `git merge` into main, `git push origin main`, `git branch -f main`) | **No** |
+| Read-only git commands that only mention `main` (`git diff`, `git log`, `git merge-base`, `git status`) | **Yes** |
 | `git push` during the build | **No**: you push in step 7 |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
 | Change files outside your project folder | **No** |
 
-After a No, Claude stops and asks what to do instead. Tell it, or type "Carry on with the plan without that."
+(You switch to `main` yourself only after the build, in step 7d.) After a No, Claude stops and asks what to do instead. Tell it, or type "Carry on with the plan without that."
 
-**e. How to stop safely.** The safest moment is just after a task finishes (the ledger gets a `Task N: complete` line). Then press `Esc` to stop Claude, and type `/exit`. Everything finished so far is committed on your branch. If you have to stop in the middle of a task, press `Esc` anyway: that task may be redone when you carry on.
+**e. How to stop safely.** The safest moment is just after a task finishes (the ledger gets a `Task N: complete` line). Then press `Esc` to stop Claude, and type `/exit`. Everything finished so far is committed on your branch. If you have to stop in the middle of a task, press `Esc` anyway: that task may be redone when you carry on. Its files may not be committed yet. Ask "Show me git status" to see them, and leave them where they are: never `git clean`, `git restore` or `reset` them. When you carry on, Claude picks them up.
 
-**To carry on later** (being tested): in your terminal, `cd ~/semester-project && claude`, check "What branch am I on?" says `build-first-steps`, then type this, with your plan file's name:
+**To carry on later** (being tested): in your terminal, `cd ~/semester-project && claude`, press `Shift + Tab` until `manual mode on`, check "What branch am I on?" says `build-first-steps`, then type this, with your plan file's name:
 
 ```text
 /superpowers:subagent-driven-development Continue the plan from the ledger. The plan is docs/superpowers/plans/<your-plan-file>.md.
@@ -289,7 +313,7 @@ It reads the ledger, skips the tasks marked complete, and carries on from the fi
 **If a worktree was made** (being tested; from Claude Code's docs, <https://code.claude.com/docs/en/worktrees>): if you said Yes to the worktree question, your build happens in another folder, so your files seem to "disappear" from `~/semester-project`. They haven't.
 
 - Claude Code's own worktrees are in `.claude/worktrees/<name>/` inside your project, on a branch called `worktree-<name>`. They start from `main` on GitHub. If Superpowers made the worktree itself, it's in `.worktrees/` instead.
-- To list them, type `git worktree list` in your terminal in `~/semester-project`.
+- To list them, type `git worktree list` in a second terminal window, in `~/semester-project`.
 - When you `/exit`, Claude Code may ask whether to keep or remove the worktree. Choose **Keep**. Removing it deletes the folder, its branch and all the work in it.
 - To go back to it, type the command Claude Code prints when you exit, which looks like `claude --worktree <name> --resume`.
 - The ledger and the build are in the worktree folder, so carry on from there. Your pull request in step 7 comes from the worktree's branch. If anything is unclear, ask in office hours before you delete anything.
@@ -345,7 +369,7 @@ OK
 
 Yours will say something like "all passed", in your language's words. Take a **screenshot**: the assignment asks for it.
 
-**b. Run your program on your own example.** Still in your terminal, start your program the way the plan or Claude says (for the deal screener, `python3 -m dealscreener`). Type in your example from step 4d, and compare its answer with the one you worked out by hand. They should match (to the cent, for money). Take a **screenshot** of the program's answer with your hand-worked answer beside it.
+**b. Run your program on your own example.** Still in your second terminal window, start your program the way the plan or Claude says (for the deal screener, `python3 -m dealscreener`). Type in your example from step 4d, and compare its answer with the one you worked out by hand. They should match (to the cent, for money). Take a **screenshot** of the program's answer with your hand-worked answer beside it.
 
 Don't match? Don't answer the menu. Tell Claude: "For this input [your input], I worked out [your answer] by hand, but the program says [its answer]. Find out which is right before changing anything." Sometimes the hand working is the one that's wrong.
 
@@ -373,7 +397,7 @@ Overall: PASS
 
 If the menu never appeared (for example, you stopped and came back), type `/superpowers:finishing-a-development-branch` in Claude Code.
 
-**d. Merge on GitHub, then pull.** As in [week 3](../03-git-and-github/) step 7: open the PR's address, read **Files changed** (you should see your plan file, your code and your tests), then on the **Conversation** tab click **Merge pull request** and **Confirm merge** (or "Squash and merge"). Then, in Claude Code:
+**d. Merge on GitHub, then pull.** As in [week 3](../03-git-and-github/) step 7: open the PR's address and read **Files changed**. You should see only your plan file, `.gitignore`, your code and your tests. If you see a `.venv/`, `node_modules/` or `__pycache__/` folder, don't merge: ask Claude "Remove .venv, node_modules and __pycache__ from git (keep them on my laptop), make sure .gitignore lists them, commit and push." Then on the **Conversation** tab click **Merge pull request** and **Confirm merge** (or "Squash and merge"; the exact label is being tested). Then, in Claude Code:
 
 ```text
 Switch back to main and pull the latest changes from GitHub.
@@ -381,11 +405,13 @@ Switch back to main and pull the latest changes from GitHub.
 
 Check: ask "Is my plan file in this folder, and what branch am I on?". The plan file and your code should be there, on `main`.
 
+Your laptop still has the `build-first-steps` branch. That's harmless: keep it until your assignment is graded. If Claude or GitHub offers to delete a branch or a worktree, answer **No** on your laptop. (Deleting the branch on GitHub after the merge, as in week 3, is fine.)
+
 ### 8. Check it worked
 
 You're done when:
 
-- Your pull request's page on GitHub shows it was merged (the exact label is being tested), and **Files changed** shows the plan file under `docs/superpowers/plans/`, your code and your tests.
+- Your pull request's page on GitHub shows it was merged, and **Files changed** shows the plan file under `docs/superpowers/plans/`, `.gitignore`, your code and your tests, and no tool folders.
 - On `main`, in your terminal in `~/semester-project`, your tests pass.
 - Your program gives the same answer as your hand-worked example.
 - You've noted one review finding and what changed, and roughly how much of your usage the build took (from `/usage`).
@@ -398,16 +424,61 @@ The [assignment](assignment.md) asks for the PR's address, two screenshots and a
 |---|---|
 | The tests fail (in step 7, or Claude says they do) | Don't merge. In Claude Code: "The tests fail. Show me which test fails and why, in plain English, then fix the code, not the test." If a test's expected answer is wrong, check it against your hand working first. |
 | An install command for the wrong laptop (`apt` on a Mac, `brew` on an Intel Mac or in WSL, `winget`, `.exe` or PowerShell on Windows) | Choose **No**. Type: "That's not for my laptop. I'm on [a Mac with an Apple chip / an Intel Mac / Windows with WSL Ubuntu]. Use the official installer for it, and explain it first." |
-| `python3: command not found` or `node: command not found` | Close your terminal and open it again, then try again. On Windows, check you're in the **Ubuntu window**, not PowerShell. Still missing? Do step 3c or 3d again. |
-| `command not found` for something Claude installed | Close your terminal (and Claude Code) and open it again. If you used a virtual environment, ask Claude: "How do I run the tests and the program with the virtual environment?" |
+| `python3: command not found` or `node: command not found` | Do "After an install" (step 3d): `/exit`, close and reopen your terminal, start Claude Code again, then try again. On Windows, check you're in the **Ubuntu window**, not PowerShell. Still missing? Do step 3c or 3d again. |
+| `command not found` for something Claude installed | Do "After an install" (step 3d). If you used a virtual environment, ask Claude: "How do I run the tests and the program with the virtual environment?" |
 | `error: externally-managed-environment` | Choose **No** to `--break-system-packages`. Ask Claude: "Use a virtual environment in .venv instead." In WSL, install `python3-venv` first (step 3c). |
 | (being tested) Superpowers starts brainstorming, asking design questions one at a time | Type: "Skip brainstorming: PLAN.md is the design. Use writing-plans for its first three build steps." |
-| `/superpowers:...` isn't in the list | Type `/reload-plugins`, then try again. Still missing? In your terminal, `claude plugin list`, and check `superpowers` is there and enabled; if not, do step 2 again. |
+| `/superpowers:...` isn't in the list | Type `/reload-plugins`, then try again. Still missing? In a second terminal window, `claude plugin list`, and check `superpowers` is there and enabled; if not, do step 2 again. |
 | `You've hit your session limit` or `weekly limit` | Normal. Wait for the reset time it shows (step 6). Leave Claude Code open, or come back later and carry on (step 5e). If you hit the weekly limit with days to go, tell your instructor. |
 | A task goes round and round in review and fix rounds | Up to 5 rounds per task is normal; after that Claude decides and writes down a ruling. If it seems stuck, press `Esc` and ask: "Summarise in plain English what's still failing and why." Check `/usage`. Ask in office hours if it's still stuck. |
-| (being tested) A worktree folder appeared, or "my files disappeared" | They're in a worktree, on another branch (step 5, "If a worktree was made"). In your terminal, `git worktree list` shows where. When you exit, choose **Keep**, never remove. Don't delete any folder yourself. |
+| (being tested) A worktree folder appeared, or "my files disappeared" | They're in a worktree, on another branch (step 5, "If a worktree was made"). In a second terminal window, `git worktree list` shows where. When you exit, choose **Keep**, never remove. Don't delete any folder yourself. |
 | Claude asks to keep or remove a worktree | Choose **Keep**. |
-| (being tested) It committed to `main` | Say **No** to any push of `main`, and to `reset --hard` or `--force`. If you haven't pushed `main`, ask Claude Code: "Make a branch called build-first-steps at this commit, switch to it, then move my local main back to match origin/main. Don't push main." Then finish from step 7. If `main` was already pushed, tell your instructor and ask in office hours. |
+| It committed to `main` | Say **No** to any push of `main`, and to `reset --hard` or `--force`. Then follow "If it committed to `main`" below. |
+| `fatal: a branch named 'build-first-steps' already exists` | Use `build-first-steps-2` instead (step 2d), here and everywhere this README says `build-first-steps`. |
 | The plan has more than three tasks | Before you choose Subagent-driven, type: "Rewrite the plan with exactly three tasks, one for each of the first three build steps in PLAN.md. Leave everything else out." Then read it again (step 4c). |
 | The program's answer doesn't match your hand-worked answer | See step 7b. Check your hand working too. |
-| `! [rejected]        main -> main (fetch first)` | You merged on GitHub and didn't pull. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
+
+### If it committed to `main`
+
+> **Being tested** with real students. The git commands were tested in a scratch repository on Linux, 12 October 2026.
+
+If Claude committed your work on `main` instead of your branch, you move the work to a new branch yourself. Type these commands **yourself, in a second terminal window** (Terminal on a Mac, a second Ubuntu window on Windows), one at a time, and check each result before the next.
+
+```bash
+cd ~/semester-project
+git fetch
+```
+
+`git fetch` gets GitHub's latest state without changing your files. It may print nothing.
+
+```bash
+git log --oneline origin/main..main
+```
+
+This lists the commits that are only on your laptop's `main`, one per line, such as `a1b2c3d Add the calculator`. **If it prints nothing, stop:** your work is already on GitHub's `main`. Tell your instructor and ask in office hours.
+
+```bash
+git switch -c rescue-first-steps
+```
+
+This makes a new branch at the same commit and moves you onto it, carrying any unsaved changes with you. Nothing is lost. It prints `Switched to a new branch 'rescue-first-steps'`.
+
+```bash
+git log --oneline origin/main..rescue-first-steps
+```
+
+This must list **the same commits** as before. If it doesn't, stop and ask in office hours.
+
+```bash
+git branch -f main origin/main
+```
+
+This moves only the `main` label back to match GitHub. Your files and the new branch are untouched. In our test it printed `branch 'main' set up to track 'origin/main'.` This is **the one exception** to "never change `main`", and only now, because your work is safe on `rescue-first-steps`. Never use `reset --hard` or `--force`, and never push `main`.
+
+Then, in Claude Code, type:
+
+```text
+Work on the rescue-first-steps branch from now on.
+```
+
+From here, read `rescue-first-steps` wherever this README says `build-first-steps`, and carry on (step 5e) or finish (step 7).

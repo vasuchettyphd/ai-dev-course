@@ -56,26 +56,26 @@ Claude writes the code. **You** decide what gets built, read what it asks to do,
 
 ---
 
-## Install Superpowers again (being tested)
+<style scoped>section { font-size: 25px; }</style>
 
-In your terminal: `cd ~/semester-project && claude`, then `manual mode on`.
+## Install Superpowers, then branch (being tested)
 
-In Claude Code:
+In your terminal: `cd ~/semester-project && claude`, then `manual mode on`. In Claude Code:
 
 ```text
 /plugin install superpowers@claude-plugins-official
 ```
 
-Choose **Install for you (user scope)**. Asked to? `/reload-plugins`.
+**Install for you (user scope)**, then `/reload-plugins` if asked. Check: `claude plugin list` (second terminal window) shows `Version: 6.4.1` or higher.
 
-Or in your terminal (from our test):
+**Branch now, before Claude writes anything.** `Show me git status.` must say `nothing to commit, working tree clean`. Then:
 
 ```text
-$ claude plugin install superpowers@claude-plugins-official
-Successfully installed plugin: superpowers@claude-plugins-official (scope: user)
+Switch to main and pull the latest changes from GitHub. Then make a
+new branch called build-first-steps and switch to it.
 ```
 
-Check: `/plugin`, or `claude plugin list` shows `Version: 6.4.1` (or higher).
+<p class="small">Branch name taken? Use build-first-steps-2.</p>
 
 ---
 
@@ -106,9 +106,9 @@ Check three things: did Claude **explain it first**? Is it **for your laptop**? 
 | Intel Mac | official `.pkg` | `brew`, `apt`, `winget`, `.exe` |
 | Windows (WSL) | `sudo apt install`, nvm | `brew`, `winget`, PowerShell, `.exe`, `.pkg` |
 
-Always **No**: `--force`, `rm -rf`, `--break-system-packages`, `sudo pip`, a `curl | bash` from an unknown site.
+Always **No**: `--force`, `rm -rf`, `--break-system-packages`, `sudo pip`, any `curl | bash` (one exception: nodejs.org's nvm line on WSL, typed by you).
 
-`sudo`: choose No and **run it yourself** in your terminal. Never type a password into Claude.
+WSL `sudo`: choose No and **run it yourself** in a second Ubuntu window. Mac `.pkg`: asks in its own window. Never type a password into Claude.
 
 ---
 
@@ -116,12 +116,12 @@ Always **No**: `--force`, `rm -rf`, `--break-system-packages`, `sudo pip`, a `cu
 
 ## Official install links
 
-Check first, in your terminal: `python3 --version`, `node --version`
+Check first, in a second terminal window: `python3 --version`, `node --version`
 
 | | Python | Node.js (LTS) |
 |---|---|---|
 | **Mac, Apple chip or Intel** | 3.9 or higher already? Use it. Else python.org/downloads/macos, **macOS installer** (3.15.0 when we checked) | nodejs.org/en/download, **macOS Installer** (being tested) |
-| **Windows (WSL)** | Missing? `sudo apt update && sudo apt install -y python3 python3-venv` (3.12.3 in our test) | nvm, from nodejs.org (being tested) |
+| **Windows (WSL)** | Missing? `sudo apt update && sudo apt install -y python3 python3-venv` (3.12.3 in our test) | nvm, from nodejs.org: type it yourself, one line at a time (being tested) |
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
@@ -129,17 +129,17 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 nvm install 24
 ```
 
-Then close and reopen your terminal, and check `--version` again.
+After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project && claude`, `manual mode on`, then "We chose Python. It's installed." Check `--version` in a second window.
 
 ---
 
 ## Plan the first three steps (being tested)
 
-On a branch, never `main`:
+Keep tool folders out of git first:
 
 ```text
-Switch to main and pull the latest changes from GitHub. Then make a
-new branch called build-first-steps and switch to it.
+Add .venv/, node_modules/ and __pycache__/ to .gitignore (create it
+if it doesn't exist), and commit .gitignore on this branch.
 ```
 
 Then:
@@ -234,6 +234,8 @@ At the end: a whole-branch review, and "Rulings I made". **Note one review findi
 
 ---
 
+<style scoped>section { font-size: 24px; } table { font-size: 19px; }</style>
+
 ## Yes or No during the build
 
 | Claude asks to | Choose |
@@ -241,9 +243,11 @@ At the end: a whole-branch review, and "Rulings I made". **Note one review findi
 | Create or edit files in your project | **Yes** |
 | Run the tests | **Yes** |
 | `git add`, `git commit` on `build-first-steps` | plain **Yes** |
-| An install it explained | plain **Yes** (`sudo`: run it yourself) |
+| An install it explained | plain **Yes** (WSL `sudo`: No, run it yourself) |
 | An install it didn't explain | **No**: "Explain this command first" |
-| Anything with `main`; `git push` | **No** (you push in step 7) |
+| Anything that **changes** `main` (switch, checkout, merge, push, `branch -f`) | **No** |
+| Read-only: `git diff`, `git log`, `git merge-base`, `git status` | **Yes** |
+| `git push` | **No** (you push in step 7) |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
 
 It only stops by itself for: can't-be-undone, security-sensitive, outside your project (push, merge, publish), or a plan too broken to guess.
@@ -305,7 +309,7 @@ Then answer **`2`**. Never 1. Plain **Yes** to `git push` and `gh pr create`. Co
 
 ## Merge, pull, check
 
-On GitHub: **Files changed** (plan file, code, tests), then **Merge pull request**, **Confirm merge**.
+On GitHub: **Files changed** shows only the plan file, `.gitignore`, code and tests (no `.venv/`, `node_modules/`), then **Merge pull request**, **Confirm merge**.
 
 In Claude Code:
 
@@ -318,6 +322,8 @@ Done when:
 - the PR is merged, with the plan file in `docs/superpowers/plans/`
 - on `main`, your tests pass
 - your program matches your hand-worked example
+
+<p class="small">Keep your local build-first-steps branch until graded. Say No to deleting a branch or worktree.</p>
 
 ---
 
