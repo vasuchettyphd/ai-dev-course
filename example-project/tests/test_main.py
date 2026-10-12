@@ -107,5 +107,61 @@ class RunTest(unittest.TestCase):
         self.assertIn("Stopped", console.output())
 
 
+def listing_b_with_rate(*rate_answers):
+    answers = list(LISTING_B)
+    answers[6:7] = list(rate_answers)
+    return answers
+
+
+class SmallPercentTest(unittest.TestCase):
+    def test_rate_typed_as_a_fraction_asks_and_yes_means_percent(self):
+        console, exit_code = run_with(listing_b_with_rate("0.07", "y"))
+        self.assertEqual(exit_code, 0)
+        self.assertIn("You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%: ", console.prompts)
+        plain, _ = run_with(LISTING_B)
+        self.assertEqual(console.output().splitlines()[-9:], plain.output().splitlines()[-9:])
+
+    def test_no_keeps_the_small_rate(self):
+        console, exit_code = run_with(listing_b_with_rate("0.07", "n"))
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Monthly mortgage payment: $315.80", console.output())
+
+    def test_yes_and_no_ignore_case_and_spaces(self):
+        yes, _ = run_with(listing_b_with_rate("0.07", " YES "))
+        plain, _ = run_with(LISTING_B)
+        self.assertEqual(yes.output().splitlines()[-9:], plain.output().splitlines()[-9:])
+        no, _ = run_with(listing_b_with_rate("0.07", "No"))
+        self.assertIn("Monthly mortgage payment: $315.80", no.output())
+
+    def test_other_answers_ask_the_follow_up_again(self):
+        console, exit_code = run_with(listing_b_with_rate("0.07", "", "maybe", "y"))
+        self.assertEqual(exit_code, 0)
+        follow_up = "You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%: "
+        self.assertEqual(console.prompts.count(follow_up), 3)
+
+    def test_shows_the_number_without_extra_zeros(self):
+        console, _ = run_with(listing_b_with_rate("0.065", "y"))
+        self.assertIn("You typed 0.065. Did you mean 6.5%? Type y for 6.5%, or n to keep 0.065%: ", console.prompts)
+
+    def test_zero_and_whole_percentages_are_not_questioned(self):
+        for rate in ("0", "1", "7", "100"):
+            console, _ = run_with(listing_b_with_rate(rate))
+            self.assertFalse(any(p.startswith("You typed") for p in console.prompts), rate)
+
+    def test_down_payment_typed_as_a_fraction_is_asked_too(self):
+        answers = list(LISTING_B)
+        answers[5:6] = ["0.25", "y"]
+        console, exit_code = run_with(answers)
+        self.assertEqual(exit_code, 0)
+        self.assertIn("You typed 0.25. Did you mean 25%? Type y for 25%, or n to keep 0.25%: ", console.prompts)
+        plain, _ = run_with(LISTING_B)
+        self.assertEqual(console.output().splitlines()[-9:], plain.output().splitlines()[-9:])
+
+    def test_running_out_of_input_at_the_follow_up_stops_politely(self):
+        console, exit_code = run_with(LISTING_B[:6] + ["0.07"])
+        self.assertEqual(exit_code, 1)
+        self.assertIn("Stopped before all the numbers were typed.", console.output())
+
+
 if __name__ == "__main__":
     unittest.main()

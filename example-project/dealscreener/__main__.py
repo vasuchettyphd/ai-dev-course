@@ -13,7 +13,8 @@ TOO_BIG = 1e12  # a trillion: far beyond any real listing, small enough to work 
 
 # Each question: (Listing field, prompt, kind of answer). Every kind takes a number
 # from 0 up to TOO_BIG. "price" must also be more than 0, "percent" at most 100,
-# "years" a whole number, 1 or more. "dollars" has no extra rule.
+# "years" a whole number, 1 or more. "dollars" has no extra rule. A "percent" between
+# 0 and 1, like 0.07, gets one follow-up question: did you mean 7%?
 PROPERTY_QUESTIONS = [
     ("purchase_price", "Purchase price ($): ", "price"),
     ("monthly_rent", "Monthly rent ($): ", "dollars"),
@@ -71,9 +72,29 @@ def ask(prompt, kind, input_fn, print_fn):
     """Ask one question until the answer makes sense."""
     while True:
         try:
-            return parse_answer(input_fn(prompt), kind)
+            value = parse_answer(input_fn(prompt), kind)
         except ValueError as problem:
             print_fn(str(problem))
+            continue
+        if kind == "percent" and 0 < value < 1:
+            # 0.07 might mean 7% typed as a decimal: ask rather than guess.
+            return confirm_small_percent(value, input_fn, print_fn)
+        return value
+
+
+def confirm_small_percent(value, input_fn, print_fn) -> float:
+    """Ask whether a percentage between 0 and 1, like 0.07, meant 7%. Returns the one chosen."""
+    as_percent = round(value * 100, 10)  # round away floating-point noise, like 7.000000000000001
+    question = (
+        f"You typed {value:g}. Did you mean {as_percent:g}%? "
+        f"Type y for {as_percent:g}%, or n to keep {value:g}%: "
+    )
+    while True:
+        reply = input_fn(question).strip().lower()
+        if reply in ("y", "yes"):
+            return as_percent
+        if reply in ("n", "no"):
+            return value
 
 
 def parse_answer(text: str, kind: str):
