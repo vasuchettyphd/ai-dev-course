@@ -21,20 +21,23 @@ The class builds this project up week by week, alongside your own:
 |---|---|
 | 4 | [`PLAN.md`](PLAN.md): the plan, in the course's fixed outline |
 | 5 | the first three build steps: the calculator, the buy-box check and a program you run, each built test first from a [Superpowers plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) |
-| 6 onward | more of the tool, step by step, following the plan |
+| 6 | a code review: three reviewer agents in [`.claude/agents/`](.claude/agents/), their findings and the decision on each in [`REVIEW.md`](REVIEW.md), and a fix commit for each finding marked `Fix` |
+| 7 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, and later weeks follow (`week-06`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then. (These menu steps have not yet been checked on every screen; if yours looks different, ask in class.)
+Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, the week 6 state will get the tag `week-06` once week 6 is published, and later weeks follow (`week-07`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then. (These menu steps have not yet been checked on every screen; if yours looks different, ask in class.)
 
-## What's here now (week 5)
+## What's here now (week 6)
 
 - `README.md`: this page.
-- `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent.
+- `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
 - `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the instructor's task plan, written in the format Superpowers' `writing-plans` produces, from the plan's first three build steps. Compare it with your own.
+- `.claude/agents/`: the three reviewer agents from week 6 (`does-it-work`, `safe-and-private` and `plain-english`). Each can only read files, never change them.
+- `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a one-line reason; each fix has its own commit, named after the finding's number.
 - `dealscreener/`: the code.
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.
   - `__main__.py` is the program you run: it asks for the numbers and prints the report.
-- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers.
+- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers. Week 6 added two more hand-worked cases (a $150 HOA fee, and 10% vacancy with a 5% repairs reserve) and a few more checks, because the review found them missing.
 
 ## How to run it
 
