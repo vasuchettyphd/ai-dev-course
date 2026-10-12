@@ -10,7 +10,7 @@ from dealscreener.calculator import (
 
 
 def make_listing(**changes):
-    """Listing A from the plan, with any fields changed that a test asks for."""
+    """Listing A from the docs/ task plan, with any fields changed that a test asks for."""
     fields = dict(
         purchase_price=200000,
         monthly_rent=1800,
