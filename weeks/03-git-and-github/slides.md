@@ -85,6 +85,8 @@ You ask Claude Code in **plain English**. For each step the README shows:
 
 Use **manual mode**: `Shift + Tab` until `manual mode on`.
 
+For git, always pick plain **Yes**. Never "Yes, and don't ask again" or "Yes, and switch to auto mode", so you see every push.
+
 ---
 
 ## Step 1: a GitHub account (being tested)
@@ -120,27 +122,38 @@ git config --global user.name "Your Name"
 git config --global user.email "12345678+yourusername@users.noreply.github.com"
 ```
 
-<p class="small">Mac (being tested): a window may offer the "command line developer tools". Click Install, then run <code>git --version</code> again.</p>
+<p class="small">Any Mac (being tested): a window may offer the "command line developer tools". Click Install, then run <code>git --version</code> again.</p>
 
 ---
 
-## Step 3: install `gh`, GitHub's command-line tool
+## Step 3 on a Mac: install `gh`, GitHub's command-line tool
 
-| Mac (Terminal), being tested | Windows (Ubuntu window) |
+Apple menu > **About This Mac**: **Chip: Apple M...** = Apple chip. **Processor: ... Intel** = Intel.
+
+| Apple chip, in Terminal | Intel (being tested) |
 |---|---|
-| Install Homebrew: the line from <https://brew.sh> | Paste GitHub's official apt block (in the README) |
-| Return to continue; your Mac password (shows nothing) | Your Ubuntu password (shows nothing) |
-| Run the **Next steps** lines it prints | |
-| Close and reopen Terminal | |
-| `brew install gh` | |
+| Install Homebrew: the line from <https://brew.sh> | Download `gh_..._macOS_universal.pkg` from <https://github.com/cli/cli/releases/latest> |
+| Return; your Mac password (shows nothing) | Open it; macOS blocks it (GitHub doesn't sign it) |
+| Run the **Next steps** lines it prints | **System Settings > Privacy & Security > Open Anyway** |
+| Reopen Terminal, then `brew install gh` | Only for this file. Never for other downloads. |
 
-Check, in either: `gh --version`
+<p class="small">macOS 15 (Sequoia) or later, and an administrator account. All Mac steps are being tested.</p>
+
+---
+
+## Step 3 on Windows, then check
+
+In the **Ubuntu window** (never PowerShell): paste GitHub's official apt block from the README. It asks for your Ubuntu password (typing shows nothing).
+
+Check, in your terminal (Mac or Windows):
+
+```bash
+gh --version
+```
 
 ```text
 gh version 2.102.0 (2026-09-30)
 ```
-
-<p class="small">Mac: macOS 15 (Sequoia) or later. Intel Macs may work but aren't officially supported by Homebrew.</p>
 
 ---
 
@@ -160,6 +173,8 @@ gh auth login
 Type the one-time code in the browser. WSL: open <https://github.com/login/device> yourself.
 
 Then check: `gh auth status` shows **your** username. No tokens, ever.
+
+Wrong username? `gh auth logout`, sign out of github.com in your browser (or use a private window), then `gh auth login` again.
 
 ---
 
@@ -183,6 +198,8 @@ Check: "Show me the git history and the current branch"
 74659dd Add README
 main
 ```
+
+<p class="small">(From our test; yours says First snapshot.)</p>
 
 ---
 
@@ -222,7 +239,7 @@ Probably: `git switch -c add-goals`, `git add`, `git commit`, `git push -u origi
 ## Merge on GitHub, then pull (being tested)
 
 1. Open the PR's address. Read **Files changed**.
-2. **Merge pull request**, then **Confirm merge**
+2. Back on the **Conversation** tab: **Merge pull request**, then **Confirm merge**
 3. Back in Claude Code: "Switch back to main and pull the latest changes from GitHub."
 
 **Pull after you merge.** Forget, and your next push is refused:
@@ -287,4 +304,6 @@ One document with:
 
 You choose the tool you'll build this term.
 
-Its history will live in a repo like the one you made today.
+Next week you'll make a new private repo for your project the same way (steps 6 and 9).
+
+`my-first-project` stays as your practice repo.
