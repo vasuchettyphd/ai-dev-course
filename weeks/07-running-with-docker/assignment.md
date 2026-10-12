@@ -15,7 +15,7 @@ No `.env` file, password, key or other secret may be in the pull request or copi
 
 **(b) A screenshot of your tests passing in the container.** Your terminal after you ran your test command with `docker run --rm semester-project ...` (README step 4c), showing the command and the result.
 
-**(c) A screenshot of your program running in the container on your own example.** Your terminal after `docker run -it --rm semester-project` (README step 4b), with your week 5 hand-worked example typed in and the program's answer, and your hand-worked answer beside it (a photo of your working, or the numbers typed next to it). Say in one sentence whether they match.
+**(c) A screenshot of your program running in the container on your own example.** Your terminal after `docker run -it --rm semester-project` with your week 5 hand-worked example typed in, or the run command from README step 4b with your example as input, or, for a web page, a screenshot of the page in your browser with your example entered. It shows the program's answer, and your hand-worked answer beside it (a photo of your working, or the numbers typed next to it). Say in one sentence whether they match.
 
 **(d) A short reflection,** about half a page:
 

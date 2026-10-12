@@ -252,7 +252,7 @@ docker run -it --rm semester-project
 - No `-it`? The deal screener prints `Stopped before all the numbers were typed.`
 - `--rm`: deletes the container when it ends. The image stays
 
-Type your **week 5 hand-worked example**: same answer? **Screenshot.**
+Type your **week 5 hand-worked example**: same answer? **Screenshot.** Not typed into? Use the run command from step 4b with your example as input (a web page: a screenshot of the page in your browser).
 
 <p class="small">The build ends "naming to docker.io/library/semester-project:latest done": that latest is your own image's label, fine.</p>
 
@@ -332,10 +332,10 @@ The deal screener's reviewer: 4 findings, all Nice to have. 2 `Fix`, 2 `Won't fi
 
 ## Finish
 
-1. "Add a short section called "How to run with Docker" to README.md ..." (build, test, run commands)
-2. "Push the containerize branch to GitHub and open a pull request into main titled "Run in Docker"."
+1. "Add a short section called 'How to run with Docker' to README.md ..." (build, test, run commands)
+2. "Push the containerize branch to GitHub and open a pull request into main titled 'Run in Docker'."
 3. **Files changed:** `Dockerfile`, `.dockerignore`, `README.md`, `REVIEW.md` (and any fix): nothing else. **No `.env`**
-4. **Merge pull request**, **Confirm merge** (being tested), then "Switch back to main and pull the latest changes from GitHub."
+4. **Merge pull request**, **Confirm merge** (or **Squash and merge**; being tested), then "Switch back to main and pull the latest changes from GitHub."
 
 Tidy up, optional, typed yourself: `docker image prune` deletes only unused leftovers (`[y/N]`). Never `docker system prune -a`.
 
@@ -350,11 +350,11 @@ Tidy up, optional, typed yourself: `docker image prune` deletes only unused left
 | What you see | Most likely |
 |---|---|
 | `Cannot connect to the Docker daemon` (being tested) | Docker Desktop isn't running: start it, wait until it says it is running, try again |
-| `docker: command not found` in Ubuntu (being tested) | **WSL Integration**: Ubuntu on, **Apply**, new Ubuntu window |
+| `docker` not found, or Ubuntu suggests `snap install docker` (being tested) | Don't install Docker in Ubuntu: **WSL Integration**: Ubuntu on, **Apply**, new Ubuntu window |
 | Line starts `PS C:\` | You're in PowerShell: use the Ubuntu window |
 | `Unexpected WSL error` | Virtualization off in BIOS/UEFI: office hours |
 | `Stopped before all the numbers were typed.` | You left out `-it` |
-| `Permission denied` saving a file | Remove `USER nobody`, or ask Claude |
+| `Permission denied` or `EACCES` (program or tests) | Remove `USER nobody`, or ask Claude |
 | `exec format error`, `no matching manifest` (being tested) | Made for another chip: ask Claude for official images for your chip |
 | `ls -a` shows `.env` or `.git` | Add it to `.dockerignore` with `**/`, build, check again |
 

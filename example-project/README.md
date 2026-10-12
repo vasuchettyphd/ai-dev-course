@@ -65,7 +65,9 @@ It asks for each number in turn. Type the number and press Enter. If you type so
 
 From week 7 you can also run the program inside a Docker container, so it behaves the same on every computer. You need Docker Desktop installed and running (see the [week 7 page](../weeks/07-running-with-docker/README.md)). Python doesn't need to be installed for this: the image brings its own (Python 3.12).
 
-Open the Terminal (Mac) or, on Windows, the Ubuntu window, go to the course repo folder, then type:
+First build the image, starting in the course repo folder.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
 ```
 cd example-project
@@ -74,7 +76,7 @@ docker build -t dealscreener .
 
 This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so it takes longer; later builds are quick.
 
-To run the tests inside the container, type this in the same window (you use it for the next two commands):
+Next, run the tests inside the container.
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
@@ -82,7 +84,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 docker run --rm dealscreener python -m unittest
 ```
 
-The last line should say `OK`, just as on your own computer. To screen a listing, type:
+The last line should say `OK`, just as on your own computer. Then screen a listing.
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 

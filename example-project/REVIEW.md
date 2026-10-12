@@ -47,7 +47,7 @@ The Decision and Reason columns were filled in afterwards, by a person checking 
 
 ## Week 7: Dockerfile review
 
-The `safe-and-private` reviewer's instructions (in [`.claude/agents/`](.claude/agents/)) were run as a separate subagent on `Dockerfile` and `.dockerignore` as they were in the first week 7 commit, on 2026-10-12; line numbers point at that version. The findings are numbered D1 to D4 so they don't clash with the week 6 numbers, and the fixes are in a commit named `Fix review D1, D2: ...`.
+The `safe-and-private` reviewer's instructions (in [`.claude/agents/`](.claude/agents/)) were run as a separate subagent on `Dockerfile` and `.dockerignore` as they were in the first week 7 commit, on 2026-10-12; line numbers point at that version. The findings are numbered D1 to D4 so they don't clash with the week 6 numbers, and the fixes are in a commit named `Fix review D1, D2: ...` (see the Commits tab of the week 7 pull request on the course repo).
 
 | # | Label | Finding (file:line) | Found by | Decision | Reason |
 |---|-------|---------------------|----------|----------|--------|
