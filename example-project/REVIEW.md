@@ -44,3 +44,16 @@ The Decision and Reason columns were filled in afterwards, by a person checking 
 - **Files that should not be in the repo** (safe-and-private): none, apart from the missing .gitignore (finding 10).
 - **Error messages** (plain-english): nothing found.
 - **Test names and comments** (plain-english): nothing found.
+
+## Week 7: Dockerfile review
+
+The `safe-and-private` reviewer's instructions (in [`.claude/agents/`](.claude/agents/)) were run as a separate subagent on `Dockerfile` and `.dockerignore` as they were in the first week 7 commit, on 2026-10-12; line numbers point at that version. The findings are numbered D1 to D4 so they don't clash with the week 6 numbers, and the fixes are in a commit named `Fix review D1, D2: ...` (see the Commits tab of the week 7 pull request on the course repo).
+
+| # | Label | Finding (file:line) | Found by | Decision | Reason |
+|---|-------|---------------------|----------|----------|--------|
+| D1 | Nice to have | .dockerignore:15-17: the secret patterns cover only `.env` and `.env.*`, so `*.pem`, `*.key`, `*.csv` and `*.log` files would be copied by `COPY . .` (Dockerfile:12) if someone added them. Fix: add `**/*.pem`, `**/*.key`, `**/*.csv`, `**/*.log`. | safe-and-private | Fix | Adding them costs nothing and keeps secrets out: key files and logs can hold secrets or private details, and PLAN.md says this version reads no CSV file, so none belongs in the image. |
+| D2 | Nice to have | .dockerignore:7-8: `.venv` and `venv` match only at the top folder, unlike the `**/` patterns. Fix: `**/.venv`, `**/venv`. | safe-and-private | Fix | Correct: a bare name only matches at the top folder, so these now use `**/` like the other patterns. |
+| D3 | Nice to have | Dockerfile:3: pinned to a tag, not a digest, so the image can change on rebuild. Fix: optionally pin `@sha256:...`. | safe-and-private | Won't fix | A digest is a long fixed code that freezes the image exactly, so it stops security patches arriving and is hard for students to read; the `3.12-slim` tag is the course's pin, as the Dockerfile comment says. |
+| D4 | Nice to have | .dockerignore:24-25: PLAN.md and README.md are still copied; harmless. Fix: none needed. | safe-and-private | Won't fix | The reviewer itself says it's harmless: they hold no private data. |
+
+What the reviewer found nothing wrong with: secrets, personal data, data sent, unsafe installs and files that should not be in the repo. It noted the official `python:3.12-slim` image (Dockerfile:3), no `pip install`, the program running as `nobody` (Dockerfile:15), and that `.git`, `.claude`, `.superpowers`, `docs`, `REVIEW.md`, `__pycache__` and `.env` files are left out.
