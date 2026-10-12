@@ -23,10 +23,10 @@ The class builds this project up week by week, alongside your own:
 | 5 | the first three build steps: the calculator, the buy-box check and a program you run, each built test first from a [Superpowers plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) |
 | 6 | a code review: three reviewer agents in [`.claude/agents/`](.claude/agents/), their findings and the decision on each in [`REVIEW.md`](REVIEW.md), and the fix commits, each named after its finding's number |
 | 7 | a [`Dockerfile`](Dockerfile) and [`.dockerignore`](.dockerignore), so the program and its tests run the same way inside a Docker container |
-| 8 | a real bug fixed test first: a classmate's [`FEEDBACK.md`](FEEDBACK.md) found it, [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
+| 8 | a real bug fixed test first: a classmate's feedback form found it ([`FEEDBACK.md`](FEEDBACK.md) is the instructor's example), [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
 | 9 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, the week 6 state will get the tag `week-06` once week 6 is published, the week 7 state will get the tag `week-07` once week 7 is published, the week 8 state will get the tag `week-08` once week 8 is published, and later weeks follow (`week-09`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04`, `week-05`, `week-06` and `week-07` exist now, the week 8 state will get the tag `week-08` once week 8 is published, and later weeks follow (`week-09`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
 ## What's here now (week 8)
 
@@ -55,7 +55,7 @@ Each week's finished state will be marked with a **git tag** named after the wee
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.
   - `__main__.py` is the program you run: it asks for the numbers and prints the report. Week 8 added one follow-up question for a percentage typed as a decimal (bug 1).
-- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers. Week 6 added two more hand-worked cases (a $150 HOA fee, and 10% vacancy with a 5% repairs reserve) and a few more checks, because the review found them missing. Week 8 added the `SmallPercentTest` tests for bug 1, written and seen to fail before the fix.
+- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers. Week 6 added two more hand-worked cases (a $150 HOA fee, and 10% vacancy with a 5% repairs reserve) and a few more checks, because the review found them missing. Week 8 added the `SmallPercentTest` tests for bug 1, written before the fix: five of them failed until the fix went in, and three check answers that already worked and must keep working.
 
 ## How to run it
 

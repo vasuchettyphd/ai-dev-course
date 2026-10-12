@@ -9,7 +9,7 @@
 
 ## What I tried (exact inputs)
 
-I used the odd-input list from the feedback form as well as my own inputs.
+I used several inputs from the odd-input list on the feedback form, as well as my own.
 
 - Listing B as the README gives it: 150000, 1700, 2400, 1200, 0, 25, 7, 30, 6000.
 - A blank answer (pressed Enter too early) for the purchase price.
