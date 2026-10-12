@@ -37,7 +37,7 @@ The week also builds the deal screener's first three steps in `example-project/`
 - Repo rules from weeks 3-4 still apply: work on a branch, merge through a PR on GitHub, then pull. Nothing is pushed straight to `main`. The repo stays private. Plain "Yes" for git prompts. Never paste secrets.
 - Every fact comes from the fact sheet with its URL. Anything not observed is marked "being tested". Pin the versions tested.
 - No em dashes (U+2014) or en dashes (U+2013). The rubric is a table under `## Rubric` with points in the last column, totalling 10.
-- `example-project/` stays the clearly labelled instructor example. Its Python code needs only the standard library and Python 3.9 or newer, because a Mac's Xcode command-line tools Python is 3.9. Tests use `unittest` and run with `python3 -m unittest`. It passes `scripts/check_course.py`.
+- `example-project/` stays the clearly labelled instructor example. Its Python code needs only the standard library and Python 3.9 or newer, because the Python that comes with a Mac's Command Line Tools may be as old as 3.9. Tests use `unittest` and run with `python3 -m unittest`. It passes `scripts/check_course.py`.
 - Instructor-only material goes in the private repo.
 - Branch `week-05-building` in the course repo and `week-05` in the instructor repo. The user merges. Links come first, one bare URL per line.
 

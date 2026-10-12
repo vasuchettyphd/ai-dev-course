@@ -144,7 +144,7 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
 
 **c. Install Python, if you need it.** Check first: in a second terminal window, type `python3 --version`.
 
-- **Mac (Apple chip or Intel):** if it prints `Python 3.9` or any higher number, you already have it: it came with Apple's Command Line Tools in week 3. If it's lower, or a window offers to install the Command Line Tools, get the installer from python.org's Mac page, <https://www.python.org/downloads/macos/>: under "Latest Python 3 Release" (Python 3.15.0 when we checked), download the **macOS installer** (`python-3.15.0-macos11.pkg`; your number may be higher). The same installer works on Apple chip and Intel Macs; Python's docs say it "runs natively on all Macs (Apple Silicon and Intel)" (<https://docs.python.org/3/using/mac.html>). Double-click it in **Downloads** and follow the steps. Then come back as in "After an install" below, and type `python3 --version` (being tested).
+- **Mac (Apple chip or Intel):** if it prints `Python 3.9` or any higher number, you already have it: it came with Apple's Command Line Tools in week 3. If it's lower, or a window offers to install the Command Line Tools, get the installer from python.org's Mac page, <https://www.python.org/downloads/macos/>: under "Latest Python 3 Release" (Python 3.15.0 when we checked), download the **macOS installer** (`python-3.15.0-macos11.pkg`; your number may be higher). The same installer works on Apple chip and Intel Macs; Python's docs say it "runs natively on all Macs (Apple Silicon and Intel)" (<https://docs.python.org/3/using/mac.html>). Double-click it in **Downloads** and follow the steps. Then come back as in "After an install" below, and type `python3 --version` (being tested). On an Apple chip Mac, Homebrew's Python is fine too; use a `.venv` for packages.
 - **Windows (WSL):** if it prints a version, you have it. If it says `command not found`, type this yourself in the second **Ubuntu window**:
 
   ```bash
@@ -191,10 +191,10 @@ Each prints a version number. `command not found`? Do "After an install" (step 3
 
 > **Being tested:** This step needs a signed-in session and is being tested. What the plan contains comes from the `writing-plans` skill's own instructions (Superpowers 6.4.1).
 
-**a. Keep tool folders out of git.** Some tools make big folders inside your project (`.venv/` for a Python virtual environment, `node_modules/` for Node.js, `__pycache__/` for Python's own scratch files). They must never go to GitHub. Still on `build-first-steps`, in Claude Code, type:
+**a. Keep tool folders out of git.** Some tools make big folders inside your project (`.venv/` for a Python virtual environment, `node_modules/` for Node.js, `__pycache__/` for Python's own scratch files, `.claude/worktrees/` for the extra folders Claude Code can make). They must never go to GitHub. Still on `build-first-steps`, in Claude Code, type:
 
 ```text
-Add .venv/, node_modules/ and __pycache__/ to .gitignore (create it if it doesn't exist), and commit .gitignore on this branch.
+Add .venv/, node_modules/, __pycache__/ and .claude/worktrees/ to .gitignore (create it if it doesn't exist), and commit .gitignore on this branch.
 ```
 
 It edits or creates `.gitignore` (an edit prompt) and commits it. Plain **Yes**.
@@ -245,7 +245,7 @@ Yours will be shorter or longer, in your own language; the shape is the same.
 | **Subagent-driven** | A fresh Claude builds each task, a fresh reviewer checks it before the next one starts, then the whole branch is reviewed at the end. Most thorough, uses more of your usage. |
 | **Native** (also called "inline") | Claude builds every task itself in this session, with one review of the whole branch at the end. Cheaper and faster, no review after each task. |
 
-It recommends one. **Choose Subagent-driven**, even if it recommends Native: the review after every step is what you're here to see. Only answer once you've read the plan and changed what you wanted. Reply:
+It recommends one. **Choose Subagent-driven**, even if it recommends Native: the review after every step is what you're here to see. Only answer once you've read the plan and changed what you wanted. First type `/usage` and write down what it shows (step 6a). You need this 'before' number for the assignment. Then reply:
 
 ```text
 Subagent-driven. Before you start building, commit the plan file on this branch if it isn't committed yet.
@@ -265,7 +265,7 @@ No. Work here, on the build-first-steps branch.
 
 Superpowers then builds in your `~/semester-project` folder. If a worktree gets made anyway, see "If a worktree was made" below.
 
-**b. What you'll see, task by task.** The build runs **without stopping between tasks**. Claude writes at most a short line between actions, so you mostly see a stream of subagents starting and finishing, short status lines, and prompts for you to answer. For each task:
+**b. What you'll see, task by task.** Before Task 1 it may run the tests once; with no tests yet it may ask whether to go on: answer Yes (being tested). The build runs **without stopping between tasks**. Claude writes at most a short line between actions, so you mostly see a stream of subagents starting and finishing, short status lines, and prompts for you to answer. For each task:
 
 1. **An implementer** (a fresh Claude that sees only that task) writes the test, runs it and sees it **fail**, writes the code, runs the test and sees it **pass**, then commits. It reports back with a status: `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT` or `BLOCKED`.
 2. **A reviewer** (another fresh Claude) checks the work against the plan and for quality, and sorts what it finds as Critical, Important or Minor.
@@ -281,7 +281,7 @@ The skill only stops to ask you for four reasons: something that can't be undone
 .superpowers/sdd/<your-plan-file's-name>/progress.md
 ```
 
-Its first line is `# SDD ledger`, followed by the plan's path, and it gets a line such as `Task 1: complete` as each task finishes. The folder also holds each task's brief and report. Git ignores it, so it doesn't appear in `git status` and never goes to GitHub. To check progress, ask "Show me the ledger", or open the file. Superpowers deletes the folder when the build finishes. Never ask Claude to "clean" untracked files (`git clean`) in the middle of a build: that deletes the ledger.
+Its first line is `# SDD ledger`, followed by the plan's path, and it gets a line such as `Task 1: complete` as each task finishes. The folder also holds each task's brief and report. Git ignores it, so it doesn't appear in `git status` and never goes to GitHub. To check progress, ask "Show me the ledger", or open the file. Superpowers may ask to delete the folder when the build finishes (you can say No). Never ask Claude to "clean" untracked files (`git clean`) in the middle of a build: that deletes the ledger.
 
 **d. Which prompts to say Yes or No to.** Read each one.
 
@@ -296,9 +296,10 @@ Its first line is `# SDD ledger`, followed by the plan's path, and it gets a lin
 | Read-only git commands that only mention `main` (`git diff`, `git log`, `git merge-base`, `git status`) | **Yes** |
 | `git push` during the build | **No**: you push in step 7 |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
+| At the very end, Claude may ask to delete `.superpowers/sdd/...` with `rm -rf` | **No** is fine. That folder is git-ignored and harmless. Type `Carry on without deleting it.` |
 | Change files outside your project folder | **No** |
 
-(You switch to `main` yourself only after the build, in step 7d.) After a No, Claude stops and asks what to do instead. Tell it, or type "Carry on with the plan without that."
+You ask Claude to switch to `main` only after the merge, in step 7d. After a No, Claude stops and asks what to do instead. Tell it, or type "Carry on with the plan without that."
 
 **e. How to stop safely.** The safest moment is just after a task finishes (the ledger gets a `Task N: complete` line). Then press `Esc` to stop Claude, and type `/exit`. Everything finished so far is committed on your branch. If you have to stop in the middle of a task, press `Esc` anyway: that task may be redone when you carry on. Its files may not be committed yet. Ask "Show me git status" to see them, and leave them where they are: never `git clean`, `git restore` or `reset` them. When you carry on, Claude picks them up.
 
@@ -308,7 +309,7 @@ Its first line is `# SDD ledger`, followed by the plan's path, and it gets a lin
 /superpowers:subagent-driven-development Continue the plan from the ledger. The plan is docs/superpowers/plans/<your-plan-file>.md.
 ```
 
-It reads the ledger, skips the tasks marked complete, and carries on from the first one that isn't.
+It reads the ledger, skips the tasks marked complete, and carries on from the first one that isn't. If it asks the worktree question again, answer No again (step 5a).
 
 **If a worktree was made** (being tested; from Claude Code's docs, <https://code.claude.com/docs/en/worktrees>): if you said Yes to the worktree question, your build happens in another folder, so your files seem to "disappear" from `~/semester-project`. They haven't.
 
@@ -316,6 +317,7 @@ It reads the ledger, skips the tasks marked complete, and carries on from the fi
 - To list them, type `git worktree list` in a second terminal window, in `~/semester-project`.
 - When you `/exit`, Claude Code may ask whether to keep or remove the worktree. Choose **Keep**. Removing it deletes the folder, its branch and all the work in it.
 - To go back to it, type the command Claude Code prints when you exit, which looks like `claude --worktree <name> --resume`.
+- The worktree started from GitHub's `main`, so it may not have your plan file or `.gitignore`. Before step 7, type in Claude Code: `Merge the build-first-steps branch into this branch.` Plain Yes. In step 7d, check Files changed shows the plan file (being tested).
 - The ledger and the build are in the worktree folder, so carry on from there. Your pull request in step 7 comes from the worktree's branch. If anything is unclear, ask in office hours before you delete anything.
 
 ### 6. Usage limits
@@ -340,6 +342,7 @@ On a Pro plan it shows your plan's usage bars, when they reset, and which share 
 
 - **Leave Claude Code open,** and it carries on by itself after the reset. It shows something like `Continuing automatically at 3:45pm · esc to cancel`. Keep your laptop awake; if it slept a long time, it shows "Press enter to continue". It can still stop at a permission prompt while you're away, so check on it.
 - **If you closed Claude Code,** come back after the reset time, and carry on with the prompt from step 5e (`Continue the plan from the ledger`).
+- If auto-continue stops after several limits in a row, carry on from the ledger after the reset (step 5e).
 
 **d. Start early in the week.** A big build can use up a five-hour session, and a heavy day can eat into your weekly limit too. Starting early leaves time to wait for a reset and still finish.
 
@@ -411,7 +414,7 @@ Your laptop still has the `build-first-steps` branch. That's harmless: keep it u
 
 You're done when:
 
-- Your pull request's page on GitHub shows it was merged, and **Files changed** shows the plan file under `docs/superpowers/plans/`, `.gitignore`, your code and your tests, and no tool folders.
+- Your pull request's page on GitHub shows it was merged, and **Files changed** shows the plan file under `docs/superpowers/plans/`, `.gitignore` (if step 4a changed it), your code and your tests, and no tool folders.
 - On `main`, in your terminal in `~/semester-project`, your tests pass.
 - Your program gives the same answer as your hand-worked example.
 - You've noted one review finding and what changed, and roughly how much of your usage the build took (from `/usage`).
@@ -455,7 +458,7 @@ git fetch
 git log --oneline origin/main..main
 ```
 
-This lists the commits that are only on your laptop's `main`, one per line, such as `a1b2c3d Add the calculator`. **If it prints nothing, stop:** your work is already on GitHub's `main`. Tell your instructor and ask in office hours.
+This lists the commits that are only on your laptop's `main`, one per line, such as `a1b2c3d Add the calculator`. **If it prints nothing,** type `git status`. If it lists your files, they are not committed yet: run only `git switch -c rescue-first-steps` (it carries them) and skip `git branch -f`. If it is clean too, stop and ask in office hours.
 
 ```bash
 git switch -c rescue-first-steps

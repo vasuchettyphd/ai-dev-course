@@ -29,7 +29,7 @@ Each week's finished state will be marked with a **git tag** named after the wee
 
 - `README.md`: this page.
 - `PLAN.md`: the plan from week 4. In week 5 its open question about the repairs reserve was answered: 8% of monthly rent.
-- `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the task plan that Superpowers' `writing-plans` produced from the plan's first three build steps. Compare it with your own.
+- `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the instructor's task plan, written in the format Superpowers' `writing-plans` produces, from the plan's first three build steps. Compare it with your own.
 - `dealscreener/`: the code.
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.

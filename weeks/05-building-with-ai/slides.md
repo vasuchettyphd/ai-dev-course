@@ -129,7 +129,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 nvm install 24
 ```
 
-After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project && claude`, `manual mode on`, then "We chose Python. It's installed." Check `--version` in a second window.
+After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project && claude`, `manual mode on`, then "We chose Python. It's installed. We're on the build-first-steps branch." Check `--version` in a second window.
 
 ---
 
@@ -138,8 +138,9 @@ After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project
 Keep tool folders out of git first:
 
 ```text
-Add .venv/, node_modules/ and __pycache__/ to .gitignore (create it
-if it doesn't exist), and commit .gitignore on this branch.
+Add .venv/, node_modules/, __pycache__/ and .claude/worktrees/ to
+.gitignore (create it if it doesn't exist), and commit .gitignore on
+this branch.
 ```
 
 Then:
@@ -207,7 +208,7 @@ Step 4: Ran 21 tests ... OK
 | **Subagent-driven** | Fresh Claude per task, a review after each task, then a whole-branch review. Most thorough, uses more |
 | **Native** ("inline") | Claude builds it all itself; one review at the end. Cheaper |
 
-**Choose Subagent-driven,** even if it recommends Native:
+**Choose Subagent-driven,** even if it recommends Native. First type `/usage` and write down what it shows (step 6a): your 'before' number.
 
 ```text
 Subagent-driven. Before you start building, commit the plan file on
@@ -249,6 +250,7 @@ At the end: a whole-branch review, and "Rulings I made". **Note one review findi
 | Read-only: `git diff`, `git log`, `git merge-base`, `git status` | **Yes** |
 | `git push` | **No** (you push in step 7) |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
+| At the very end: delete `.superpowers/sdd/...` with `rm -rf` | **No** is fine: "Carry on without deleting it." |
 
 It only stops by itself for: can't-be-undone, security-sensitive, outside your project (push, merge, publish), or a plan too broken to guess.
 
@@ -259,7 +261,7 @@ It only stops by itself for: can't-be-undone, security-sensitive, outside your p
 `.superpowers/sdd/<plan-name>/progress.md`, in your project folder
 
 - `# SDD ledger`, then `Task 1: complete` ... as tasks finish
-- git ignores it; deleted when the build finishes
+- git ignores it; Superpowers may ask to delete the folder when the build finishes (you can say No)
 
 **Stop safely:** just after a task finishes, `Esc`, then `/exit`.
 
@@ -309,7 +311,7 @@ Then answer **`2`**. Never 1. Plain **Yes** to `git push` and `gh pr create`. Co
 
 ## Merge, pull, check
 
-On GitHub: **Files changed** shows only the plan file, `.gitignore`, code and tests (no `.venv/`, `node_modules/`), then **Merge pull request**, **Confirm merge**.
+On GitHub: **Files changed** shows only the plan file, `.gitignore`, code and tests (no `.venv/`, `node_modules/`, `__pycache__/`), then **Merge pull request**, **Confirm merge**.
 
 In Claude Code:
 
@@ -323,7 +325,7 @@ Done when:
 - on `main`, your tests pass
 - your program matches your hand-worked example
 
-<p class="small">Keep your local build-first-steps branch until graded. Say No to deleting a branch or worktree.</p>
+<p class="small">Keep your local build-first-steps branch until graded. Say No to deleting a branch or worktree. Committed to main? README rescue steps, typed by you.</p>
 
 ---
 

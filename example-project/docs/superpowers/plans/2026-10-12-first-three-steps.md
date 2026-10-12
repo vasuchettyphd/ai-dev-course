@@ -14,7 +14,7 @@ All paths and commands below are relative to the `example-project/` folder.
 
 ## Global Constraints
 
-- Python 3.9 or newer, because a Mac's Xcode command-line tools Python is 3.9. The code files in `dealscreener/` start with `from __future__ import annotations`, so their type hints work on 3.9. No `match` statements and no `X | Y` types.
+- Python 3.9 or newer, because the Python that comes with a Mac's Command Line Tools may be as old as 3.9. The code files in `dealscreener/` start with `from __future__ import annotations`, so their type hints work on 3.9. No `match` statements and no `X | Y` types.
 - Standard library only. Nothing to install.
 - Tests run with `python3 -m unittest` from the `example-project/` folder.
 - Percentages are written as 25 for 25%, everywhere.
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Run the tests to see them fail**
 
 Run: `python3 -m unittest`
-Expected: FAIL with `ModuleNotFoundError: No module named 'dealscreener.calculator'`
+Expected: FAIL with `ModuleNotFoundError: No module named 'dealscreener'`
 
 - [ ] **Step 3: Write the calculator**
 

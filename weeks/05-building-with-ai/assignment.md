@@ -4,7 +4,7 @@
 
 Follow the [week 5 README](README.md) on your own laptop, in your private `semester-project` repo, then collect four things.
 
-**(a) Your merged pull request.** The address of the merged pull request on `semester-project` that adds your Superpowers plan file (under `docs/superpowers/plans/`) and the first three build steps from your `PLAN.md`, built on a branch (README steps 2d to 7). Its **Files changed** must show the plan file, the code, the tests and `.gitignore`. The repo stays **private**, with `vasuchettyphd` as a collaborator, so your instructor can open it.
+**(a) Your merged pull request.** The address of the merged pull request on `semester-project` that adds your Superpowers plan file (under `docs/superpowers/plans/`) and the first three build steps from your `PLAN.md`, built on a branch (README steps 2d to 7). Its **Files changed** must show the plan file, the code, the tests and `.gitignore` (if step 4a changed it). The repo stays **private**, with `vasuchettyphd` as a collaborator, so your instructor can open it.
 
 **(b) A screenshot of the tests passing.** Your terminal after you ran the tests yourself (README step 7a), showing the command and the result (for example `OK`, or "all passed").
 
