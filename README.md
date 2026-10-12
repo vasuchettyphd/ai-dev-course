@@ -20,7 +20,7 @@ Some advanced topics need their own API key and credit, beyond the costs above; 
 
 ## Before week 1
 
-A laptop running macOS 13 or later, or Windows 10 (version 2004 or later) or Windows 11, with at least 4 GB of memory, where you can install software (on Windows you need administrator rights). Chromebooks won't work. On Windows we'll set up WSL, the Linux environment built into Windows, together in week 2. Nothing else needs installing yet.
+A laptop running macOS 15 (Sequoia) or later, or Windows 10 (version 2004 or later) or Windows 11, with at least 4 GB of memory, where you can install software: you need administrator rights on both Mac and Windows. Chromebooks won't work. On Windows we'll set up WSL, the Linux environment built into Windows, together in week 2. Nothing else needs installing yet.
 
 ## Schedule
 

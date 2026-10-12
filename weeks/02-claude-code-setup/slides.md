@@ -74,7 +74,7 @@ Paste: `Cmd + V` on a Mac; `Ctrl + Shift + V` or right-click in Ubuntu.
 
 After that, every step is the same.
 
-<p class="small">Needs macOS 13+, or Windows 10 version 2004 (build 19041)+ or Windows 11, and 4 GB RAM.</p>
+<p class="small">Needs macOS 15 (Sequoia)+, or Windows 10 version 2004 (build 19041)+ or Windows 11, and 4 GB RAM.</p>
 
 ---
 
