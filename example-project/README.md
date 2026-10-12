@@ -132,7 +132,11 @@ The program runs inside the container as a user called `nobody`, which has no sp
 
 From week 9 the program can read a pasted listing for you. It sends the text to a model (Claude Haiku 5.5) through the Anthropic API, then shows each number it found at the usual question. Press Enter to keep a number, or type the right one. Questions the listing didn't answer, and the loan questions, are asked as usual. Every call costs a little API credit (see the [cost record](#cost-record)), and the program never calls the model unless you add `--listing`.
 
-You need three things: an API key with credit on it, a `.env` file holding the key, and the `anthropic` package. The [week 9 page](../weeks/09-calling-a-model/README.md) shows how to get a key and set a spend limit.
+You need three things: an API key with credit on it, a `.env` file holding the key, and the `anthropic` package. The [week 9 page](../weeks/09-calling-a-model/README.md) (published with this week) walks through each step; in short:
+
+- **Key:** in the Anthropic Console, go to Settings > API keys (https://platform.claude.com/settings/keys) and click **Create key**. The Console shows the key, which starts with `sk-ant-`, only once, so put it straight into `.env` (step 1 below).
+- **Spend limit, before your first call:** in Settings > Billing (https://platform.claude.com/settings/billing), set a monthly spend limit in the "Spend limits" section, so a mistake can't cost more than you chose.
+- **Safety:** the key goes only in `.env`, typed with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a pull request.
 
 **1. Put your key in `.env`, with a text editor.** Never paste your key into Claude Code, a chat, a screenshot, a commit or a pull request. In the `example-project` folder, make a copy of `.env.example` called `.env`.
 
@@ -142,7 +146,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 cp .env.example .env
 ```
 
-Open `.env` in a text editor (not in Claude Code), replace `put-your-key-here` with your key, and save. Then check git ignores it.
+Open `.env` in a text editor (not in Claude Code), replace `put-your-key-here` with your key, and save. Write the key with no quote marks around it, like `ANTHROPIC_API_KEY=sk-ant-...`: `docker run --env-file` keeps quote marks as part of the key, and Anthropic then rejects it. Then check git ignores `.env`.
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
@@ -162,7 +166,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`source .venv/bin/activate` switches this window to the virtual environment: your prompt starts with `(.venv)`. In a new window, type it again before running the program. On Windows, if `python3 -m venv .venv` says `ensurepip is not available` and suggests `apt install python3.12-venv`, type `sudo apt install python3-venv`, delete the broken `.venv` folder it left behind (`rm -r .venv`), and run the three lines again.
+`source .venv/bin/activate` switches this window to the virtual environment: your prompt starts with `(.venv)`. In a new window, type it again before running the program. On Windows, if `python3 -m venv .venv` says `ensurepip is not available` and suggests `apt install python3.12-venv`, type `sudo apt install python3-venv`, delete the broken `.venv` folder it left behind (`rm -r .venv`), and run the three lines again. `rm -r .venv` deletes only that broken `.venv` folder you just made, by name, and nothing else: never add `-f` or any other folder or file to it.
 
 **3. Run it with `--listing`.**
 
@@ -172,7 +176,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 python3 -m dealscreener --listing
 ```
 
-Paste the listing, then type `done` on a line by itself and press Enter. (Type `done` straight away to skip the step.) Try `listings/listing-b.txt`: every number should match listing B, so pressing Enter five times and typing the loan details (25, 7, 30, 6000) gives a cash flow of $430.53. Then try `listings/messy-listing.txt` and check what the model made of the monthly tax and the missing insurance before you press Enter. The model can be wrong: you are the one who confirms each number.
+Paste the listing, then type `done` on a line by itself and press Enter. (Type `done` straight away to skip the step.) Try `listings/listing-b.txt`: every number should match listing B (being tested), so pressing Enter five times and typing the loan details (25, 7, 30, 6000) should give a cash flow of $430.53 (being tested). Then try `listings/messy-listing.txt` and check what the model made of the monthly tax and the missing insurance before you press Enter. The model can be wrong: you are the one who confirms each number.
 
 If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence, adds "For now, type the numbers yourself.", and asks the questions as usual. The tests never call the model: `python3 -m unittest` stays free and works without a key. The one real-call test runs only on request.
 

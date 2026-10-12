@@ -71,11 +71,13 @@ class Extraction:
 def load_env_file(path=".env") -> None:
     """Copy KEY=VALUE lines from a .env file into the environment.
 
-    Blank lines and lines starting with # are skipped, and quotes around a value are
-    removed. A variable that is already set is left alone. A missing file does nothing.
+    Blank lines and lines starting with # are skipped. An "export " in front of a line,
+    quotes around a value, and a " # note" after an unquoted value are removed. A variable
+    that is already set is left alone. A missing file does nothing.
     """
     try:
-        with open(path, encoding="utf-8") as env_file:
+        # utf-8-sig also reads files some Windows editors save with a hidden mark at the start.
+        with open(path, encoding="utf-8-sig") as env_file:
             lines = env_file.read().splitlines()
     except OSError:
         return
@@ -85,8 +87,12 @@ def load_env_file(path=".env") -> None:
             continue
         name, value = line.split("=", 1)
         name, value = name.strip(), value.strip()
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-            value = value[1:-1]
+        if name.startswith("export "):
+            name = name[len("export "):].strip()
+        if value[:1] in ("\"", "'") and value.find(value[0], 1) > 0:
+            value = value[1:value.find(value[0], 1)]  # the text between the quotes
+        elif " #" in value:
+            value = value.split(" #", 1)[0].rstrip()  # a note after the value
         if name and name not in os.environ:
             os.environ[name] = value
 
@@ -141,9 +147,13 @@ def usable_number(value):
     """A finite number that is 0 or more, as a float. Anything else becomes None."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
+    try:
+        value = float(value)  # a huge whole number, like 10**400, can't become a float
+    except (OverflowError, TypeError, ValueError):
+        return None
     if not math.isfinite(value) or value < 0:
         return None
-    return float(value)
+    return value
 
 
 def describe_error(error) -> str:
@@ -152,6 +162,11 @@ def describe_error(error) -> str:
     status = getattr(error, "status_code", None)
     if status is None:
         return "Couldn't reach Anthropic. Check your internet connection."
+    # The spend limit you set yourself: Anthropic's message begins "You have reached your
+    # specified API usage limits" (or "specified workspace API usage limits").
+    if status == 400 and "reached your specified" in str(error).lower():
+        return ("Your monthly spend limit has been reached. "
+                "Raise it in the Anthropic Console, or wait until it resets.")
     if status == 402 or (status == 400 and "credit" in str(error).lower()):
         return "Your API credit has run out. Add credit in the Anthropic Console."
     messages = {

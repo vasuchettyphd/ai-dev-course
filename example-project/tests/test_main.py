@@ -236,6 +236,13 @@ class ListingStepTest(unittest.TestCase):
         self.assertEqual(console.prompts.count("Purchase price ($) [from the listing: 150000]: "), 2)
         self.assertEqual(console.lines[-1], "Overall: PASS")
 
+    def test_large_listing_numbers_show_as_plain_digits(self):
+        client = FakeClient(reply(dict(GOOD, purchase_price=1e22, monthly_rent=1700.5)))
+        console, _, _ = run_listing(["a listing", "done", "", "150000", "", "", "", ""] + LOAN_B, client)
+        self.assertIn("Purchase price ($) [from the listing: 10000000000000000000000]: ", console.prompts)
+        self.assertIn("Please type a smaller number.", console.lines)
+        self.assertIn("Monthly rent ($) [from the listing: 1700.5]: ", console.prompts)
+
     def test_loan_questions_are_always_asked_normally(self):
         client = FakeClient(reply(GOOD))
         console, _, _ = run_listing(["a listing", "done"] + ACCEPT_ALL + LOAN_B, client)

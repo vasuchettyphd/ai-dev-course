@@ -121,8 +121,7 @@ def ask_with_default(prompt, kind, default, input_fn, print_fn):
     if default is None:
         return ask(prompt, kind, input_fn, print_fn)
     # "Purchase price ($): " becomes "Purchase price ($) [from the listing: 150000]: ".
-    # .12g shows 1250000 as 1250000 rather than 1.25e+06.
-    offer = f"{prompt.rstrip().rstrip(':')} [from the listing: {default:.12g}]: "
+    offer = f"{prompt.rstrip().rstrip(':')} [from the listing: {plain_number(default)}]: "
     while True:
         typed = input_fn(offer)
         if not typed.strip():
@@ -135,6 +134,11 @@ def ask_with_default(prompt, kind, default, input_fn, print_fn):
             return parse_answer(typed, kind)
         except ValueError as problem:
             print_fn(str(problem))
+
+
+def plain_number(value) -> str:
+    """A number as plain digits to the cent, without extra zeros: 150000, 1700.5, never 1.5e+05."""
+    return f"{value:.2f}".rstrip("0").rstrip(".")
 
 
 def ask_all(questions, input_fn, print_fn) -> dict:

@@ -86,6 +86,11 @@ class ExtractListingTest(unittest.TestCase):
         self.assertIsNone(values["purchase_price"])
         self.assertIsNone(values["monthly_rent"])
 
+    def test_a_whole_number_too_big_for_a_float_becomes_none(self):
+        # json.loads reads 1 followed by 400 zeros as a Python int that float() can't hold.
+        values = extract.extract_listing("x", FakeClient(reply('{"purchase_price": 1' + "0" * 400 + "}"))).values
+        self.assertIsNone(values["purchase_price"])
+
     def test_true_and_false_are_not_numbers(self):
         values = extract.extract_listing("x", FakeClient(reply({"monthly_hoa": True}))).values
         self.assertIsNone(values["monthly_hoa"])
@@ -128,6 +133,13 @@ class DescribeErrorTest(unittest.TestCase):
         message = extract.describe_error(FakeAPIError(400, "Your credit balance is too low"))
         self.assertIn("credit has run out", message)
 
+    def test_your_own_spend_limit_is_named(self):
+        for text in ("You have reached your specified API usage limits. You will regain access on 2026-11-01.",
+                     "You have reached your specified workspace API usage limits."):
+            message = extract.describe_error(FakeAPIError(400, text))
+            self.assertIn("spend limit has been reached", message)
+            self.assertNotIn("2026-11-01", message)
+
     def test_no_status_means_the_network(self):
         self.assertIn("reach Anthropic", extract.describe_error(ConnectionError("down")))
 
@@ -165,6 +177,27 @@ class LoadEnvFileTest(unittest.TestCase):
                 self.assertEqual(os.environ["ANTHROPIC_API_KEY"], "sk-ant-from-file")
                 self.assertEqual(os.environ["OTHER"], "kept")
                 self.assertEqual(os.environ["SINGLE"], "x y")
+
+    def write_env(self, folder, text, encoding="utf-8"):
+        path = os.path.join(folder, ".env")
+        with open(path, "w", encoding=encoding) as f:
+            f.write(text)
+        return path
+
+    def test_a_file_saved_with_a_byte_order_mark_still_works(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = self.write_env(folder, "ANTHROPIC_API_KEY=sk-ant-bom\n", encoding="utf-8-sig")
+            with mock.patch.dict(os.environ, {}, clear=True):
+                extract.load_env_file(path)
+                self.assertEqual(os.environ.get("ANTHROPIC_API_KEY"), "sk-ant-bom")
+
+    def test_export_in_front_and_a_note_after_are_ignored(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = self.write_env(folder, "export ANTHROPIC_API_KEY=sk-ant-exp # my key\nQUOTED=\"a # b\"\n")
+            with mock.patch.dict(os.environ, {}, clear=True):
+                extract.load_env_file(path)
+                self.assertEqual(os.environ.get("ANTHROPIC_API_KEY"), "sk-ant-exp")
+                self.assertEqual(os.environ.get("QUOTED"), "a # b")
 
     def test_a_missing_file_does_nothing(self):
         with mock.patch.dict(os.environ, {}, clear=True):
