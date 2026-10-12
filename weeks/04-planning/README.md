@@ -4,7 +4,7 @@
 
 **Time:** plan for about 90 minutes (an estimate); the grilling can take longer if your idea is big. **Cost:** nothing beyond your Claude plan. The add-in you install is free.
 
-**Tested with:** Claude Code 2.1.296, `mattpocock-skills` 1.2.3, `superpowers` 6.4.1 and AI-DLC 2.11.0, on Ubuntu 24.04 Linux (in a container), 12 October 2026. These are the versions tested; the official add-in marketplace updates itself, so yours may be newer. We tested, without signing in to Claude: installing Claude Code, adding Anthropic's official add-in marketplace, installing, listing, updating and removing the add-ins from the terminal, reading the `/grill-me` and Superpowers instructions inside them, and installing and setting up AI-DLC. Everything inside a signed-in Claude Code session (plan mode, the `/plugin` screen, running `/grill-me`, writing `PLAN.md`, Superpowers and AI-DLC runs), everything on GitHub, and every step on a Mac follow the official docs and are being tested on real Mac and Windows laptops.
+**Tested with:** Claude Code 2.1.296, `mattpocock-skills` 1.2.3, `superpowers` 6.4.1 and AI-DLC 2.11.0, on Ubuntu 24.04 Linux (in a container), 12 October 2026. These are the versions tested; the official add-in marketplace updates itself, so yours may be newer. We tested, without signing in to Claude: installing Claude Code, adding Anthropic's official add-in marketplace, installing, listing, updating and removing the add-ins from the terminal, reading the `/grill-me` and Superpowers instructions inside them, and installing and setting up AI-DLC. Everything inside a signed-in Claude Code session (plan mode, the `/plugin` screen, running `/grill-me`, writing `PLAN.md`, Superpowers and AI-DLC runs), everything on GitHub, and every step on a Mac or in Windows (WSL) follow the official docs and are being tested on real Mac and Windows laptops.
 
 ## Before you start
 
@@ -233,7 +233,7 @@ If `/grill-me` isn't in the list, type `/mattpocock-skills:grill-me` instead (be
 
 **As you go, copy the three questions you find hardest, and your answers, into a note.** The assignment asks for them.
 
-**d. How it ends.** It finishes when there are no open questions left, and it asks you to confirm that you both agree. Read its summary, correct anything that's wrong, then say so, for example: `Yes, we agree.`
+**d. How it ends.** It finishes when there are no open questions left, and it asks you to confirm that you both agree. Read what it says it has understood, correct anything that's wrong, then confirm (being tested), for example: `Yes, we agree.`
 
 **To stop early** (you're out of time, or it's going round in circles), type:
 
@@ -242,6 +242,8 @@ Stop grilling, summarise the decisions so far
 ```
 
 Anything not decided goes under "Open questions" in your plan.
+
+If you have to stop before the grilling is finished (for example, at the end of class), first type `Stop grilling, summarise the decisions so far` and copy the reply into your note. Claude Code does not keep the grilling for you. Next time, start `claude` in `~/semester-project`, type `/grill-me`, paste your summary, and add `Carry on grilling me from here.`
 
 ### 6. Write `PLAN.md` and merge it through a pull request
 
@@ -267,6 +269,8 @@ See the instructor's worked example: [`example-project/PLAN.md`](../../example-p
 ```text
 Make a new branch called add-plan. On it, write PLAN.md from our grilling session, with a title line "# Plan: <my project's name>" and exactly these seven headings, in this order: Goal, Who it's for, Must-haves, Not in this version, Data it uses, First three build steps, Open questions. Use my answers, not your own ideas. Be specific: numbers, names and examples. Keep it to about one page. Show it to me before you commit.
 ```
+
+If you closed Claude Code since the grilling, paste your summary before this prompt.
 
 **What Claude Code will probably do:** `git switch -c add-plan`, then create `PLAN.md` (an edit prompt). Choose plain **Yes**.
 
@@ -299,7 +303,7 @@ You don't need either of these for the assignment. Your instructor demonstrates 
 
 | | Plan mode + `/grill-me` (this week) | Superpowers | AWS AI-DLC |
 |---|---|---|---|
-| **What it is** | A Claude Code mode plus a free plugin (`mattpocock-skills`) | A free plugin (`superpowers`, by Jesse Vincent) that gives Claude a careful build process | A free, open-source workflow from AWS (`awslabs/aidlc-workflows`) that runs inside Claude Code and other AI tools |
+| **What it is** | A Claude Code mode plus a free plugin (`mattpocock-skills`) | A free plugin (`superpowers`, by Jesse Vincent, <https://github.com/obra/superpowers>) that gives Claude a careful build process | A free, open-source workflow from AWS (`awslabs/aidlc-workflows`) that runs inside Claude Code and other AI tools |
 | **How it plans** | Plan mode drafts a plan; `/grill-me` asks rounds of numbered questions with recommended answers | Brainstorming asks one question at a time, proposes 2 or 3 approaches, then gets your approval section by section | Runs through phases (Initialization, Ideation, Inception, Construction, Operation), one stage at a time, and stops for your approval at each gate |
 | **What it produces** | Nothing by itself; you ask for `PLAN.md` | A design file and a step-by-step build plan, saved under `docs/superpowers/` and committed to git | A folder of records for each stage under `aidlc/`, plus a `.claude/` folder with about 40 AI-DLC skills |
 | **When to use it** | Any idea, even with no software at all. Best for deciding what to build | When you're ready to build software and want it built in small, tested steps | Team software projects that want a full, documented process |
@@ -346,7 +350,7 @@ In our test it printed `✔ Successfully uninstalled plugin: superpowers (scope:
 
 > **Being tested:** Installing and setting up AI-DLC is from our test, on Linux. Running `/aidlc` needs a signed-in session and is being tested. Source: <https://github.com/awslabs/aidlc-workflows>.
 
-AI-DLC also gives Claude Code permission to edit any file in the folder without asking. That's another reason to keep it in a throwaway folder.
+AI-DLC also gives Claude Code a very broad edit permission (exact reach being tested). That's another reason to keep it in a throwaway folder.
 
 **a. Install it.** In your terminal (on Windows, in the **Ubuntu window**, never PowerShell), paste this line from AI-DLC's README:
 
@@ -364,13 +368,13 @@ Next: aidlc config
 **b. Set it up in a throwaway folder.** In your terminal, make the folder (if you haven't already) and set AI-DLC up in it:
 
 ```bash
-mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init
+mkdir -p ~/aidlc-sandbox && cd ~/aidlc-sandbox && git init
 aidlc config --harness claude && aidlc doctor
 ```
 
 `aidlc config` writes its files (`aidlc/` and `.claude/`) into this folder.
 
-In our test, `aidlc config` printed `configured /home/student/proj for Claude Code 2.11.0; next: open Claude Code in this project ...` and `aidlc doctor` ended with:
+In our test, `aidlc config` printed `configured ... for Claude Code 2.11.0; next: open Claude Code in this project ...` and `aidlc doctor` ended with:
 
 ```text
 0 problems, 4 warnings.
@@ -384,6 +388,8 @@ Warnings are advisory - if everything works, ignore them.
 ```
 
 It works through its stages and stops at each approval gate for you to approve, revise or skip.
+
+When you're done: `cd ~ && rm -rf ~/aidlc-sandbox ~/planning-sandbox` (in your terminal). The `aidlc` command stays in `~/.local/bin`; to remove it, see AI-DLC's README. On an Intel Mac the AI-DLC installer is being tested; if it fails, skip this optional part.
 
 ### 8. Check it worked
 

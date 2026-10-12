@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296, mattpocock-skills 1.2.3, superpowers 6.4.1 and AI-DLC 2.11.0 on Ubuntu Linux (in a container), 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, or on a Mac is being tested on real Mac and Windows laptops.</p>
+<p class="small">Tested with Claude Code 2.1.296, mattpocock-skills 1.2.3, superpowers 6.4.1 and AI-DLC 2.11.0 on Ubuntu Linux (in a container), 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, or on a Mac or in Windows (WSL) is being tested on real Mac and Windows laptops.</p>
 
 ---
 
@@ -163,7 +163,7 @@ This week: **No, keep planning**. Happy with it? Then `Shift + Tab` until `manua
 
 ---
 
-## Install `/grill-me` (mattpocock-skills)
+## Install `/grill-me` (mattpocock-skills) (being tested)
 
 In Claude Code:
 
@@ -219,6 +219,8 @@ Stop grilling, summarise the decisions so far
 
 Anything undecided goes under **Open questions**.
 
+Stopping before it ends (end of class)? Copy the summary into your note. Next time: `claude` in `~/semester-project`, `/grill-me`, paste it, add `Carry on grilling me from here.`
+
 ---
 
 ## `PLAN.md`: the fixed outline
@@ -250,7 +252,7 @@ Use my answers. Be specific. Show it to me before you commit.
 
 Then: commit, push, `gh pr create` ("Add project plan").
 
-On GitHub: **Files changed**, then **Merge pull request**.
+On GitHub: **Files changed**, then **Merge pull request**, then **Confirm merge**.
 
 Back in Claude Code: "Switch back to main and pull the latest changes from GitHub."
 
@@ -268,19 +270,22 @@ Back in Claude Code: "Switch back to main and pull the latest changes from GitHu
 
 ---
 
+<style scoped>section { font-size: 23px; }</style>
+
 ## Trying them yourself (optional)
 
 Only **after your `PLAN.md` PR is merged**, in a **throwaway folder**:
 
 ```bash
-mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init
+mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 ```
 
-**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. User scope means it's on in **every** folder, so remove it afterwards: `claude plugin uninstall superpowers@claude-plugins-official`
+**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. User scope means it's on in **every** folder, so remove it afterwards, in your terminal: `claude plugin uninstall superpowers@claude-plugins-official` (or `/plugin uninstall superpowers@claude-plugins-official` in Claude Code, being tested). If Claude Code is open, type `/reload-plugins`.
 
-**AI-DLC** (Windows: the Ubuntu window). It lets Claude edit any file in the folder without asking.
+**AI-DLC** (Windows: the Ubuntu window). It gives Claude a very broad edit permission (exact reach being tested). Use its own folder:
 
 ```bash
+mkdir -p ~/aidlc-sandbox && cd ~/aidlc-sandbox && git init
 curl -fsSL https://github.com/awslabs/aidlc-workflows/releases/latest/download/install.sh | sh
 aidlc config --harness claude && aidlc doctor
 ```
@@ -300,7 +305,7 @@ One document with:
 | Criterion | Points |
 |---|---|
 | Repo private (screenshot) and collaborator added | 3 |
-| `PLAN.md`: outline (1), specific (1), merged by PR (2) | 4 |
+| `PLAN.md`: outline (1), specific and no sensitive data (1), merged by PR (2) | 4 |
 | Three grilling questions, answers, and what changed | 3 |
 
 ---
