@@ -1,11 +1,14 @@
 """Ask for one listing's numbers, then print its results and the buy-box check.
 
 Run it from the example-project folder with:  python3 -m dealscreener
+To paste a listing first and let a model read its numbers:  python3 -m dealscreener --listing
 """
 from __future__ import annotations
 
 import math
+import sys
 
+from dealscreener import extract
 from dealscreener.buybox import check, money, passes, percent
 from dealscreener.calculator import Listing, analyse
 
@@ -30,11 +33,22 @@ LOAN_QUESTIONS = [
 ]
 
 
-def run(input_fn=input, print_fn=print) -> int:
-    """Run the screener once. Returns 0 when done, or 1 if the input stopped early."""
+def run(input_fn=input, print_fn=print, use_listing=False, client_factory=None) -> int:
+    """Run the screener once. Returns 0 when done, or 1 if the input stopped early.
+
+    With use_listing=True it first offers to read a pasted listing with a model; the
+    numbers it finds are shown at each question for you to accept or replace.
+    """
     print_fn("Rental deal screener. Type each number and press Enter.")
     try:
-        answers = ask_all(PROPERTY_QUESTIONS + LOAN_QUESTIONS, input_fn, print_fn)
+        from_listing = {}
+        if use_listing:
+            from_listing = listing_step(input_fn, print_fn, client_factory or extract.make_client)
+        answers = {
+            field: ask_with_default(prompt, kind, from_listing.get(field), input_fn, print_fn)
+            for field, prompt, kind in PROPERTY_QUESTIONS
+        }
+        answers.update(ask_all(LOAN_QUESTIONS, input_fn, print_fn))
         while True:
             try:
                 results = analyse(Listing(**answers))
@@ -61,6 +75,66 @@ def run(input_fn=input, print_fn=print) -> int:
     print_fn("")
     print_fn(f"Overall: {'PASS' if passes(rule_results) else 'FAIL'}")
     return 0
+
+
+def listing_step(input_fn, print_fn, client_factory) -> dict:
+    """Read a pasted listing and ask the model for its numbers. Returns {field: number or None}.
+
+    Returns {} when the step is skipped or fails: then every question is asked as usual.
+    """
+    print_fn(
+        "Paste the listing text, then type done on a line by itself and press Enter. "
+        "To skip and type the numbers yourself, type done now."
+    )
+    lines = []
+    while True:
+        line = input_fn("")
+        if line.strip().lower() == "done":
+            break
+        lines.append(line)  # blank lines are kept: they separate the listing's paragraphs
+    text = "\n".join(lines).strip()
+    if not text:
+        return {}
+    if len(text) > extract.MAX_LISTING_CHARS:
+        print_fn("That listing is too long (over 20,000 characters). Type the numbers yourself.")
+        return {}
+    print_fn("Asking the model to read the listing...")
+    try:
+        result = extract.extract_listing(text, client_factory())
+    except extract.ExtractionError as problem:
+        print_fn(f"{problem} For now, type the numbers yourself.")
+        return {}
+    except Exception as error:  # any failed call: a plain sentence, never a traceback or the key
+        print_fn(f"{extract.describe_error(error)} For now, type the numbers yourself.")
+        return {}
+    cost = extract.cost_usd(result.input_tokens, result.output_tokens)
+    print_fn(f"Used {result.input_tokens} input and {result.output_tokens} output tokens, about ${cost:.4f}.")
+    print_fn("Check each number from the listing: press Enter to keep it, or type the right number.")
+    return result.values
+
+
+def ask_with_default(prompt, kind, default, input_fn, print_fn):
+    """Ask one question, offering a number from the listing that Enter accepts.
+
+    With no number from the listing (default is None), it is the usual question.
+    """
+    if default is None:
+        return ask(prompt, kind, input_fn, print_fn)
+    # "Purchase price ($): " becomes "Purchase price ($) [from the listing: 150000]: ".
+    # .12g shows 1250000 as 1250000 rather than 1.25e+06.
+    offer = f"{prompt.rstrip().rstrip(':')} [from the listing: {default:.12g}]: "
+    while True:
+        typed = input_fn(offer)
+        if not typed.strip():
+            try:
+                return parse_answer(repr(default), kind)  # the listing's number gets the same checks
+            except ValueError as problem:
+                print_fn(str(problem))
+                return ask(prompt, kind, input_fn, print_fn)
+        try:
+            return parse_answer(typed, kind)
+        except ValueError as problem:
+            print_fn(str(problem))
 
 
 def ask_all(questions, input_fn, print_fn) -> dict:
@@ -122,4 +196,7 @@ def parse_answer(text: str, kind: str):
 
 
 if __name__ == "__main__":
-    raise SystemExit(run())
+    use_listing = "--listing" in sys.argv[1:]
+    if use_listing:
+        extract.load_env_file()  # the API key, from a .env file in this folder, if there is one
+    raise SystemExit(run(use_listing=use_listing))
