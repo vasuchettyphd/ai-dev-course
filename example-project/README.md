@@ -32,7 +32,7 @@ Each week's finished state will be marked with a **git tag** named after the wee
 - `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
 - `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the instructor's task plan, written in the format Superpowers' `writing-plans` produces, from the plan's first three build steps. Compare it with your own.
 - `.claude/agents/`: the three reviewer agents from week 6 (`does-it-work`, `safe-and-private` and `plain-english`). Each can only read files, never change them.
-- `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one).
+- `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one). Find those commits on the Commits tab of the week 6 pull request on the course repo.
 - `dealscreener/`: the code.
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.

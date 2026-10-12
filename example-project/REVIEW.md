@@ -1,15 +1,15 @@
 # Review of week 5 build
 
-The instructor's worked example for week 6. Three reviewer agents read the deal screener as it was at the end of week 5 and reported problems. They did not change any file. This page collects what they found, and the Decision and Reason columns record what was done about each one. Every `Fix` is in a commit named after its number, for example `Fix review #3: ...` (the wording fixes #1, #5, #6, #7 and #13 share one commit).
+The instructor's worked example for week 6. Three reviewer agents read the deal screener as it was at the end of week 5 and reported problems. They did not change any file. This page collects what they found, and the Decision and Reason columns record what was done about each one. Every `Fix` is in a commit named after its number, for example `Fix review #3: ...` (the wording fixes #1, #5, #6, #7 and #13 share one commit). Those commits are listed on the Commits tab of the week 6 pull request on the course repo.
 
 ## How this was made
 
-- **Reviewers:** the three agent files in [`.claude/agents/`](.claude/agents/): `does-it-work` (right answers and tests), `safe-and-private` (secrets, personal data, unsafe setup) and `plain-english` (clear names, messages and instructions). Each one can only read files (`tools: Read, Grep, Glob`).
+- **Reviewers:** the three agent files in [`.claude/agents/`](.claude/agents/): `does-it-work` (right answers and tests), `safe-and-private` (secrets, personal data, unsafe setup) and `plain-english` (clear names, messages and instructions). The agent files can only read files (`tools: Read, Grep, Glob`).
 - **Code reviewed:** `example-project/` at the git tag `week-05` (PLAN.md, dealscreener/, tests/, README.md).
 - **Date:** 2026-10-12.
 - **Line numbers** point at the week 5 code (tag `week-05`); where a reviewer's number was wrong, the corrected one is shown with the reviewer's in brackets.
 
-One prompt, typed into Claude Code, ran the three reviewers and combined their reports:
+Each reviewer's instructions (the files in `.claude/agents/`) were run as a separate subagent on the week 5 code (tag `week-05`), and their reports were combined using the rules in the prompt students type in step 4b:
 
 > Run the does-it-work, safe-and-private and plain-english reviewers in parallel, as separate subagents, on this project. Then combine their reports into REVIEW.md: one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason. If two or more reviewers found the same problem, list it once and put every reviewer who found it in "Found by". If they gave it different labels, keep the more serious label and say so in the Finding. Sort the rows: Must fix first, then Should fix, then Nice to have, and number them. Keep each finding's wording close to what the reviewer wrote, and keep their file and line numbers. Leave Decision and Reason empty. Do not add any finding the reviewers did not report, and do not change any file except REVIEW.md. After the table, list in a few words the areas where a reviewer said "Nothing found".
 

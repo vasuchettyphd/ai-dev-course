@@ -191,13 +191,13 @@ Wrong? "Set the tools line in every file in .claude/agents/ to exactly: tools: R
 
 ## Check Claude can use them (being tested)
 
+<style scoped>section { font-size: 24px; } pre { font-size: 18px; }</style>
+
 ```text
 Which subagents can you use in this project?
 ```
 
-Should name `does-it-work`, `safe-and-private`, `plain-english`.
-
-<p class="small">In 2.1.296, /agents only prints a reminder, and claude agents is for background sessions.</p>
+Should name `does-it-work`, `safe-and-private`, `plain-english` (it may list built-in ones too).
 
 Then check one can't edit:
 
@@ -207,7 +207,9 @@ README.md. Don't edit anything yourself and don't try another way.
 Just tell me what the subagent said.
 ```
 
-It should say it can't. An edit prompt? **No**, then check `tools:` again.
+It should say it can't. But its instructions say never to edit, and the `tools:` line is what really stops it: a refusal alone proves nothing. An edit prompt? **No**, then check `tools:` again.
+
+Optional: "Ask the does-it-work subagent which tools it has. Just tell me what it said." (Read, Grep, Glob; being tested)
 
 Then: "Commit the three files in .claude/agents/ on this branch ..."
 
@@ -327,7 +329,7 @@ Deal screener #8: new tests failed first (`ImportError: cannot import name 'perc
    Push the review-fixes branch to GitHub and open a pull request into
    main titled "Review fixes".
    ```
-3. **Files changed:** only `.claude/agents/`, `REVIEW.md` and your fixes. Read each fix's green and red lines **yourself**
+3. **Files changed:** `REVIEW.md`, the three agent files, and the files your fixes changed (code, tests, and any README or PLAN.md you reworded): nothing else. Read each fix's green and red lines **yourself**
 4. **Merge pull request**, **Confirm merge** (or **Squash and merge**; being tested), then "Switch back to main and pull the latest changes from GitHub."
 
 <p class="small">Deal screener after its fixes: Ran 39 tests, OK. Committed to main? Week 5's rescue steps.</p>
@@ -338,7 +340,7 @@ Deal screener #8: new tests failed first (`ImportError: cannot import name 'perc
 
 - The **merged fix PR** address: three reviewer files, `REVIEW.md`, the fixes
 - Screenshot: **tests passing** after the fixes
-- Reflection: the **most useful reviewer**; one finding you **disagreed** with, and why
+- Reflection: the **most useful reviewer**, what you did about it (quote a green or red line from its fix, say what it does); one finding you **disagreed** with, and why
 
 | Criterion | Points |
 |---|---|

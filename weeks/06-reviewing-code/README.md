@@ -142,7 +142,7 @@ Read PLAN.md and the three reviewer files in .claude/agents/ (does-it-work.md, s
 
 **What Claude Code will probably do:** read the four files, then ask to edit each agent file (an edit prompt; plain **Yes**, not the "don't ask again" option), and list the changes. If any prompt asks to change a `tools:` line, answer **No**. Read them. If a change doesn't fit your project, say so, for example: "In does-it-work, also check ...".
 
-**e. Check each reviewer can only read.** This is the most important check this week. Open each of the three files (or ask "Show me the first five lines of each file in .claude/agents/"). Each starts with a block like this one, from the deal screener:
+**e. Check each reviewer can only read.** This is the most important check this week. Ask "Show me the `tools:` line of each file in .claude/agents/" (or open each file; on a Mac, Finder hides folders starting with a dot). Each file starts with a block like this one, from the deal screener:
 
 ```text
 ---
@@ -166,7 +166,7 @@ If any file has no `tools` line, or lists anything else (`Edit`, `Write`, `Bash`
 Which subagents can you use in this project?
 ```
 
-It should name `does-it-work`, `safe-and-private` and `plain-english`. Two things that **don't** work for this: in Claude Code 2.1.296, `/agents` only prints a reminder to ask Claude or edit the `.claude/agents/` folder; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
+It should name `does-it-work`, `safe-and-private` and `plain-english` (it may list built-in ones too). Two things that **don't** work for this: in Claude Code 2.1.296, `/agents` only prints a reminder to ask Claude or edit the `.claude/agents/` folder; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
 
 **g. Check a reviewer really can't edit** (being tested). In Claude Code, type:
 
@@ -174,7 +174,15 @@ It should name `does-it-work`, `safe-and-private` and `plain-english`. Two thing
 Ask the does-it-work subagent to add the word "test" to the end of README.md. Don't edit anything yourself and don't try another way. Just tell me what the subagent said.
 ```
 
-The reviewer should say it can't: it has no tool that edits files. If an edit prompt appears anyway, choose **No**, and check step 3e again.
+It should say it can't. Its instructions say never to change a file, but the tools line from step 3e is what actually stops it, so a refusal alone doesn't prove the line is right. If an edit prompt appears anyway, choose **No**, and check step 3e again.
+
+Optional follow-up, in Claude Code:
+
+```text
+Ask the does-it-work subagent which tools it has. Just tell me what it said.
+```
+
+It should list Read, Grep and Glob (being tested).
 
 **h. Commit the reviewers.** In Claude Code:
 
@@ -186,7 +194,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 ### 4. Run all three
 
-> **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used this prompt; your run in a signed-in session is being tested.
+> **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used these reviewer instructions and these combining rules. Running this one prompt in a signed-in session is being tested.
 
 **a. Check your usage first.** In Claude Code, type `/usage` and write down what it shows. Keep these numbers; you'll compare them in step 4e, and bring them to next week's class.
 
@@ -266,6 +274,8 @@ Commit REVIEW.md on this branch with the message "Triage the review".
 Fix finding #1 in REVIEW.md, test first: write a test that fails because of this problem, run the tests and show me it fails, then change the code until all the tests pass. Change nothing else. Then commit on this branch with the message "Fix review #1: <a few words>".
 ```
 
+(Your #1 may be a wording finding, as the deal screener's was; then use the wording prompt below.)
+
 For a **wording** finding (a README sentence, a comment, a message), there's nothing to test first:
 
 ```text
@@ -274,7 +284,7 @@ Fix finding #5 in REVIEW.md. It is a wording change, so no new test: make the ch
 
 Plain **Yes** to edits in your project, the tests and the commit. Read each change before you go on to the next finding. You can put several small wording fixes in one commit, as the deal screener did ("Fix review #1, #5, #6, #7, #13: ...").
 
-In the deal screener, the fix for #8 started with new tests that failed (`ImportError: cannot import name 'percent'`), then the code was fixed and all 37 tests passed. For #3 and #4 the new tests passed straight away: the code was already right and only the test was missing, which is fine.
+The deal screener's only Must fix (#1) was a wording change, so #8 is its test-first example. In the deal screener, the fix for #8 started with new tests that failed (`ImportError: cannot import name 'percent'`), then the code was fixed and all 37 tests passed. For #3 and #4 the new tests passed straight away: the code was already right and only the test was missing, which is fine. You can see the deal screener's fix commits on the Commits tab of the week 6 pull request on the course repo.
 
 **b. Run the tests and the program yourself.** In a second terminal window, `cd ~/semester-project`, then your test command from week 5 (for example `python3 -m unittest` or `npm test`). For the deal screener after its fixes:
 
@@ -294,7 +304,7 @@ Push the review-fixes branch to GitHub and open a pull request into main titled 
 
 It will probably run `git push -u origin review-fixes` and `gh pr create ...`. Plain **Yes** to each. It prints the pull request's address. Copy it: you hand it in.
 
-**d. Read Files changed yourself, before you merge.** Open the address and click **Files changed** (step 2). You should see the three files in `.claude/agents/`, `REVIEW.md`, and the code and tests your fixes changed: nothing else. Go file by file. For each fix, find its green and red lines and check they do what the finding asked. For any part you don't follow, use "Explain this change in plain English: <paste>" (step 2). If something is there that shouldn't be, don't merge: ask Claude what it is and why.
+**d. Read Files changed yourself, before you merge.** Open the address and click **Files changed** (step 2). You should see `REVIEW.md`, the three agent files, and the files your fixes changed (code, tests, and any README or PLAN.md you reworded): nothing else. Go file by file. For each fix, find its green and red lines and check they do what the finding asked. For any part you don't follow, use "Explain this change in plain English: <paste>" (step 2). If something is there that shouldn't be, don't merge: ask Claude what it is and why.
 
 **e. Merge on GitHub, then pull.** On the **Conversation** tab click **Merge pull request** and **Confirm merge** (or **Squash and merge**; the exact labels are being tested), as in [week 3](../03-git-and-github/) step 7. Then, in Claude Code:
 

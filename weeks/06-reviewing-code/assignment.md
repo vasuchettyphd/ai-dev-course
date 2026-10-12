@@ -16,7 +16,7 @@ The repo stays **private**, with `vasuchettyphd` as a collaborator, so your inst
 
 **(c) A short reflection,** about half a page:
 
-1. **The most useful reviewer:** which of your three reviewers found the most useful thing, what it was, and what you did about it.
+1. **The most useful reviewer:** which of your three reviewers found the most useful thing, what it was, and what you did about it: quote one green or red line from its fix in your pull request's Files changed, and say in plain words what it does.
 2. **One finding you disagreed with:** quote or describe it, and say why you disagreed, with the evidence you checked (README step 5). If you agreed with every finding, pick the one you came closest to marking `Won't fix`, and say why you fixed it in the end.
 
 Never put a password, a sign-in code or a token in your hand-in.
