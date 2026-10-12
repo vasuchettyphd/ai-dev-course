@@ -95,6 +95,14 @@ class EdgeCaseTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyse(make_listing(down_payment_pct=120), ASSUMPTIONS)
 
+    def test_vacancy_over_100_percent_raises(self):
+        with self.assertRaisesRegex(ValueError, "Vacancy must be between 0% and 100%"):
+            analyse(make_listing(), Assumptions(vacancy_pct=120, repairs_reserve_pct=8))
+
+    def test_repairs_reserve_over_100_percent_raises(self):
+        with self.assertRaisesRegex(ValueError, "Repairs reserve must be between 0% and 100%"):
+            analyse(make_listing(), Assumptions(vacancy_pct=5, repairs_reserve_pct=120))
+
     def test_purchase_price_of_zero_raises(self):
         with self.assertRaises(ValueError):
             analyse(make_listing(purchase_price=0), ASSUMPTIONS)
