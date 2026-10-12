@@ -214,9 +214,10 @@ screener, as a model. ... adapt both files to my project. Rules: start from an
 official image on Docker Hub for my language, pinned to a version, never latest
 (if my project is Python, use python:3.12-slim, as the model does) ... Never copy
 a .env file, passwords, keys or other secrets into the image ... Keep USER nobody
-unless my program writes files inside the container ... Don't add --privileged,
-ports or folders from my laptop. Keep a plain-English comment above every line.
-Don't build or run anything yet, and don't commit.
+unless my program writes files inside the container ... Don't add --privileged.
+If my program isn't typed into, tell me the exact docker run command, ask
+before adding a port, and never mount anything except this project folder.
+Keep a plain-English comment above every line. Don't build or run anything yet, and don't commit.
 ```
 
 ---
