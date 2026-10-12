@@ -25,7 +25,7 @@ Turn `ai-dev-course` from six standalone advanced tutorials into a full 14-week 
 | 2 | Setting up Claude Code | Install on Mac or Windows (WSL), sign in, first session, CLAUDE.md, what costs money | Working setup; ask Claude to explain a file |
 | 3 | Git and GitHub | Repos, commits, branches, PRs, using git through Claude Code | Create their project repo |
 | 4 | Planning | Plan mode with `/grill-me`, AWS AI-DLC (`awslabs/aidlc-workflows`) and Superpowers, compared on the deal screener | Choose an idea, get grilled on it, write the plan |
-| 5 | Building with AI | Superpowers or AI-DLC: small steps, tests first | First working version |
+| 5 | Building with AI | Building with Superpowers (decided in week 4): small steps, tests first | First working version |
 | 6 | Reviewing code | Several reviewers with different focuses; reading a diff without being a coder | Review their own build and fix what's found |
 | 7 | Running what you build | Docker: why "works on my machine" isn't enough, running the app in a container | Containerize their project |
 | 8 | Debugging with AI + midterm check-in | Reproduce, narrow down, avoid the "fix it" loop | Demo version 1 to a classmate |
