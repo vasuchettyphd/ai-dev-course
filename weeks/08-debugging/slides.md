@@ -208,7 +208,7 @@ Changing code before explaining the cause? **No**: "Explain the cause in plain E
 
 ---
 
-<style scoped>section { font-size: 23px; } pre { font-size: 16px; }</style>
+<style scoped>section { font-size: 21px; } pre { font-size: 14px; }</style>
 
 ## The test fails first, then passes
 
@@ -216,11 +216,14 @@ Second terminal window, `python3 -m unittest`. **Before the fix** (shortened):
 
 ```text
 .......................................F.FF.FF.
+FAIL: test_rate_typed_as_a_fraction_asks_and_yes_means_percent (tests.test_main.SmallPercentTest...)
+AssertionError: 'You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%: '
+not found in [..., 'Interest rate (%): ', 'Loan term (years): ', 'Loan term (years): ', ...]
 FAIL: test_yes_and_no_ignore_case_and_spaces (tests.test_main.SmallPercentTest...)
 First differing element 0:
 'Monthly mortgage payment: $315.80'
 'Monthly mortgage payment: $748.47'
-Ran 47 tests in 0.006s
+Ran 47 tests in 0.004s
 
 FAILED (failures=5)
 ```
@@ -233,7 +236,7 @@ Ran 47 tests in 0.004s
 OK
 ```
 
-**Screenshot both.** The failure must show **your bug** (the wrong answer), not `ImportError` or `NameError`. 5 of the 8 new tests failed; 3 check answers that already worked.
+**Screenshot both.** The failure must show **your bug** (no question asked; the wrong answer), not `ImportError` or `NameError`. 5 of the 8 new tests failed; 3 check answers that already worked.
 
 ---
 
@@ -241,7 +244,7 @@ OK
 
 ## One fix, then check everywhere
 
-Commit the test first: "Test for bug N: ... (fails before the fix)". Then:
+Commit the test first: "Test for bug N: ... (fails before the fix)". (The deal screener used one commit; yours shows the test failing first.) Then:
 
 ```text
 Now make one fix: the smallest change to the code that fixes the cause you
@@ -252,7 +255,7 @@ bug. Then run all my tests and show me the result.
 *Deal screener:* one change. It now asks:
 `You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%:`
 
-Check: **all** tests pass, the bug's exact input works, then in Docker:
+Check: **all** tests pass, the bug's exact input works, then in Docker (Docker Desktop running):
 `docker build -t semester-project .` and your test command in the container. Commit: "Fix bug N: ...".
 
 ---
@@ -261,7 +264,7 @@ Check: **all** tests pass, the bug's exact input works, then in Docker:
 
 ## When you're in the loop: two attempts, then stop
 
-1. `Esc`. **Undo** with week 3's safe undo: `git restore` (not committed), `git revert` (committed). The committed test stays
+1. `Esc`. **Undo** with week 3's safe undo: `git restore` **all** uncommitted changes (only failed attempts are uncommitted), `git revert` committed attempts. The committed test stays
 2. **Ask for the cause** before any change:
 
 ```text
@@ -279,8 +282,8 @@ The skill's own limit is **three**: "DON'T attempt Fix #4 without architectural 
 
 ## Finish
 
-1. `BUGS.md`: Status "Fixed in commit ...", Cause in one or two plain sentences. Commit
-2. "Push the fix-&lt;short-name&gt; branch to GitHub and open a pull request into main titled 'Fix bug N: ...'."
+1. "Push the fix-&lt;short-name&gt; branch to GitHub and open a pull request into main titled 'Fix bug N: ...'."
+2. `BUGS.md`: Status "Fixed in &lt;the pull request's address&gt;", Cause in one or two plain sentences. Commit and push again: the PR updates
 3. **Files changed:** the test, the fix, `BUGS.md` (and your feedback file). **Nothing else:** no deleted test, no changed expected answer, no `.env`
 4. **Merge pull request**, then "Switch back to main and pull the latest changes from GitHub."
 
@@ -309,7 +312,7 @@ The skill's own limit is **three**: "DON'T attempt Fix #4 without architectural 
 ## Assignment
 
 - The **feedback form** you filled in for your partner (file or photo)
-- The link to **`BUGS.md`**: at least one bug with exact steps to reproduce
+- The link to **`BUGS.md`** on `main` after the merge (not merged? on your fix branch): at least one bug with exact steps to reproduce
 - The **merged fix PR**, with screenshots: the test **failing** before, all tests **passing** after
 - Reflection: what your partner found that you hadn't; how you avoided (or got out of) the "fix it" loop
 

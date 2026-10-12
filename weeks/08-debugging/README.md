@@ -7,7 +7,7 @@
 **Tested with** (12 October 2026; these are the versions tested, yours may be newer):
 
 - Superpowers 6.4.1, whose `systematic-debugging` skill this week follows. Every quote from the skill below is from its `SKILL.md` in that version. Superpowers 7.0.0 came out on 10 October 2026; its `systematic-debugging` differs from 6.4.1 only in two lines of a shell example, but 7.0.0 is not tested.
-- Claude Code 2.1.296 on Linux (WSL 2, Intel/AMD chip).
+- Claude Code 2.1.296 on Linux (WSL 2).
 - The deal screener example's real bug (an interest rate typed as `0.07` is read as 0.07%), reproduced with Python 3.14.4, then fixed test first: before the fix, `python3 -m unittest` ran 47 tests and printed `FAILED (failures=5)`; after it, the same 47 tests passed. They also passed in a container on Docker Engine 29.8.0 with the `python:3.12-slim` image (Python 3.12.15).
 - The instructor filled in the feedback form for the deal screener, acting as the classmate: [`example-project/FEEDBACK.md`](../../example-project/FEEDBACK.md). The bug it found is Bug 1 in [`example-project/BUGS.md`](../../example-project/BUGS.md).
 - Being tested on real Mac and Windows laptops: the peer demo in class, everything inside a signed-in Claude Code session (starting `systematic-debugging` by name or on its own, and what it shows you), everything on GitHub, and every step on a Mac or in Windows (WSL).
@@ -166,13 +166,13 @@ It will probably run `git switch main`, `git pull` and `git switch -c fix-<short
 - **Cause:** (fill in once you know)
 ```
 
-In Claude Code, type this, then paste the "What broke" part of your form after it (type it in if your form is on paper), and add what you saw in 3b:
+You write `BUGS.md` from the form **your partner filled in about your project** (step 2c, their copy to you), not the one you filled in for them. In Claude Code, type this, then paste the "What broke" part of that form after it (type it in if it's on paper), and add what you saw in 3b:
 
 ```text
 Make a file called BUGS.md at the top of my project. Start it with "# Bugs" and the line "Bugs found in my project, one section each, newest last." Then add one section for each bug below, numbered from 1, using exactly this template: a heading "## Bug N: <short name>", then the lines Found by, What I did (exact input), What I expected, What happened, Does it happen every time?, Status and Cause, as in the deal screener's BUGS.md. Copy the exact inputs and messages word for word. Status is Open and Cause is "(fill in once you know)" for every bug. Don't guess anything that isn't in my notes: write "Not sure" instead. Don't change any other file. Here are my notes:
 ```
 
-Plain **Yes** to creating `BUGS.md`. Then read every section against your form: the exact input must be exact (every number, in order, as typed). Fix anything wrong yourself, or tell Claude exactly what to change.
+Plain **Yes** to creating `BUGS.md`. Then read every section against your partner's form: the exact input must be exact (every number, in order, as typed). Fix anything wrong yourself, or tell Claude exactly what to change.
 
 **The worked example: the deal screener's Bug 1.** The instructor, acting as the classmate, typed listing B with `0.07` for the interest rate, meaning 7%. Here it is in [`example-project/BUGS.md`](../../example-project/BUGS.md), as it was first written:
 
@@ -212,6 +212,8 @@ You stay on your `fix-<short-name>` branch. Keep the bottom line at `manual mode
 
 The command must be at the very start of the message, so the skill starts straight away. If `/superpowers:systematic-debugging` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers systematic-debugging skill.` instead (being tested). A long paste may show as a short label such as `[Pasted text]` in the prompt box; that's normal (being tested).
 
+The skill allows a "one-off test script if no framework", but this course wants a real test in your project's own tests: it stays in the project, and every time you run your tests it checks that this bug never comes back.
+
 **b. What you'll see, phase by phase** (being tested; its exact words will differ). Each phase below shows what the deal screener's run found.
 
 1. **Root Cause Investigation.** It reads your code and the error message, if there is one, and asks to run your program or your tests with the bug's input (**Yes**). It traces where the wrong value first appears. *Deal screener:* no error message, the program finished normally, so the clue was in the numbers. The typed `0.07` went through `parse_answer` in `dealscreener/__main__.py`, which accepts any percentage from 0 to 100, so it came out as 0.07%. The calculator was right; the input check was where the meaning was lost.
@@ -226,18 +228,22 @@ If it asks to change code before it has explained the cause, choose **No** and t
 ```text
 .......................................F.FF.FF.
 ...
+FAIL: test_rate_typed_as_a_fraction_asks_and_yes_means_percent (tests.test_main.SmallPercentTest.test_rate_typed_as_a_fraction_asks_and_yes_means_percent)
+...
+AssertionError: 'You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%: ' not found in ['Purchase price ($): ', 'Monthly rent ($): ', 'Yearly property tax ($): ', 'Yearly insurance ($): ', 'Monthly HOA fee ($, 0 if none): ', 'Down payment (%): ', 'Interest rate (%): ', 'Loan term (years): ', 'Loan term (years): ', 'Closing costs ($): ']
+...
 FAIL: test_yes_and_no_ignore_case_and_spaces (tests.test_main.SmallPercentTest.test_yes_and_no_ignore_case_and_spaces)
 ...
 First differing element 0:
 'Monthly mortgage payment: $315.80'
 'Monthly mortgage payment: $748.47'
 ...
-Ran 47 tests in 0.006s
+Ran 47 tests in 0.004s
 
 FAILED (failures=5)
 ```
 
-(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**, the wrong answer next to the one you expected, like `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
+(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**. In the deal screener's first failure, the program never asked "Did you mean 7%?" (it asked for the loan term twice, because the `y` meant for the question was read as the loan term). In the second, the wrong answer sits next to the one expected: `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
 
 The deal screener added 8 tests (`SmallPercentTest` in [`example-project/tests/test_main.py`](../../example-project/tests/test_main.py)). Five failed before the fix. The other three passed already, on purpose: they check answers that already worked and must keep working (a real `0` or `7` isn't questioned, `n` keeps 0.07%, and running out of input stops politely). That's fine. What matters is that at least one test fails because of the bug.
 
@@ -247,7 +253,7 @@ Then commit the test on its own. In Claude Code:
 Commit only the new test on this branch with the message "Test for bug N: <short name> (fails before the fix)".
 ```
 
-Plain **Yes**. Committing the test first keeps it safe if you need to undo a fix (step 5).
+Plain **Yes**. Committing the test first keeps it safe if you need to undo a fix (step 5). (The deal screener put its test and fix in one commit; you commit the test first so your history shows it failing before the fix.)
 
 **d. Make one fix.** In Claude Code:
 
@@ -265,7 +271,7 @@ You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%:
 
 1. Run your test command again. **Every** test must pass, not only the new one. For the deal screener: `Ran 47 tests` and `OK`. Take a **screenshot**: the assignment asks for it.
 2. Run your program and type the bug's exact input from `BUGS.md`. The bug must be gone. *Deal screener:* `0.07`, then `y`, gave a monthly mortgage payment of $748.47 and cash flow $430.53, the same as typing `7`.
-3. In the container (week 7): build again, so the image has the fix, then run your test command in it:
+3. In the container (week 7): open Docker Desktop and wait until it says it is running, then build again, so the image has the fix, and run your test command in it:
 
    ```bash
    docker build -t semester-project .
@@ -288,13 +294,13 @@ Plain **Yes**.
 
 You're in the "fix it" loop when a fix doesn't work, or one fix breaks something else, and Claude goes straight to another change. **After two failed attempts, stop.** Press `Esc` to stop Claude, then do three things:
 
-**a. Undo the attempts,** with [week 3's safe undo](../03-git-and-github/README.md#8-undo-safely): `git restore` for changes not yet committed, `git revert` for commits. Your test is safe, because you committed it in step 4c. In Claude Code:
+**a. Undo the attempts,** with [week 3's safe undo](../03-git-and-github/README.md#8-undo-safely): `git restore` for changes not yet committed, `git revert` for commits. Your failing test is already committed (step 4c), and so are `BUGS.md` and your feedback file (step 3d), so **every** uncommitted change is from the fix attempts: throw them all away. In Claude Code:
 
 ```text
-Stop. Two fixes haven't worked. Throw away the uncommitted changes to the code with git restore, but keep the committed test for this bug. If any fix attempt was committed, undo it with git revert instead. Show me each command before you run it, and don't use reset, --force or git clean.
+Stop. Two fixes haven't worked. Throw away all my uncommitted changes with git restore; the test for this bug is already committed, so it stays. If any fix attempt was committed, undo that commit with git revert, so the history keeps a record. Show me each command before you run it, and don't use reset, --force or git clean.
 ```
 
-Check each command names only the code files you expect: if you see `.`, `git clean` or `reset`, choose **No**. Then ask "What does git status say?": it should say `nothing to commit, working tree clean`, and your test should still be there and still fail.
+It will probably run `git restore .` (this time that's right: everything uncommitted is a failed attempt) and, for a committed attempt, `git revert <commit> --no-edit`. Plain **Yes** to those; **No** to `git clean`, `reset` or `--force`. Then ask "What does git status say?": it should say `nothing to commit, working tree clean`. If it still lists a new file an attempt made, ask Claude what it is before anything deletes it. Your test should still be there and still fail.
 
 **b. Ask for the cause before any change.** In Claude Code:
 
@@ -312,21 +318,21 @@ Read the answer. Does it make sense with what you saw? Ask about anything that d
 
 > **Being tested:** This step needs a signed-in session and a real GitHub account, and is being tested.
 
-**a. Update the bug in `BUGS.md`.** In Claude Code:
-
-```text
-In BUGS.md, update the bug we just fixed: set Status to "Fixed in commit <the fix commit's short hash>", and write the Cause in one or two plain sentences: what was wrong in the code, and which test now checks it. Change nothing else. Then commit BUGS.md on this branch with the message "Bug N fixed: status and cause".
-```
-
-Plain **Yes**. The other bugs stay `Open`: you only fix one this week. The deal screener's finished entry is Bug 1 in [`example-project/BUGS.md`](../../example-project/BUGS.md).
-
-**b. Push and open a pull request.** In Claude Code:
+**a. Push and open a pull request.** In Claude Code:
 
 ```text
 Push the fix-<short-name> branch to GitHub and open a pull request into main titled "Fix bug N: <short name>".
 ```
 
-It will probably run `git push -u origin fix-<short-name>` and `gh pr create ...`. Plain **Yes** to each. Copy the pull request's address: you hand it in.
+It will probably run `git push -u origin fix-<short-name>` and `gh pr create ...`. Plain **Yes** to each. Copy the pull request's address: you hand it in, and it goes in `BUGS.md` next.
+
+**b. Update the bug in `BUGS.md`, then push again.** The template's Status line says "Fixed in <commit or PR link>". Use the pull request's address: a commit's hash can change when GitHub merges. In Claude Code, with the address you copied:
+
+```text
+In BUGS.md, update the bug we just fixed: set Status to "Fixed in <the pull request's address>", and write the Cause in one or two plain sentences: what was wrong in the code, and which test now checks it. Change nothing else. Then commit BUGS.md on this branch with the message "Bug N fixed: status and cause", and push the branch to GitHub.
+```
+
+Plain **Yes** to the edit, the commit and the push. The pull request updates by itself: refresh its page to see the new commit. The other bugs stay `Open`: you only fix one this week. The deal screener's finished entry is Bug 1 in [`example-project/BUGS.md`](../../example-project/BUGS.md) (it names a commit, because the instructor's fix wasn't merged through its own pull request).
 
 **c. Read Files changed yourself, before you merge.** Open the address and click **Files changed** (week 6 step 2). You should see:
 
@@ -355,10 +361,10 @@ You're done when:
 - `BUGS.md` on `main` has at least one bug written with the exact input, what you expected, what happened, and whether it happens every time.
 - Your fix's pull request is merged, and **Files changed** shows the test, the fix and `BUGS.md`, and nothing unrelated.
 - You have a screenshot of the new test failing before the fix, and one of all the tests passing after it.
-- On `main`, your tests pass on your laptop and in the container (`docker build -t semester-project .`, then your test command in it), and the bug's exact input no longer shows the bug.
+- On `main`, your tests pass on your laptop and in the container (with Docker Desktop running: `docker build -t semester-project .`, then your test command in it), and the bug's exact input no longer shows the bug.
 - The fixed bug's Status and Cause are filled in.
 
-The [assignment](assignment.md) asks for the form, the link to `BUGS.md`, the pull request's address, two screenshots and a short reflection.
+`BUGS.md` was made on your `fix-<short-name>` branch, so it reaches `main` only when the fix is merged. The [assignment](assignment.md) asks for the form, the link to `BUGS.md` (on `main` after the merge; if your fix isn't merged, its link on your `fix-<short-name>` branch), the pull request's address, two screenshots and a short reflection.
 
 ## Troubleshooting
 
