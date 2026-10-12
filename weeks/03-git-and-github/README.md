@@ -4,14 +4,14 @@
 
 **Time:** plan for about 90 minutes (an estimate); installing Homebrew on a Mac can make it longer. **Cost:** nothing beyond your Claude plan. A GitHub account is free.
 
-**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step that runs on your own computer, using a stand-in for GitHub: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push. Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's and Homebrew's docs and is being tested on real Mac and Windows laptops.
+**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step that runs on your own computer, using a stand-in for GitHub: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push. Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's, Homebrew's and Apple's docs and is being tested on real Mac and Windows laptops.
 
 ## Before you start
 
 You need:
 
-- Week 2 done: Claude Code installed and signed in, and your practice folder `~/my-first-project` with `hello.md` and `CLAUDE.md` in it. If you don't have the folder, make it: in your terminal, type `cd ~` then `mkdir my-first-project`.
-- On a Mac: **macOS 15 (Sequoia) or later** (Apple menu > About This Mac). This week installs a tool with Homebrew, which needs macOS 15 or later. If your Mac is older, tell your instructor now: the course's Mac steps need macOS 15.
+- Week 2 done: Claude Code installed and signed in, and your practice folder `~/my-first-project` with `hello.md` and `CLAUDE.md` in it. If you don't have the folder, make it: in your terminal, type `cd ~` then `mkdir my-first-project`. Then, in your terminal, type `cd ~/my-first-project && claude`, and ask Claude Code: "Create hello.md with three tips for using Claude Code, and a short CLAUDE.md describing this folder." Approve the two new files, then type `/exit` to leave Claude Code.
+- On a Mac: **macOS 15 (Sequoia) or later** (Apple menu > About This Mac), and an **administrator** account on the Mac. If your Mac is older, or it's a work or school Mac where you aren't an administrator, tell your instructor now: the course's Mac steps need both.
 - An email address you can open now, to create a GitHub account.
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows, as in week 2. Every command below says where to type it. On Windows, nothing this week goes in PowerShell.
@@ -80,7 +80,7 @@ Near the "Keep my email addresses private" setting, GitHub shows your private ad
 git --version
 ```
 
-> **Being tested:** On a Mac without Apple's developer tools, this may open a window asking to install the "command line developer tools". Click Install, wait for it to finish, then type `git --version` again.
+> **Being tested:** On any Mac (Apple chip or Intel) without Apple's developer tools, the first `git --version` may open a window asking to install the "command line developer tools". Click Install, wait for it to finish, then type `git --version` again.
 
 **On Windows.** In the **Ubuntu window**, type:
 
@@ -121,13 +121,22 @@ It should print your `noreply` address.
 
 `gh` is GitHub's own command-line tool. Claude Code uses it to create your GitHub repo and open pull requests, and you use it to sign in to GitHub from the terminal.
 
-#### On a Mac: with Homebrew
+#### On a Mac: first, check your chip
+
+Click the Apple menu, then **About This Mac**.
+
+- If it shows **Chip** followed by a name such as `Apple M1`, your Mac has an **Apple chip**. Follow "On a Mac with an Apple chip" below.
+- If it shows **Processor** followed by an **Intel** name, it's an **Intel Mac**. Skip Homebrew and follow "On an Intel Mac" below.
+
+(Apple's own page explains this: <https://support.apple.com/en-us/116943>.)
+
+#### On a Mac with an Apple chip: with Homebrew
 
 > **Being tested:** These steps are being tested on a real Mac laptop. If something looks different, tell your instructor.
 
-**Homebrew** is a free installer for Mac tools. Homebrew supports macOS 15 (Sequoia) and later. Macs with Apple chips (M1 and later) are its main supported setup. On an older **Intel** Mac, Homebrew may work but isn't officially supported, and it may ask to install Apple's "command line developer tools": accept, and if you get stuck, come to office hours.
+**Homebrew** is a free installer for Mac tools. It supports macOS 15 (Sequoia) and later, on Macs with Apple chips.
 
-You need an **administrator** account on the Mac to install Homebrew (being tested). If it's a work or school Mac where you aren't an administrator, ask in office hours.
+You need an **administrator** account on the Mac. The installer uses `sudo` (a command that asks for administrator rights), so it asks for your Mac login password, and it stops if your account isn't an administrator. If it's a work or school Mac where you aren't an administrator, ask in office hours.
 
 **a. Install Homebrew.** If you already use Homebrew, skip to step c. Otherwise, in **Terminal**, paste this line exactly (from <https://brew.sh>) and press Enter:
 
@@ -136,10 +145,10 @@ You need an **administrator** account on the Mac to install Homebrew (being test
 ```
 
 - It explains what it will do, then pauses. Press **Return** to continue.
-- Expect it to ask for a password: your Mac login password. Typing it shows nothing; that's normal.
+- It asks for your Mac login password. Typing it shows nothing; that's normal.
 - It can take several minutes.
 
-**b. Run the "Next steps" lines.** At the end, the installer prints **Next steps** with one or more lines to run. Copy and run **exactly the lines it prints**, in Terminal. Run the lines the installer prints, not the one below. Only if it prints none, use the line from Homebrew's docs for Apple-chip Macs: `eval "$(/opt/homebrew/bin/brew shellenv)"`.
+**b. Run the "Next steps" lines.** At the end, the installer prints **Next steps** with one or more lines to run. Copy and run **exactly the lines it prints**, in Terminal.
 
 Then close Terminal (`Cmd + Q`), open it again, and check:
 
@@ -147,13 +156,29 @@ Then close Terminal (`Cmd + Q`), open it again, and check:
 brew --version
 ```
 
-It should print `Homebrew` followed by a version number (being tested). If it says `command not found`, see the troubleshooting table.
+It should print `Homebrew` followed by a version number (being tested). Still `command not found`? Come to office hours.
 
 **c. Install `gh`.** In **Terminal**, type:
 
 ```bash
 brew install gh
 ```
+
+#### On an Intel Mac: GitHub's installer
+
+> **Being tested:** These Intel Mac steps are being tested. If something looks different, tell your instructor.
+
+Homebrew's installer only works on Macs with Apple chips, so on an Intel Mac you install `gh` with GitHub's own installer instead.
+
+**a. Download it.** In your web browser, open GitHub's official release page for `gh`: <https://github.com/cli/cli/releases/latest>. Scroll down to **Assets** and click the file whose name ends in `_macOS_universal.pkg`. When we checked (release 2.102.0) it was called `gh_2.102.0_macOS_universal.pkg`; your number may be higher.
+
+**b. Open it.** In **Finder**, open your **Downloads** folder and double-click the file. macOS will probably block it, because GitHub doesn't sign this installer at the moment. GitHub's install page (<https://github.com/cli/cli/blob/trunk/docs/install_macos.md>) says: "As of May 29th, Mac OS installer .pkg are unsigned with efforts prioritized in cli/cli#9139 to support signing them." Close the warning, but don't delete the file.
+
+**c. Allow it, this once.** Click the Apple menu, then **System Settings**, then **Privacy & Security** in the sidebar. Scroll down to **Security** and click **Open Anyway** (Apple says the button is there for about an hour after you tried to open the file). Enter your Mac login password if asked. The installer opens; follow its steps to the end.
+
+This is the one exception in this course. It's safe here because the file comes from GitHub's own release page, and GitHub's own docs say it isn't signed. Apple warns that overriding security settings "is the most common way that a Mac gets infected with malware", so **never** click Open Anyway for other downloads, for files from emails or chat messages, or for websites you don't know.
+
+**d. Check it.** Close Terminal (`Cmd + Q`), open it again, and do "Check it worked" below.
 
 #### On Windows: in the Ubuntu window
 
@@ -214,6 +239,7 @@ It asks a few questions. Use the arrow keys and Enter, and choose:
 Then it shows a **one-time code** and asks you to press Enter to open github.com in your browser. Press Enter, sign in to GitHub in the browser if asked, type the code, and approve.
 
 - **On Windows (WSL):** the browser may not open by itself. Copy the code from the Ubuntu window, then open <https://github.com/login/device> in your normal Windows browser and type the code there.
+- **On Windows (WSL), being tested:** `gh` may say it saved your sign-in in a plain-text file, because Ubuntu here has no credential store. That's expected here; carry on.
 - Never create, copy or paste a "personal access token" for this course. The browser sign-in is all you need.
 
 **Check who you're signed in as.** In your terminal, type:
@@ -228,7 +254,7 @@ It should show that you're logged in to github.com, with **your** GitHub usernam
 You are not logged into any GitHub hosts. To log in, run: gh auth login
 ```
 
-If it shows someone else's username (for example on a shared laptop), type `gh auth logout`, then `gh auth login` again.
+If it shows someone else's username (for example on a shared laptop), type `gh auth logout`. Before signing in again, sign out of github.com in your browser (or use a private window), then sign in there with your own account. Then type `gh auth login` again.
 
 ### 5. Make `my-first-project` a git repository
 
@@ -255,6 +281,8 @@ Make this folder a git repository with the branch name main. Then save a first s
 
 Each of these shows a permission prompt. Read it: the command should start with `git`, and it should stay in your `my-first-project` folder. Choose **Yes**.
 
+For git commands, always pick plain **Yes**. Never pick "Yes, and don't ask again" or "Yes, and switch to auto mode" for git, so you see every push. (Claude Code's permissions page, <https://code.claude.com/docs/en/permissions>, lists these options; "don't ask again" for a command is saved for this repo for good.)
+
 Why `main`: plain `git init` names the first branch `master` and prints a long `hint:` about branch names. GitHub calls its main branch `main`, so you want `main` from the start.
 
 **c. What to check.** Ask Claude Code:
@@ -268,6 +296,8 @@ It will probably run `git log --oneline` and `git branch --show-current`. You sh
 ```text
 74659dd Add README
 ```
+
+(From our test; yours says `First snapshot`.)
 
 and the branch:
 
@@ -331,7 +361,7 @@ It may ask you what your three goals are; tell it. When `gh pr create` works, it
 **b. Review and merge on GitHub.** Open the PR's address in your browser.
 
 1. Read the title and description. Click **Files changed** to see exactly what's different. This is the "review before it becomes official" part.
-2. At the bottom of the PR's main page, click **Merge pull request**, then **Confirm merge**. (Depending on the repo's settings the button may say "Squash and merge" instead; that's fine too.)
+2. Go back to the **Conversation** tab. At the bottom of it, click **Merge pull request**, then **Confirm merge**. (Depending on the repo's settings the button may say "Squash and merge" instead; that's fine too.)
 3. GitHub offers **Delete branch**. You can click it: the draft's work is now in `main`.
 
 **c. Pull the merged result back to your laptop.** The merge happened on GitHub, so your laptop doesn't have it yet. In Claude Code, type:
@@ -385,7 +415,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 Throw away my uncommitted change to hello.md with git restore.
 ```
 
-It will probably run `git restore hello.md`. Approve it. `git restore` asks no question and has no undo, so only use it on changes you really don't want. Ask "What does git status say?" again. In our test:
+It will probably run `git restore hello.md`. Check the command names `hello.md` only; if you see `.` or `git clean`, choose **No**. Otherwise approve it. `git restore` asks no question and has no undo, so only use it on changes you really don't want. Ask "What does git status say?" again. In our test:
 
 ```text
 On branch main
@@ -447,14 +477,14 @@ GitHub emails your instructor an invitation. Once they accept it, they can see y
 
 You're done when:
 
-- `gh auth status` in your terminal shows you're signed in with your own GitHub username.
+- `gh auth status` in your terminal shows you're signed in with your own GitHub username. Type `/exit` to leave Claude Code first (or open a new terminal).
 - Your repo `https://github.com/yourusername/my-first-project` exists and is marked **Private**.
 - Your `add-goals` pull request's page on GitHub shows it was merged. (The exact label is being tested.)
 - `goals.md` is in `~/my-first-project` on your laptop, on the `main` branch.
 - The history (ask Claude Code "Show me the git history") includes a line starting with `Revert "`.
 - In your repo's **Settings > Collaborators**, `vasuchettyphd` is listed. (Exactly how a pending invitation looks is being tested.)
 
-The [assignment](assignment.md) asks for the repo's address, the merged PR's address and a short reflection. Next week, [Planning a project](../04-planning/), you choose the tool you'll build this term, and this repo is where its history will live.
+The [assignment](assignment.md) asks for the repo's address, the merged PR's address and a short reflection. Next week, [Planning a project](../04-planning/), you choose the tool you'll build this term. Next week you'll make a new private repo for your project the same way (steps 6 and 9). `my-first-project` stays as your practice repo.
 
 ## Troubleshooting
 
@@ -467,13 +497,15 @@ The [assignment](assignment.md) asks for the repo's address, the merged PR's add
 | `! [rejected]        main -> main (fetch first)` with `Updates were rejected because the remote contains work that you do not have locally` | GitHub has commits your laptop doesn't, usually because you merged a PR. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." Say **No** to any prompt that contains `--force` or `reset --hard`. |
 | (being tested) `Need to specify how to reconcile divergent branches` | Same cause and same fix. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
 | The repo is public | (being tested) On github.com, open the repo, then **Settings**. In the **Danger Zone** at the bottom, click **Change visibility**, choose private, and follow the confirmation steps until you click **Make this repository private**. |
-| `gh auth status` shows the wrong username | (being tested) Type `gh auth logout` and answer the questions it asks (which account, and to confirm). Then type `gh auth login` and sign in with your own account. |
+| `gh auth status` shows the wrong username | (being tested) Type `gh auth logout` and answer the questions it asks (which account, and to confirm). Before signing in again, sign out of github.com in your browser (or use a private window), then sign in there with your own account. Then type `gh auth login`. |
 | `You are not logged into any GitHub hosts. To log in, run: gh auth login` | Do step 4. |
 | A push is refused with a message about exposing your private email | (being tested) Your commits use your personal email. Do step 1b and "Tell git who you are" in step 2 with your `noreply` address, then ask Claude Code: "Change the author email on my commits that are not on GitHub yet to my noreply address, without losing any files. Don't force-push and don't use reset --hard." Say **No** to any prompt that contains `--force` or `reset --hard`. If you're unsure, stop and ask in office hours. |
 | The browser doesn't open during `gh auth login` (WSL) | (being tested) Copy the one-time code from the Ubuntu window, open <https://github.com/login/device> in your Windows browser and type the code. |
-| (being tested) `gh repo create` says the repository name already exists (for example after a first try that failed) | The repo was already made on GitHub. Ask Claude Code: "Connect this folder to my existing private GitHub repository my-first-project as origin and push main, instead of creating a new one." Or choose a new name. |
-| `gh: command not found` (or `brew: command not found` on a Mac) | Mac: run the "Next steps" lines the Homebrew installer printed (step 3b), close and reopen Terminal, then try again. Windows: make sure you're in the **Ubuntu** window, not PowerShell, then redo step 3. |
-| (being tested) A Mac window asks to install "command line developer tools" | Click Install, wait for it to finish, then run the command again. |
+| (being tested) `gh repo create` says the repository name already exists (for example after a first try that failed) | The repo was already made on GitHub. First open `https://github.com/yourusername/my-first-project` in your browser and check it says **Private** (if not, see "The repo is public"). Then ask Claude Code: "Connect this folder to my existing private GitHub repository my-first-project as origin and push main, instead of creating a new one. Don't force-push." Say **No** to any prompt that contains `--force`. Or choose a new name. |
+| `gh: command not found` (or `brew: command not found` on a Mac) | Apple-chip Mac: run the "Next steps" lines the Homebrew installer printed (step 3b), close and reopen Terminal, then `brew --version`; still not found? Come to office hours. Intel Mac: close and reopen Terminal; still not found? Come to office hours. Windows: make sure you're in the **Ubuntu** window, not PowerShell, then redo step 3. |
+| (being tested) A Mac window asks to install "command line developer tools" (on any Mac, for example on your first `git --version`) | Click Install, wait for it to finish, then run the command again. |
+| (being tested) A Mac warning says the `gh` installer can't be opened (Intel Mac) | Expected: GitHub doesn't sign it. Do step 3 "On an Intel Mac", part c (**Open Anyway** in **Privacy & Security**). Only for this file from GitHub's release page. |
+| (being tested) `CONFLICT` or `Automatic merge failed` | Ask Claude Code to explain the conflict and show both versions before changing anything. Don't reset. If you're unsure, stop and ask in office hours. |
 | Claude Code wants to run `git reset --hard` or `git push --force` | Choose **No**. Ask it to undo with `git revert` instead (step 8). |
 | You merged on GitHub but `goals.md` isn't on your laptop | You haven't pulled. Ask Claude Code: "Switch to main and pull the latest changes from GitHub." |
 | Typing your password shows nothing | That's normal in the terminal. Type it carefully and press Enter. |
