@@ -13,7 +13,7 @@ Me: a first-time small investor looking at single-family homes and small multi-u
 ## Must-haves
 
 1. **Inputs for one listing:** purchase price, monthly rent, yearly property tax, yearly insurance, monthly HOA fee (0 if none), down payment (%), interest rate (%), loan term (years), and closing costs ($).
-2. **Assumptions I set once:** vacancy 5% of rent, and a repairs reserve as a % of monthly rent before vacancy (I pick the number; see open questions).
+2. **Assumptions I set once:** vacancy 5% of rent, and a repairs reserve of 8% of monthly rent before vacancy (decided in week 5, while building).
 3. **The three numbers, with these formulas:**
    - Down payment amount ($) = purchase price x down payment %
    - Effective monthly rent = monthly rent x (1 - vacancy rate)
@@ -39,7 +39,7 @@ Me: a first-time small investor looking at single-family homes and small multi-u
 ## Data it uses
 
 - Numbers I type in for each listing, copied from public listings or made up for practice.
-- My buy-box settings (minimum 10% cash-on-cash, monthly cash flow at least $100, 5% vacancy, the repairs reserve).
+- My buy-box settings (minimum 10% cash-on-cash, monthly cash flow at least $100, 5% vacancy, 8% repairs reserve).
 - No personal data: no names, addresses of people, account numbers or credit details. A listing's street address is optional and never needed for the math.
 
 ## First three build steps
@@ -50,7 +50,6 @@ Me: a first-time small investor looking at single-family homes and small multi-u
 
 ## Open questions
 
-- How big should the repairs reserve be: 5%, 8% or 10% of rent?
 - Should property management be a cost, as a % of rent, even if I manage it myself?
 - (From the tutorial's round 3.) Should "close but not quite" deals (for example, 9% cash-on-cash) be flagged, and how close counts?
 - (From the tutorial's round 3.) When two deals both pass, which number decides: cash flow or cash-on-cash return?
