@@ -53,7 +53,8 @@ def files(root):
         parts = p.relative_to(root).parts
         if any(part in SKIP for part in parts):
             continue
-        if any(part.startswith(".") for part in parts[:-1]):
+        # Hidden folders are skipped, except .claude/ (agent files students copy).
+        if any(part.startswith(".") and part != ".claude" for part in parts[:-1]):
             continue
         yield p
 
