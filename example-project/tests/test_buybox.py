@@ -53,6 +53,18 @@ class BuyBoxTest(unittest.TestCase):
         self.assertFalse(cash_flow.passed)
         self.assertEqual(cash_flow.reason, "Monthly cash flow $50.00 is below $100.00 by $50.00")
 
+    def test_just_under_10_percent_that_shows_as_10_00_passes(self):
+        cash_on_cash, _ = check(make_results(cash_on_cash_pct=9.996, monthly_cash_flow=500))
+        self.assertTrue(cash_on_cash.passed)
+        self.assertEqual(cash_on_cash.reason, "Cash-on-cash return 10.00% is at least 10.00%")
+
+    def test_just_under_10_percent_that_shows_as_9_99_fails(self):
+        cash_on_cash, _ = check(make_results(cash_on_cash_pct=9.994, monthly_cash_flow=500))
+        self.assertFalse(cash_on_cash.passed)
+        self.assertEqual(
+            cash_on_cash.reason, "Cash-on-cash return 9.99% is below 10.00% by 0.01 points"
+        )
+
     def test_negative_cash_flow_fails(self):
         _, cash_flow = check(make_results(cash_on_cash_pct=20, monthly_cash_flow=-50))
         self.assertFalse(cash_flow.passed)

@@ -27,8 +27,8 @@ All paths and commands below are relative to the `example-project/` folder.
 
 1. **Letters, a blank line, or "nan" typed instead of a number.** The program says "Please type a number, like 1500." and asks the same question again. (Task 3: `test_bad_price_is_asked_again_without_a_traceback`, `test_blank_and_not_a_number_answers_are_asked_again`.)
 2. **0% down and $0 closing costs, so no cash is invested.** Cash-on-cash return would divide by zero. The calculator raises a plain-English error, and the program prints it and asks the loan questions again. (Task 1: `test_zero_cash_invested_raises`; Task 3: `test_zero_cash_invested_explains_and_asks_again_from_the_down_payment`.)
-3. **A 0% interest rate.** The usual loan formula divides by zero. The payment is the loan split evenly over the months. (Task 1: `test_zero_interest_splits_the_loan_evenly`.)
-4. **A percentage over 100, a price of 0, or a loan term of 0 or 2.5 years.** The program says what to type and asks again. (Task 3: `test_percentage_over_100_is_asked_again`, `test_zero_price_is_asked_again`, `test_loan_term_must_be_whole_years`.)
+3. **A 0% or tiny interest rate.** The usual loan formula divides by zero. At 0% the payment is the loan split evenly over the months, and a tiny rate gives almost the same. (Task 1: `test_zero_interest_splits_the_loan_evenly`, `test_tiny_interest_rate_does_not_divide_by_zero`.)
+4. **A percentage over 100, a price of 0, a loan term of 0 or 2.5 years, or a huge number like 1e308.** The program says what to type and asks again, and never prints "nan" or "inf". (Task 1: `test_numbers_too_large_to_work_out_raise`; Task 3: `test_percentage_over_100_is_asked_again`, `test_zero_price_is_asked_again`, `test_loan_term_must_be_whole_years`, `test_huge_numbers_are_asked_again`.)
 5. **The input stops early** (Ctrl+D, Ctrl+C, or piped input runs out). The program says it stopped, with no traceback. (Task 3: `test_running_out_of_input_stops_without_a_traceback`.)
 
 ## Files
@@ -107,7 +107,7 @@ Expected: about `997.9537 748.4653`.
   - `Assumptions(vacancy_pct=5.0, repairs_reserve_pct=8.0)`.
   - `Results(monthly_mortgage, monthly_cash_flow, cap_rate_pct, cash_on_cash_pct)`.
   - `monthly_mortgage_payment(principal, annual_rate_pct, years) -> float`.
-  - `analyse(listing, assumptions=Assumptions()) -> Results`. Raises `ValueError` with a plain-English message for a purchase price of 0 or less, a negative amount, a percentage outside 0-100, a loan term below 1, or zero cash invested (the message contains "cash invested").
+  - `analyse(listing, assumptions=Assumptions()) -> Results`. Raises `ValueError` with a plain-English message for a purchase price of 0 or less, a negative amount, a percentage outside 0-100, a loan term below 1, zero cash invested (the message contains "cash invested"), or results too large to work out (the message contains "too large").
 
 - [ ] **Step 1: Write the failing test**
 
@@ -170,6 +170,9 @@ class EdgeCaseTest(unittest.TestCase):
     def test_zero_interest_splits_the_loan_evenly(self):
         self.assertAlmostEqual(monthly_mortgage_payment(120000, 0, 10), 1000.00, delta=0.01)
 
+    def test_tiny_interest_rate_does_not_divide_by_zero(self):
+        self.assertAlmostEqual(monthly_mortgage_payment(120000, 1e-300, 10), 1000.00, delta=0.01)
+
     def test_zero_down_with_closing_costs_works(self):
         results = analyse(make_listing(down_payment_pct=0, closing_costs=6000), ASSUMPTIONS)
         self.assertLess(results.monthly_cash_flow, 0)
@@ -193,6 +196,10 @@ class EdgeCaseTest(unittest.TestCase):
     def test_loan_term_below_one_year_raises(self):
         with self.assertRaises(ValueError):
             analyse(make_listing(loan_term_years=0), ASSUMPTIONS)
+
+    def test_numbers_too_large_to_work_out_raise(self):
+        with self.assertRaisesRegex(ValueError, "too large"):
+            analyse(make_listing(purchase_price=1e308, monthly_rent=1e308), ASSUMPTIONS)
 
 
 if __name__ == "__main__":
@@ -219,7 +226,7 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'dealscreener.calculat
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import astuple, dataclass
 
 
 @dataclass(frozen=True)
@@ -259,7 +266,9 @@ def monthly_mortgage_payment(principal: float, annual_rate_pct: float, years: fl
     if annual_rate_pct == 0:
         return principal / months  # no interest: split the loan evenly
     monthly_rate = annual_rate_pct / 100 / 12
-    return principal * monthly_rate / (1 - (1 + monthly_rate) ** -months)
+    # This is 1 - (1 + rate) ** -months, written so a tiny rate can't round it to 0.
+    denominator = -math.expm1(-months * math.log1p(monthly_rate))
+    return principal * monthly_rate / denominator
 
 
 def analyse(listing: Listing, assumptions: Assumptions = Assumptions()) -> Results:
@@ -288,12 +297,15 @@ def analyse(listing: Listing, assumptions: Assumptions = Assumptions()) -> Resul
     )
     cash_flow = effective_rent - operating_costs - mortgage
 
-    return Results(
+    results = Results(
         monthly_mortgage=mortgage,
         monthly_cash_flow=cash_flow,
         cap_rate_pct=(effective_rent - operating_costs) * 12 / listing.purchase_price * 100,
         cash_on_cash_pct=cash_flow * 12 / cash_invested * 100,
     )
+    if not all(math.isfinite(number) for number in astuple(results)):
+        raise ValueError("These numbers are too large to work out.")
+    return results
 
 
 def _check_inputs(listing: Listing, assumptions: Assumptions) -> None:
@@ -331,7 +343,7 @@ def _check_percentage(label: str, value: float) -> None:
 - [ ] **Step 4: Run the tests to see them pass**
 
 Run: `python3 -m unittest`
-Expected: `Ran 10 tests` and `OK`
+Expected: `Ran 12 tests` and `OK`
 
 - [ ] **Step 5: Record the repairs reserve decision in `PLAN.md`**
 
@@ -355,7 +367,7 @@ git commit -m "Add the calculator, tested against two hand-worked listings"
 - Produces:
   - `BuyBox(min_cash_on_cash_pct=10.0, min_monthly_cash_flow=100.0)`.
   - `RuleResult(name, value, threshold, passed, reason)`.
-  - `check(results, buy_box=BuyBox()) -> list` of two `RuleResult`s, cash-on-cash first. A rule passes when `round(value, 6) >= threshold`.
+  - `check(results, buy_box=BuyBox()) -> list` of two `RuleResult`s, cash-on-cash first. A rule passes when `round(value, 2) >= threshold`: the value is rounded to 2 decimals, the same as the reason shows it, so the reason never contradicts the result.
   - `passes(rule_results) -> bool`: True only if every rule passed.
   - `money(amount) -> str`: `1234.5` becomes `"$1,234.50"`, `-50` becomes `"-$50.00"`.
   - Reason texts look like `"Cash-on-cash return 5.74% is below 10.00% by 4.26 points"`, `"Cash-on-cash return 11.88% is at least 10.00%"`, `"Monthly cash flow $268.05 is at least $100.00"` and `"Monthly cash flow $50.00 is below $100.00 by $50.00"`.
@@ -419,6 +431,18 @@ class BuyBoxTest(unittest.TestCase):
         _, cash_flow = check(make_results(cash_on_cash_pct=20, monthly_cash_flow=50))
         self.assertFalse(cash_flow.passed)
         self.assertEqual(cash_flow.reason, "Monthly cash flow $50.00 is below $100.00 by $50.00")
+
+    def test_just_under_10_percent_that_shows_as_10_00_passes(self):
+        cash_on_cash, _ = check(make_results(cash_on_cash_pct=9.996, monthly_cash_flow=500))
+        self.assertTrue(cash_on_cash.passed)
+        self.assertEqual(cash_on_cash.reason, "Cash-on-cash return 10.00% is at least 10.00%")
+
+    def test_just_under_10_percent_that_shows_as_9_99_fails(self):
+        cash_on_cash, _ = check(make_results(cash_on_cash_pct=9.994, monthly_cash_flow=500))
+        self.assertFalse(cash_on_cash.passed)
+        self.assertEqual(
+            cash_on_cash.reason, "Cash-on-cash return 9.99% is below 10.00% by 0.01 points"
+        )
 
     def test_negative_cash_flow_fails(self):
         _, cash_flow = check(make_results(cash_on_cash_pct=20, monthly_cash_flow=-50))
@@ -484,35 +508,37 @@ def money(amount: float) -> str:
     return f"{sign}${abs(amount):,.2f}"
 
 
-def _at_least(value: float, threshold: float) -> bool:
-    # Rounding first stops tiny float errors (9.9999999...) from failing an exact match.
-    return round(value, 6) >= threshold
+# Both rules compare the value rounded to 2 decimals, the same as the reason
+# shows it, so the reason never contradicts pass or fail (9.996% shows as
+# 10.00% and passes).
 
 
 def _check_cash_on_cash(value: float, threshold: float) -> RuleResult:
     name = "Cash-on-cash return"
-    passed = _at_least(value, threshold)
+    shown = round(value, 2)
+    passed = shown >= threshold
     if passed:
-        reason = f"{name} {value:.2f}% is at least {threshold:.2f}%"
+        reason = f"{name} {shown:.2f}% is at least {threshold:.2f}%"
     else:
-        reason = f"{name} {value:.2f}% is below {threshold:.2f}% by {threshold - value:.2f} points"
+        reason = f"{name} {shown:.2f}% is below {threshold:.2f}% by {threshold - shown:.2f} points"
     return RuleResult(name, value, threshold, passed, reason)
 
 
 def _check_cash_flow(value: float, threshold: float) -> RuleResult:
     name = "Monthly cash flow"
-    passed = _at_least(value, threshold)
+    shown = round(value, 2)
+    passed = shown >= threshold
     if passed:
-        reason = f"{name} {money(value)} is at least {money(threshold)}"
+        reason = f"{name} {money(shown)} is at least {money(threshold)}"
     else:
-        reason = f"{name} {money(value)} is below {money(threshold)} by {money(threshold - value)}"
+        reason = f"{name} {money(shown)} is below {money(threshold)} by {money(threshold - shown)}"
     return RuleResult(name, value, threshold, passed, reason)
 ```
 
 - [ ] **Step 4: Run the tests to see them pass**
 
 Run: `python3 -m unittest`
-Expected: `Ran 17 tests` and `OK`
+Expected: `Ran 21 tests` and `OK`
 
 - [ ] **Step 5: Commit**
 
@@ -530,7 +556,7 @@ git commit -m "Add the buy-box check with a reason for each rule"
 
 **Interfaces:**
 - Consumes: `Listing`, `analyse` from `dealscreener.calculator`; `check`, `passes`, `money` from `dealscreener.buybox`.
-- Produces: `run(input_fn=input, print_fn=print) -> int`. It asks for each `Listing` field in order, re-asks with a short message when an answer makes no sense, prints the numbers, each rule's PASS or FAIL with its reason, and a last line `Overall: PASS` or `Overall: FAIL`. It returns 0, or 1 if the input stopped early. `python3 -m dealscreener` calls it. Passing in `input_fn` and `print_fn` lets the tests type answers and read the output without a keyboard.
+- Produces: `run(input_fn=input, print_fn=print) -> int`. It asks for each `Listing` field in order, re-asks with a short message when an answer makes no sense (not a number, below 0, over 100 for a percentage, over a trillion, and so on), prints the numbers, each rule's PASS or FAIL with its reason, and a last line `Overall: PASS` or `Overall: FAIL`. It returns 0, or 1 if the input stopped early. `python3 -m dealscreener` calls it. Passing in `input_fn` and `print_fn` lets the tests type answers and read the output without a keyboard.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -615,6 +641,13 @@ class RunTest(unittest.TestCase):
         console, _ = run_with(["0"] + LISTING_B)
         self.assertIn("The purchase price must be more than 0.", console.lines)
 
+    def test_huge_numbers_are_asked_again(self):
+        console, _ = run_with(["1e308"] + LISTING_B)
+        self.assertIn("Please type a smaller number.", console.lines)
+        self.assertNotIn("nan", console.output())
+        self.assertNotIn("inf", console.output())
+        self.assertEqual(console.lines[-1], "Overall: PASS")
+
     def test_percentage_over_100_is_asked_again(self):
         answers = LISTING_B[:5] + ["120"] + LISTING_B[5:]
         console, _ = run_with(answers)
@@ -664,7 +697,11 @@ import math
 from dealscreener.buybox import check, money, passes
 from dealscreener.calculator import Listing, analyse
 
-# Each question: (Listing field, prompt, kind of answer).
+TOO_BIG = 1e12  # a trillion: far beyond any real listing, small enough to work out
+
+# Each question: (Listing field, prompt, kind of answer). Every kind takes a number
+# from 0 up to TOO_BIG. "price" must also be more than 0, "percent" at most 100,
+# "years" a whole number, 1 or more. "dollars" has no extra rule.
 PROPERTY_QUESTIONS = [
     ("purchase_price", "Purchase price ($): ", "price"),
     ("monthly_rent", "Monthly rent ($): ", "dollars"),
@@ -738,6 +775,8 @@ def parse_answer(text: str, kind: str):
         raise ValueError("Please type a number, like 1500.")
     if value < 0:
         raise ValueError("Please type a number that is 0 or more.")
+    if value > TOO_BIG:
+        raise ValueError("Please type a smaller number.")
     if kind == "price" and value == 0:
         raise ValueError("The purchase price must be more than 0.")
     if kind == "percent" and value > 100:
@@ -756,7 +795,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run the tests to see them pass**
 
 Run: `python3 -m unittest`
-Expected: `Ran 27 tests` and `OK`
+Expected: `Ran 32 tests` and `OK`
 
 - [ ] **Step 5: Run it by hand with listing B**
 

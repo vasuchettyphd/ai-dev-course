@@ -40,26 +40,28 @@ def money(amount: float) -> str:
     return f"{sign}${abs(amount):,.2f}"
 
 
-def _at_least(value: float, threshold: float) -> bool:
-    # Rounding first stops tiny float errors (9.9999999...) from failing an exact match.
-    return round(value, 6) >= threshold
+# Both rules compare the value rounded to 2 decimals, the same as the reason
+# shows it, so the reason never contradicts pass or fail (9.996% shows as
+# 10.00% and passes).
 
 
 def _check_cash_on_cash(value: float, threshold: float) -> RuleResult:
     name = "Cash-on-cash return"
-    passed = _at_least(value, threshold)
+    shown = round(value, 2)
+    passed = shown >= threshold
     if passed:
-        reason = f"{name} {value:.2f}% is at least {threshold:.2f}%"
+        reason = f"{name} {shown:.2f}% is at least {threshold:.2f}%"
     else:
-        reason = f"{name} {value:.2f}% is below {threshold:.2f}% by {threshold - value:.2f} points"
+        reason = f"{name} {shown:.2f}% is below {threshold:.2f}% by {threshold - shown:.2f} points"
     return RuleResult(name, value, threshold, passed, reason)
 
 
 def _check_cash_flow(value: float, threshold: float) -> RuleResult:
     name = "Monthly cash flow"
-    passed = _at_least(value, threshold)
+    shown = round(value, 2)
+    passed = shown >= threshold
     if passed:
-        reason = f"{name} {money(value)} is at least {money(threshold)}"
+        reason = f"{name} {money(shown)} is at least {money(threshold)}"
     else:
-        reason = f"{name} {money(value)} is below {money(threshold)} by {money(threshold - value)}"
+        reason = f"{name} {money(shown)} is below {money(threshold)} by {money(threshold - shown)}"
     return RuleResult(name, value, threshold, passed, reason)

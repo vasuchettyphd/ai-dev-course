@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import astuple, dataclass
 
 
 @dataclass(frozen=True)
@@ -42,7 +42,9 @@ def monthly_mortgage_payment(principal: float, annual_rate_pct: float, years: fl
     if annual_rate_pct == 0:
         return principal / months  # no interest: split the loan evenly
     monthly_rate = annual_rate_pct / 100 / 12
-    return principal * monthly_rate / (1 - (1 + monthly_rate) ** -months)
+    # This is 1 - (1 + rate) ** -months, written so a tiny rate can't round it to 0.
+    denominator = -math.expm1(-months * math.log1p(monthly_rate))
+    return principal * monthly_rate / denominator
 
 
 def analyse(listing: Listing, assumptions: Assumptions = Assumptions()) -> Results:
@@ -71,12 +73,15 @@ def analyse(listing: Listing, assumptions: Assumptions = Assumptions()) -> Resul
     )
     cash_flow = effective_rent - operating_costs - mortgage
 
-    return Results(
+    results = Results(
         monthly_mortgage=mortgage,
         monthly_cash_flow=cash_flow,
         cap_rate_pct=(effective_rent - operating_costs) * 12 / listing.purchase_price * 100,
         cash_on_cash_pct=cash_flow * 12 / cash_invested * 100,
     )
+    if not all(math.isfinite(number) for number in astuple(results)):
+        raise ValueError("These numbers are too large to work out.")
+    return results
 
 
 def _check_inputs(listing: Listing, assumptions: Assumptions) -> None:

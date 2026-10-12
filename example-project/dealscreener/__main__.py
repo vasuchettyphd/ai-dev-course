@@ -9,7 +9,11 @@ import math
 from dealscreener.buybox import check, money, passes
 from dealscreener.calculator import Listing, analyse
 
-# Each question: (Listing field, prompt, kind of answer).
+TOO_BIG = 1e12  # a trillion: far beyond any real listing, small enough to work out
+
+# Each question: (Listing field, prompt, kind of answer). Every kind takes a number
+# from 0 up to TOO_BIG. "price" must also be more than 0, "percent" at most 100,
+# "years" a whole number, 1 or more. "dollars" has no extra rule.
 PROPERTY_QUESTIONS = [
     ("purchase_price", "Purchase price ($): ", "price"),
     ("monthly_rent", "Monthly rent ($): ", "dollars"),
@@ -83,6 +87,8 @@ def parse_answer(text: str, kind: str):
         raise ValueError("Please type a number, like 1500.")
     if value < 0:
         raise ValueError("Please type a number that is 0 or more.")
+    if value > TOO_BIG:
+        raise ValueError("Please type a smaller number.")
     if kind == "price" and value == 0:
         raise ValueError("The purchase price must be more than 0.")
     if kind == "percent" and value > 100:

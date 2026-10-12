@@ -76,6 +76,13 @@ class RunTest(unittest.TestCase):
         console, _ = run_with(["0"] + LISTING_B)
         self.assertIn("The purchase price must be more than 0.", console.lines)
 
+    def test_huge_numbers_are_asked_again(self):
+        console, _ = run_with(["1e308"] + LISTING_B)
+        self.assertIn("Please type a smaller number.", console.lines)
+        self.assertNotIn("nan", console.output())
+        self.assertNotIn("inf", console.output())
+        self.assertEqual(console.lines[-1], "Overall: PASS")
+
     def test_percentage_over_100_is_asked_again(self):
         answers = LISTING_B[:5] + ["120"] + LISTING_B[5:]
         console, _ = run_with(answers)

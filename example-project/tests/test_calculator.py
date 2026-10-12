@@ -54,6 +54,9 @@ class EdgeCaseTest(unittest.TestCase):
     def test_zero_interest_splits_the_loan_evenly(self):
         self.assertAlmostEqual(monthly_mortgage_payment(120000, 0, 10), 1000.00, delta=0.01)
 
+    def test_tiny_interest_rate_does_not_divide_by_zero(self):
+        self.assertAlmostEqual(monthly_mortgage_payment(120000, 1e-300, 10), 1000.00, delta=0.01)
+
     def test_zero_down_with_closing_costs_works(self):
         results = analyse(make_listing(down_payment_pct=0, closing_costs=6000), ASSUMPTIONS)
         self.assertLess(results.monthly_cash_flow, 0)
@@ -77,6 +80,10 @@ class EdgeCaseTest(unittest.TestCase):
     def test_loan_term_below_one_year_raises(self):
         with self.assertRaises(ValueError):
             analyse(make_listing(loan_term_years=0), ASSUMPTIONS)
+
+    def test_numbers_too_large_to_work_out_raise(self):
+        with self.assertRaisesRegex(ValueError, "too large"):
+            analyse(make_listing(purchase_price=1e308, monthly_rent=1e308), ASSUMPTIONS)
 
 
 if __name__ == "__main__":
