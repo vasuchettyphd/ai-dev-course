@@ -55,7 +55,7 @@ class HoaTest(unittest.TestCase):
         self.assertAlmostEqual(results.monthly_mortgage, 997.95, delta=0.01)
         self.assertAlmostEqual(results.monthly_cash_flow, 118.05, delta=0.01)
         self.assertAlmostEqual(results.cap_rate_pct, 6.696, delta=0.001)
-        self.assertAlmostEqual(results.cash_on_cash_pct, 2.530, delta=0.001)
+        self.assertAlmostEqual(results.cash_on_cash_pct, 2.5296, delta=0.0005)
 
 
 class OtherAssumptionsTest(unittest.TestCase):
