@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import math
 
-from dealscreener.buybox import check, money, passes
+from dealscreener.buybox import check, money, passes, percent
 from dealscreener.calculator import Listing, analyse
 
 TOO_BIG = 1e12  # a trillion: far beyond any real listing, small enough to work out
@@ -51,8 +51,8 @@ def run(input_fn=input, print_fn=print) -> int:
     print_fn("")
     print_fn(f"Monthly mortgage payment: {money(results.monthly_mortgage)}")
     print_fn(f"Monthly cash flow: {money(results.monthly_cash_flow)}")
-    print_fn(f"Cap rate: {results.cap_rate_pct:.2f}%")
-    print_fn(f"Cash-on-cash return: {results.cash_on_cash_pct:.2f}%")
+    print_fn(f"Cap rate: {percent(results.cap_rate_pct)}")
+    print_fn(f"Cash-on-cash return: {percent(results.cash_on_cash_pct)}")
     print_fn("")
     rule_results = check(results)
     for rule in rule_results:
