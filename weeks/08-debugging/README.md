@@ -294,7 +294,7 @@ Plain **Yes**.
 
 You're in the "fix it" loop when a fix doesn't work, or one fix breaks something else, and Claude goes straight to another change. **After two failed attempts, stop.** Press `Esc` to stop Claude, then do three things:
 
-**a. Undo the attempts,** with [week 3's safe undo](../03-git-and-github/README.md#8-undo-safely): `git restore` for changes not yet committed, `git revert` for commits. Your failing test is already committed (step 4c), and so are `BUGS.md` and your feedback file (step 3d), so **every** uncommitted change is from the fix attempts: throw them all away. In Claude Code:
+**a. Undo the attempts,** with [week 3's safe undo](../03-git-and-github/README.md#8-undo-safely): `git restore` for changes not yet committed, `git revert` for commits. Your failing test is already committed (step 4c), and so is `BUGS.md`, plus your feedback file if you made one (step 3d), so **every** uncommitted change is from the fix attempts: throw them all away. In Claude Code:
 
 ```text
 Stop. Two fixes haven't worked. Throw away all my uncommitted changes with git restore; the test for this bug is already committed, so it stays. If any fix attempt was committed, undo that commit with git revert, so the history keeps a record. Show me each command before you run it, and don't use reset, --force or git clean.
