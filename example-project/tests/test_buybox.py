@@ -1,7 +1,7 @@
 """Tests for the buy-box check."""
 import unittest
 
-from dealscreener.buybox import BuyBox, check, passes
+from dealscreener.buybox import BuyBox, check, money, passes, percent
 from dealscreener.calculator import Results
 
 
@@ -70,6 +70,23 @@ class BuyBoxTest(unittest.TestCase):
         self.assertFalse(cash_flow.passed)
         self.assertEqual(
             cash_flow.reason, "Monthly cash flow -$50.00 is below $100.00 by $150.00"
+        )
+
+
+class FormatTest(unittest.TestCase):
+    def test_money_and_percent_formats(self):
+        self.assertEqual(money(1234.5), "$1,234.50")
+        self.assertEqual(money(-50), "-$50.00")
+        self.assertEqual(percent(9.432), "9.43%")
+
+    def test_a_tiny_negative_number_shows_as_zero_not_minus_zero(self):
+        self.assertEqual(money(-0.004), "$0.00")
+        self.assertEqual(percent(-0.004), "0.00%")
+
+    def test_a_tiny_negative_cash_on_cash_reason_has_no_minus_zero(self):
+        cash_on_cash, _ = check(make_results(cash_on_cash_pct=-0.004, monthly_cash_flow=500))
+        self.assertEqual(
+            cash_on_cash.reason, "Cash-on-cash return 0.00% is below 10.00% by 10.00 points"
         )
 
 

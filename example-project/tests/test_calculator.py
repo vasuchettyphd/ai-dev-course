@@ -10,7 +10,7 @@ from dealscreener.calculator import (
 
 
 def make_listing(**changes):
-    """Listing A from the plan, with any fields changed that a test asks for."""
+    """Listing A from the docs/ task plan, with any fields changed that a test asks for."""
     fields = dict(
         purchase_price=200000,
         monthly_rent=1800,
@@ -47,6 +47,28 @@ class ListingBTest(unittest.TestCase):
         self.assertAlmostEqual(results.cash_on_cash_pct, 11.877, delta=0.001)
 
 
+class HoaTest(unittest.TestCase):
+    def test_listing_a_with_a_150_dollar_hoa_matches_the_hand_worked_numbers(self):
+        # Costs go up by $150 a month, to 300 + 150 + 144 = 594, so cash flow
+        # drops by exactly $150: 1710 - 594 - 997.95 = 118.05.
+        results = analyse(make_listing(monthly_hoa=150), ASSUMPTIONS)
+        self.assertAlmostEqual(results.monthly_mortgage, 997.95, delta=0.01)
+        self.assertAlmostEqual(results.monthly_cash_flow, 118.05, delta=0.01)
+        self.assertAlmostEqual(results.cap_rate_pct, 6.696, delta=0.001)
+        self.assertAlmostEqual(results.cash_on_cash_pct, 2.5296, delta=0.0005)
+
+
+class OtherAssumptionsTest(unittest.TestCase):
+    def test_listing_a_with_10_percent_vacancy_and_5_percent_repairs(self):
+        # Rent kept: 1800 x 0.90 = 1620. Repairs: 1800 x 0.05 = 90, so costs
+        # are 300 + 0 + 90 = 390. Cash flow: 1620 - 390 - 997.95 = 232.05.
+        results = analyse(make_listing(), Assumptions(vacancy_pct=10, repairs_reserve_pct=5))
+        self.assertAlmostEqual(results.monthly_mortgage, 997.95, delta=0.01)
+        self.assertAlmostEqual(results.monthly_cash_flow, 232.05, delta=0.01)
+        self.assertAlmostEqual(results.cap_rate_pct, 7.380, delta=0.001)
+        self.assertAlmostEqual(results.cash_on_cash_pct, 4.972, delta=0.001)
+
+
 class EdgeCaseTest(unittest.TestCase):
     def test_default_assumptions_are_5_percent_vacancy_and_8_percent_repairs(self):
         self.assertEqual(Assumptions(), ASSUMPTIONS)
@@ -72,6 +94,14 @@ class EdgeCaseTest(unittest.TestCase):
     def test_down_payment_over_100_percent_raises(self):
         with self.assertRaises(ValueError):
             analyse(make_listing(down_payment_pct=120), ASSUMPTIONS)
+
+    def test_vacancy_over_100_percent_raises(self):
+        with self.assertRaisesRegex(ValueError, "Vacancy must be between 0% and 100%"):
+            analyse(make_listing(), Assumptions(vacancy_pct=120, repairs_reserve_pct=8))
+
+    def test_repairs_reserve_over_100_percent_raises(self):
+        with self.assertRaisesRegex(ValueError, "Repairs reserve must be between 0% and 100%"):
+            analyse(make_listing(), Assumptions(vacancy_pct=5, repairs_reserve_pct=120))
 
     def test_purchase_price_of_zero_raises(self):
         with self.assertRaises(ValueError):

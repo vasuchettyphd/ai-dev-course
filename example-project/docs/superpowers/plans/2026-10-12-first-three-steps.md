@@ -1,5 +1,7 @@
 # Deal Screener First Three Steps Implementation Plan
 
+> **Week 6 review fixes changed:** `buybox.py` gained `percent()` and `money()` now rounds before formatting, so a tiny negative number never shows as "-$0.00" or "-0.00%" (`__main__.py` uses both); new tests cover a $150 HOA, 10% vacancy with 5% repairs, and settings over 100%. The plan below is the week 5 version; see `REVIEW.md` for why.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the deal screener's first three steps from `PLAN.md`: a calculator for one listing, the buy-box check, and a program that asks for a listing's numbers and prints the results.

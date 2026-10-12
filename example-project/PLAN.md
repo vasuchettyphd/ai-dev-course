@@ -23,7 +23,7 @@ Me: a first-time small investor looking at single-family homes and small multi-u
    - **Monthly cash flow** = effective monthly rent - monthly operating costs - monthly mortgage payment
    - **Cap rate** = (effective monthly rent - monthly operating costs) x 12 / purchase price
    - **Cash-on-cash return** = monthly cash flow x 12 / (down payment amount + closing costs)
-4. **The buy-box check:** pass only if cash-on-cash return is at least 10% and monthly cash flow is at least $100. Show each rule, the listing's number, and pass or fail.
+4. **The buy-box check:** pass only if cash-on-cash return is at least 10% and monthly cash flow is at least $100. Show each rule, the listing's number, and pass or fail. Each number is compared as it is shown, rounded to 2 decimals (decided in week 6, after the review), so 9.996% shows as 10.00% and passes, and 9.994% shows as 9.99% and fails.
 5. **Tests that prove the math:** at least one example listing whose answers are worked out by hand first, and a check that the tool gets exactly those answers (week 5 builds this with Superpowers, test first).
 
 ## Not in this version
