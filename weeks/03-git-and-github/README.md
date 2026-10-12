@@ -2,16 +2,16 @@
 
 **Goal:** save versions of your work with git, keep a private copy of it on GitHub, make a change through a pull request, and undo a change safely, all by asking Claude Code in plain English.
 
-**Time:** plan for about 90 minutes; installing Homebrew on a Mac can make it longer. **Cost:** nothing beyond your Claude plan. A GitHub account is free.
+**Time:** plan for about 90 minutes (an estimate); installing Homebrew on a Mac can make it longer. **Cost:** nothing beyond your Claude plan. A GitHub account is free.
 
-**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step on your laptop: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push (against a stand-in for GitHub on the same machine). Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's and Homebrew's docs and is being tested on real Mac and Windows laptops.
+**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step that runs on your own computer, using a stand-in for GitHub: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push. Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's and Homebrew's docs and is being tested on real Mac and Windows laptops.
 
 ## Before you start
 
 You need:
 
 - Week 2 done: Claude Code installed and signed in, and your practice folder `~/my-first-project` with `hello.md` and `CLAUDE.md` in it. If you don't have the folder, make it: in your terminal, type `cd ~` then `mkdir my-first-project`.
-- On a Mac: **macOS 15 (Sequoia) or later** (Apple menu > About This Mac). This week installs a tool with Homebrew, which needs macOS 15 or later.
+- On a Mac: **macOS 15 (Sequoia) or later** (Apple menu > About This Mac). This week installs a tool with Homebrew, which needs macOS 15 or later. If your Mac is older, tell your instructor now: the course's Mac steps need macOS 15.
 - An email address you can open now, to create a GitHub account.
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows, as in week 2. Every command below says where to type it. On Windows, nothing this week goes in PowerShell.
@@ -68,7 +68,7 @@ Claude Code runs read-only git commands, such as `git status`, `git log` and `gi
 3. Tick **Keep my email addresses private**.
 4. Also tick **Block command line pushes that expose my email**.
 
-Near the "Keep my email addresses private" setting, GitHub shows your private address. It looks like `12345678+yourusername@users.noreply.github.com` (a number, a plus sign, your username). Copy it; you need it in step 2. (Exactly where GitHub shows it is being tested.)
+Near the "Keep my email addresses private" setting, GitHub shows your private address. It looks like `12345678+yourusername@users.noreply.github.com` (a number, a plus sign, your username). Copy it; you need it in step 2. (Exactly where GitHub shows it is being tested.) If you can't find it, look on the same **Emails** page for text ending in `users.noreply.github.com` and copy all of it exactly, including the number. Still can't find it? Ask in office hours.
 
 **Optional:** students can apply for the free GitHub Student Developer Pack at <https://github.com/settings/education/benefits>. You don't need it for this course.
 
@@ -127,6 +127,8 @@ It should print your `noreply` address.
 
 **Homebrew** is a free installer for Mac tools. Homebrew supports macOS 15 (Sequoia) and later. Macs with Apple chips (M1 and later) are its main supported setup. On an older **Intel** Mac, Homebrew may work but isn't officially supported, and it may ask to install Apple's "command line developer tools": accept, and if you get stuck, come to office hours.
 
+You need an **administrator** account on the Mac to install Homebrew (being tested). If it's a work or school Mac where you aren't an administrator, ask in office hours.
+
 **a. Install Homebrew.** If you already use Homebrew, skip to step c. Otherwise, in **Terminal**, paste this line exactly (from <https://brew.sh>) and press Enter:
 
 ```bash
@@ -137,7 +139,15 @@ It should print your `noreply` address.
 - Expect it to ask for a password: your Mac login password. Typing it shows nothing; that's normal.
 - It can take several minutes.
 
-**b. Run the "Next steps" lines.** At the end, the installer prints **Next steps** with one or more lines to run. Copy and run **exactly the lines it prints**, in Terminal. (For reference, on Apple-chip Macs Homebrew's docs give this line: `eval "$(/opt/homebrew/bin/brew shellenv)"`. The installer's own lines come first.) Then close Terminal (`Cmd + Q`) and open it again.
+**b. Run the "Next steps" lines.** At the end, the installer prints **Next steps** with one or more lines to run. Copy and run **exactly the lines it prints**, in Terminal. Run the lines the installer prints, not the one below. Only if it prints none, use the line from Homebrew's docs for Apple-chip Macs: `eval "$(/opt/homebrew/bin/brew shellenv)"`.
+
+Then close Terminal (`Cmd + Q`), open it again, and check:
+
+```bash
+brew --version
+```
+
+It should print `Homebrew` followed by a version number (being tested). If it says `command not found`, see the troubleshooting table.
 
 **c. Install `gh`.** In **Terminal**, type:
 
@@ -164,6 +174,8 @@ On Windows you install `gh` inside Ubuntu (WSL), with GitHub's official steps. T
 ```
 
 It asks for your Ubuntu password. Lots of text scrolls past; near the end, look for a line like `Setting up gh (2.102.0) ...` (your number may be higher).
+
+If the paste stops partway (for example after the password, or with an error), paste the whole block again. If that still fails, paste it one line at a time.
 
 #### Check it worked (Mac and Windows)
 
@@ -330,7 +342,13 @@ Switch back to main and pull the latest changes from GitHub.
 
 It will probably run `git switch main` then `git pull`. Then check: ask "Is goals.md in this folder, and what does the history look like now?". `goals.md` should be there, on `main`.
 
-**Rule of thumb: pull after you merge.** If you forget and commit on `main`, GitHub will refuse your next push (see "rejected ... (fetch first)" in the troubleshooting table).
+**Rule of thumb: pull after you merge.** If you forget and commit on `main`, GitHub will refuse your next push with `rejected ... (fetch first)`. The fix is this prompt:
+
+```text
+Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push.
+```
+
+In our test (against a stand-in for GitHub), `git pull --no-rebase --no-edit` printed `Merge made by the 'ort' strategy.` and the push that followed worked.
 
 ### 8. Undo safely
 
@@ -374,7 +392,11 @@ On branch main
 nothing to commit, working tree clean
 ```
 
-**b. Revert a commit.** First make a small commit to undo. In Claude Code, type:
+**b. Revert a commit.**
+
+> **Being tested:** This part pushes to GitHub, so it is being tested. The revert itself is from our test.
+
+First make a small commit to undo. In Claude Code, type:
 
 ```text
 Add a line saying "This line will be undone" to hello.md, commit it, and push main to GitHub.
@@ -417,6 +439,8 @@ Your repo is private, so your instructor can't see it until you invite them. Do 
 5. Type `vasuchettyphd` and select it from the matches.
 6. Click **Add vasuchettyphd to my-first-project**.
 
+Check it worked: the **Collaborators** list should now show `vasuchettyphd` as a pending invitation (being tested). If you misspelled the name, remove that entry and add `vasuchettyphd` again.
+
 GitHub emails your instructor an invitation. Once they accept it, they can see your repo. You don't need to do anything else. Don't change the repo to public so your instructor can see it: the invitation is how they get in.
 
 ## Check it worked
@@ -440,12 +464,14 @@ The [assignment](assignment.md) asks for the repo's address, the merged PR's add
 | `fatal: not a git repository (or any of the parent directories): .git` | You're not inside a repo. In your terminal, `cd ~/my-first-project`, start `claude` there, and do step 5 if you haven't. |
 | The branch is called `master`, not `main` (for example `git switch main` says `fatal: invalid reference: main`) | Ask Claude Code: "Rename this branch to main with `git branch -M main`." Do this before you push to GitHub. |
 | `fatal: No configured push destination.` | This folder isn't connected to GitHub yet. Do step 6. |
-| `! [rejected]        main -> main (fetch first)` with `Updates were rejected because the remote contains work that you do not have locally` | GitHub has commits your laptop doesn't, usually because you merged a PR. Ask Claude Code: "Pull the latest changes from GitHub, then push again." Don't let it force-push. |
+| `! [rejected]        main -> main (fetch first)` with `Updates were rejected because the remote contains work that you do not have locally` | GitHub has commits your laptop doesn't, usually because you merged a PR. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." Say **No** to any prompt that contains `--force` or `reset --hard`. |
+| (being tested) `Need to specify how to reconcile divergent branches` | Same cause and same fix. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
 | The repo is public | (being tested) On github.com, open the repo, then **Settings**. In the **Danger Zone** at the bottom, click **Change visibility**, choose private, and follow the confirmation steps until you click **Make this repository private**. |
-| `gh auth status` shows the wrong username | (being tested) Type `gh auth logout`, then `gh auth login` and sign in with your own account. |
+| `gh auth status` shows the wrong username | (being tested) Type `gh auth logout` and answer the questions it asks (which account, and to confirm). Then type `gh auth login` and sign in with your own account. |
 | `You are not logged into any GitHub hosts. To log in, run: gh auth login` | Do step 4. |
-| A push is refused with a message about exposing your private email | (being tested) Your commits use your personal email. Do step 1b and "Tell git who you are" in step 2 with your `noreply` address, then ask Claude Code for help redoing the commits that weren't pushed. |
+| A push is refused with a message about exposing your private email | (being tested) Your commits use your personal email. Do step 1b and "Tell git who you are" in step 2 with your `noreply` address, then ask Claude Code: "Change the author email on my commits that are not on GitHub yet to my noreply address, without losing any files. Don't force-push and don't use reset --hard." Say **No** to any prompt that contains `--force` or `reset --hard`. If you're unsure, stop and ask in office hours. |
 | The browser doesn't open during `gh auth login` (WSL) | (being tested) Copy the one-time code from the Ubuntu window, open <https://github.com/login/device> in your Windows browser and type the code. |
+| (being tested) `gh repo create` says the repository name already exists (for example after a first try that failed) | The repo was already made on GitHub. Ask Claude Code: "Connect this folder to my existing private GitHub repository my-first-project as origin and push main, instead of creating a new one." Or choose a new name. |
 | `gh: command not found` (or `brew: command not found` on a Mac) | Mac: run the "Next steps" lines the Homebrew installer printed (step 3b), close and reopen Terminal, then try again. Windows: make sure you're in the **Ubuntu** window, not PowerShell, then redo step 3. |
 | (being tested) A Mac window asks to install "command line developer tools" | Click Install, wait for it to finish, then run the command again. |
 | Claude Code wants to run `git reset --hard` or `git push --force` | Choose **No**. Ask it to undo with `git revert` instead (step 8). |

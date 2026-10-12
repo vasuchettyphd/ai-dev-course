@@ -131,6 +131,7 @@ git config --global user.email "12345678+yourusername@users.noreply.github.com"
 | Install Homebrew: the line from <https://brew.sh> | Paste GitHub's official apt block (in the README) |
 | Return to continue; your Mac password (shows nothing) | Your Ubuntu password (shows nothing) |
 | Run the **Next steps** lines it prints | |
+| Close and reopen Terminal | |
 | `brew install gh` | |
 
 Check, in either: `gh --version`
@@ -230,7 +231,9 @@ Probably: `git switch -c add-goals`, `git add`, `git commit`, `git push -u origi
  ! [rejected]        main -> main (fetch first)
 ```
 
-Fix: pull, then push again. Never force-push.
+Fix: ask Claude Code to pull **as a merge** (`git pull --no-rebase --no-edit`), then push again. No reset, no force-push.
+
+A prompt with `--force` or `reset --hard`? Say **No**.
 
 ---
 
@@ -268,12 +271,13 @@ Your instructor accepts from the invitation email. **Don't make the repo public.
 One document with:
 
 - Your **private** repo's address, with `vasuchettyphd` added
+- A screenshot of the repo page showing **Private**
 - The address of a **merged** pull request
 - One paragraph: when would you use a branch?
 
 | Criterion | Points |
 |---|---|
-| Repo exists and is private (2), collaborator added (2) | 4 |
+| Repo exists, screenshot shows Private (2), collaborator added (2) | 4 |
 | Merged PR with a sensible title and description | 3 |
 | Reflection: a real branch situation, the risk, a safe undo | 3 |
 
