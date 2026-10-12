@@ -10,7 +10,7 @@
 
 You need:
 
-- A laptop with **macOS 13 or later**, or **Windows 10 version 2004 (build 19041) or later**, or **Windows 11**. To check: on a Mac, Apple menu > About This Mac; on Windows, press `Win + R`, type `winver` and press Enter.
+- A laptop with **macOS 15 (Sequoia) or later**, or **Windows 10 version 2004 (build 19041) or later**, or **Windows 11**. To check: on a Mac, Apple menu > About This Mac; on Windows, press `Win + R`, type `winver` and press Enter.
 - At least **4 GB of memory (RAM)** and an internet connection.
 - About 90 minutes (your first install may take longer), at a time when you can restart your laptop (Windows).
 
