@@ -67,14 +67,12 @@ From week 7 you can also run the program inside a Docker container, so it behave
 
 Open the Terminal (Mac) or, on Windows, the Ubuntu window, go to the course repo folder, then type:
 
-Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
-
 ```
 cd example-project
 docker build -t dealscreener .
 ```
 
-This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so the first build takes longer; later builds are quick.
+This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so it takes longer; later builds are quick.
 
 To run the tests inside the container, type this in the same window (you use it for the next two commands):
 
