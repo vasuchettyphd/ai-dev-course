@@ -23,11 +23,12 @@ The class builds this project up week by week, alongside your own:
 | 5 | the first three build steps: the calculator, the buy-box check and a program you run, each built test first from a [Superpowers plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) |
 | 6 | a code review: three reviewer agents in [`.claude/agents/`](.claude/agents/), their findings and the decision on each in [`REVIEW.md`](REVIEW.md), and the fix commits, each named after its finding's number |
 | 7 | a [`Dockerfile`](Dockerfile) and [`.dockerignore`](.dockerignore), so the program and its tests run the same way inside a Docker container |
-| 8 onward | more of the tool, step by step, following the plan |
+| 8 | a real bug fixed test first: a classmate's [`FEEDBACK.md`](FEEDBACK.md) found it, [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
+| 9 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, the week 6 state will get the tag `week-06` once week 6 is published, and later weeks follow (`week-07`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state will be marked with a **git tag** named after the week: the week 4 state will get the tag `week-04` once week 4 is published, the week 5 state will get the tag `week-05` once week 5 is published, the week 6 state will get the tag `week-06` once week 6 is published, the week 7 state will get the tag `week-07` once week 7 is published, the week 8 state will get the tag `week-08` once week 8 is published, and later weeks follow (`week-09`, ... up to `week-13`). In-class demos start from the previous week's tag. Once the tags exist, if you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 7)
+## What's here now (week 8)
 
 - `README.md`: this page.
 - `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
@@ -36,11 +37,25 @@ Each week's finished state will be marked with a **git tag** named after the wee
 - `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one). Find those commits on the Commits tab of the week 6 pull request on the course repo. Week 7 added a section reviewing the Dockerfile and .dockerignore (findings D1 to D4).
 - `Dockerfile`: the recipe Docker follows to build an image of the program, with a plain-English note above every line.
 - `.dockerignore`: the files Docker leaves out of the image, with the reason for each group.
+- `FEEDBACK.md`: the week 8 feedback form, filled in for this project by the instructor acting as the classmate. It lists the inputs tried (including the odd-input list), what worked, and what broke: an interest rate typed as `0.07`.
+- `BUGS.md`: the bug list, one section each, newest last. Bug 1 is the `0.07` interest rate, now fixed. Each bug uses this template:
+
+  ```markdown
+  ## Bug N: <short name>
+
+  - **Found by:** <who> on <date>
+  - **What I did (exact input):**
+  - **What I expected:**
+  - **What happened:**
+  - **Does it happen every time?** Yes / No / Not sure
+  - **Status:** Open / Fixed in <commit or PR link>
+  - **Cause:** (fill in once you know)
+  ```
 - `dealscreener/`: the code.
   - `calculator.py` works out the monthly mortgage, cash flow, cap rate and cash-on-cash return for one listing.
   - `buybox.py` checks those numbers against the buy box and gives the reason for each pass or fail.
-  - `__main__.py` is the program you run: it asks for the numbers and prints the report.
-- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers. Week 6 added two more hand-worked cases (a $150 HOA fee, and 10% vacancy with a 5% repairs reserve) and a few more checks, because the review found them missing.
+  - `__main__.py` is the program you run: it asks for the numbers and prints the report. Week 8 added one follow-up question for a percentage typed as a decimal (bug 1).
+- `tests/`: the tests, written before the code. Two listings were worked out by hand first, and the tests check the code gets the same answers. Week 6 added two more hand-worked cases (a $150 HOA fee, and 10% vacancy with a 5% repairs reserve) and a few more checks, because the review found them missing. Week 8 added the `SmallPercentTest` tests for bug 1, written and seen to fail before the fix.
 
 ## How to run it
 
@@ -59,7 +74,7 @@ The last line should say `OK`. To screen a listing yourself, type:
 python3 -m dealscreener
 ```
 
-It asks for each number in turn. Type the number and press Enter. If you type something that isn't a sensible number, it says what to type and asks again. Try listing B from the [task plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) (price 150000, rent 1700, tax 2400, insurance 1200, HOA 0, down payment 25, interest rate 7, loan term 30, closing costs 6000): the monthly cash flow should be $430.53 and the deal should pass.
+It asks for each number in turn. Type the number and press Enter. If you type something that isn't a sensible number, it says what to type and asks again. Try listing B from the [task plan](docs/superpowers/plans/2026-10-12-first-three-steps.md) (price 150000, rent 1700, tax 2400, insurance 1200, HOA 0, down payment 25, interest rate 7, loan term 30, closing costs 6000): the monthly cash flow should be $430.53 and the deal should pass. If you type a percentage as a decimal, like `0.07` for the interest rate, it asks whether you meant 7%: type `y` for 7% or `n` to keep 0.07%.
 
 ## How to run with Docker
 
@@ -94,7 +109,7 @@ docker run -it --rm dealscreener
 
 It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program (`-i` keeps your typing connected to the program, `-t` makes it act like a terminal); `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
 
-The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs` and `REVIEW.md`: people read them, but the program doesn't need them.
+The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs`, `REVIEW.md`, `BUGS.md` and `FEEDBACK.md`: people read them, but the program doesn't need them.
 
 The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user. That line (`USER nobody`) is optional: if your own program writes files inside `/app` and gets "Permission denied", remove that line from your Dockerfile or ask Claude.
 

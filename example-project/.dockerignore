@@ -29,6 +29,9 @@
 .claude
 .superpowers
 
-# The task plans and the code review: people read them, the program doesn't need them.
+# The task plans, the code review, the bug list and the feedback form: people read them,
+# the program doesn't need them.
 docs
 REVIEW.md
+BUGS.md
+FEEDBACK.md
