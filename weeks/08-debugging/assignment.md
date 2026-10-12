@@ -4,7 +4,7 @@
 
 Take part in the peer demo in class, then follow the [week 8 README](README.md) on your own laptop, in your private `semester-project` repo, and collect four things.
 
-**(a) The feedback form you filled in for your partner** (README step 2c). Either the file, `feedback-for-<partner>.md` in your repo (hand in its link on GitHub), or a clear photo of the printed form. It lists the exact inputs you tried on your partner's program, what worked, and, for anything that broke, what you typed, what you expected and what happened. If your partner's program never broke, the form says which inputs you tried, including the odd-input list.
+**(a) The feedback form you filled in for your partner** (README step 2c). Either the file, `feedback-for-<partner>.md` in your repo (hand in its link on `main` after the merge, or on your `fix-<short-name>` branch if it isn't merged), or a clear photo of the printed form. It lists the exact inputs you tried on your partner's program, what worked, and, for anything that broke, what you typed, what you expected and what happened. If your partner's program never broke, the form says which inputs you tried, including the odd-input list.
 
 **(b) The link to `BUGS.md` in your repo** (README step 3). You make it on your `fix-<short-name>` branch, so it reaches `main` when your fix is merged: hand in its link on `main` after the merge. If your fix isn't merged, hand in its link on your `fix-<short-name>` branch. It has at least one bug written with the course's template, including the exact input someone else could type to see the bug, what you expected, what happened, and whether it happens every time.
 

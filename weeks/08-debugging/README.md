@@ -51,7 +51,7 @@ What to answer this week:
 | Run your tests, or run your program with the bug's input | **Yes** |
 | Read-only commands: `git status`, `git log`, `git diff`, `ls` | **Yes** |
 | `git add`, `git commit`, `git push` on your `fix-` branch, `gh pr create` | plain **Yes** |
-| `git restore` or `git revert` that you asked for in step 5, naming only the files you expect | plain **Yes** |
+| The `git restore` or `git revert` you asked for in step 5 (in step 5a, `git restore .` is expected) | plain **Yes** |
 | Edit a file, or part of one, that has nothing to do with the bug ("while I'm here" tidying, renaming, rewriting) | **No** |
 | Delete a test, skip one, or change a test's expected answer so that it passes | **No** |
 | Edit code before it has told you the cause, or before you've seen the new test fail | **No** |
@@ -118,7 +118,7 @@ Stay beside them, and only let them type into your program. Don't explain or def
 - **What broke, and exactly how:** for each problem, **what I typed**, **what I expected**, and **what happened** (copy any message word for word). "It crashed" isn't enough; "I typed `abc` for the price and it printed `ValueError: could not convert string to float` and stopped" is.
 - **One suggestion.**
 
-Leave the last line, "For the owner: bugs added to BUGS.md", for the owner. Give the owner a copy before you leave (send them the file, or let them photograph the paper), and keep yours: the form you filled in for your partner is part of your assignment. The deal screener's form is an example: [`example-project/FEEDBACK.md`](../../example-project/FEEDBACK.md).
+Leave the last line, "For the owner: bugs added to BUGS.md", for the owner. Give the owner a copy before you leave (send them the file, or let them photograph the paper), and keep yours: the form you filled in for your partner is part of your assignment. If you receive your partner's form as a file, keep it outside `semester-project` (for example in Downloads), so step 3a's `git status` check doesn't stop you. The deal screener's form is an example: [`example-project/FEEDBACK.md`](../../example-project/FEEDBACK.md).
 
 **d. If something gets in the way.**
 
@@ -169,7 +169,7 @@ It will probably run `git switch main`, `git pull` and `git switch -c fix-<short
 You write `BUGS.md` from the form **your partner filled in about your project** (step 2c, their copy to you), not the one you filled in for them. In Claude Code, type this, then paste the "What broke" part of that form after it (type it in if it's on paper), and add what you saw in 3b:
 
 ```text
-Make a file called BUGS.md at the top of my project. Start it with "# Bugs" and the line "Bugs found in my project, one section each, newest last." Then add one section for each bug below, numbered from 1, using exactly this template: a heading "## Bug N: <short name>", then the lines Found by, What I did (exact input), What I expected, What happened, Does it happen every time?, Status and Cause, as in the deal screener's BUGS.md. Copy the exact inputs and messages word for word. Status is Open and Cause is "(fill in once you know)" for every bug. Don't guess anything that isn't in my notes: write "Not sure" instead. Don't change any other file. Here are my notes:
+Make a file called BUGS.md at the top of my project. Start it with "# Bugs" and the line "Bugs found in my project, one section each, newest last." Then add one section for each bug below, numbered from 1, using exactly this template: a heading "## Bug N: <short name>", then the lines Found by, What I did (exact input), What I expected, What happened, Does it happen every time?, Status and Cause. Copy the exact inputs and messages word for word. Status is Open and Cause is "(fill in once you know)" for every bug. Don't guess anything that isn't in my notes: write "Not sure" instead. Don't change any other file. Here are my notes:
 ```
 
 Plain **Yes** to creating `BUGS.md`. Then read every section against your partner's form: the exact input must be exact (every number, in order, as typed). Fix anything wrong yourself, or tell Claude exactly what to change.
@@ -212,7 +212,7 @@ You stay on your `fix-<short-name>` branch. Keep the bottom line at `manual mode
 
 The command must be at the very start of the message, so the skill starts straight away. If `/superpowers:systematic-debugging` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers systematic-debugging skill.` instead (being tested). A long paste may show as a short label such as `[Pasted text]` in the prompt box; that's normal (being tested).
 
-The skill allows a "one-off test script if no framework", but this course wants a real test in your project's own tests: it stays in the project, and every time you run your tests it checks that this bug never comes back.
+The skill allows a "One-off test script if no framework", but this course wants a real test in your project's own tests: it stays in the project, and every time you run your tests it checks that this bug never comes back.
 
 **b. What you'll see, phase by phase** (being tested; its exact words will differ). Each phase below shows what the deal screener's run found.
 
@@ -243,7 +243,7 @@ Ran 47 tests in 0.004s
 FAILED (failures=5)
 ```
 
-(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**. In the deal screener's first failure, the program never asked "Did you mean 7%?" (it asked for the loan term twice, because the `y` meant for the question was read as the loan term). In the second, the wrong answer sits next to the one expected: `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
+(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**. In the first failure shown above, the program never asked "Did you mean 7%?" (it asked for the loan term twice, because the `y` meant for the question was read as the loan term). In the second one shown, the wrong answer sits next to the one expected: `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
 
 The deal screener added 8 tests (`SmallPercentTest` in [`example-project/tests/test_main.py`](../../example-project/tests/test_main.py)). Five failed before the fix. The other three passed already, on purpose: they check answers that already worked and must keep working (a real `0` or `7` isn't questioned, `n` keeps 0.07%, and running out of input stops politely). That's fine. What matters is that at least one test fails because of the bug.
 
@@ -300,7 +300,7 @@ You're in the "fix it" loop when a fix doesn't work, or one fix breaks something
 Stop. Two fixes haven't worked. Throw away all my uncommitted changes with git restore; the test for this bug is already committed, so it stays. If any fix attempt was committed, undo that commit with git revert, so the history keeps a record. Show me each command before you run it, and don't use reset, --force or git clean.
 ```
 
-It will probably run `git restore .` (this time that's right: everything uncommitted is a failed attempt) and, for a committed attempt, `git revert <commit> --no-edit`. Plain **Yes** to those; **No** to `git clean`, `reset` or `--force`. Then ask "What does git status say?": it should say `nothing to commit, working tree clean`. If it still lists a new file an attempt made, ask Claude what it is before anything deletes it. Your test should still be there and still fail.
+It will probably run `git restore .` (this time that's right: everything uncommitted is a failed attempt) and, for a committed attempt, `git revert <commit> --no-edit`. Plain **Yes** to those; **No** to `git clean`, `reset` or `--force`. Then ask "What does git status say?": it should say `nothing to commit, working tree clean`. If `git status` lists a changed file that isn't from a fix attempt, commit it first. If it still lists a new file an attempt made, ask Claude what it is before anything deletes it. Your test should still be there and still fail.
 
 **b. Ask for the cause before any change.** In Claude Code:
 

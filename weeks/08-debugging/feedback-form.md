@@ -8,7 +8,7 @@
 - words instead of numbers, such as `abc`
 - `0`
 - a negative number, such as `-5`
-- a very large number, such as `999999999999`
+- a very large number, such as `1e308`
 - a decimal where a whole number is expected (`30.5` years), and the reverse: `0.07` where `7` is meant
 - symbols: `$`, `%` and `,`, such as `$1,500` or `25%`
 - very long text: hold a key down for a few seconds, or paste a long sentence
