@@ -33,7 +33,7 @@ Each week's finished state will be marked with a **git tag** named after the wee
 - `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
 - `docs/superpowers/plans/2026-10-12-first-three-steps.md`: the instructor's task plan, written in the format Superpowers' `writing-plans` produces, from the plan's first three build steps. Compare it with your own.
 - `.claude/agents/`: the three reviewer agents from week 6 (`does-it-work`, `safe-and-private` and `plain-english`). Each can only read files, never change them.
-- `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one). Find those commits on the Commits tab of the week 6 pull request on the course repo.
+- `REVIEW.md`: the week 6 code review. Each finding has a decision (`Fix` or `Won't fix`) and a short reason; every fix is in a commit named after its number (the wording fixes share one). Find those commits on the Commits tab of the week 6 pull request on the course repo. Week 7 added a section reviewing the Dockerfile and .dockerignore (findings D1 to D4).
 - `Dockerfile`: the recipe Docker follows to build an image of the program, with a plain-English note above every line.
 - `.dockerignore`: the files Docker leaves out of the image, with the reason for each group.
 - `dealscreener/`: the code.
@@ -63,18 +63,22 @@ It asks for each number in turn. Type the number and press Enter. If you type so
 
 ## How to run with Docker
 
-From week 7 you can also run the program inside a Docker container, so it runs the same way on every computer. You need Docker Desktop installed and running (see week 7). Python doesn't need to be installed for this: the image brings its own (Python 3.12).
+From week 7 you can also run the program inside a Docker container, so it behaves the same on every computer. You need Docker Desktop installed and running (see the [week 7 page](../weeks/07-running-with-docker/README.md)). Python doesn't need to be installed for this: the image brings its own (Python 3.12).
 
-Open the Terminal (Mac) or, on Windows, the Ubuntu window, go to the folder where you cloned the course repo, and type:
+Open the Terminal (Mac) or, on Windows, the Ubuntu window, go to the course repo folder, then type:
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
 ```
 cd example-project
 docker build -t dealscreener .
 ```
 
-This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so it takes a minute; later builds are quick.
+This builds an image called `dealscreener` from the `Dockerfile` in this folder (the final `.` means "this folder"). The first build downloads the official Python image, so the first build takes longer; later builds are quick.
 
-To run the tests inside the container, type:
+To run the tests inside the container, type this in the same window (you use it for the next two commands):
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
 ```
 docker run --rm dealscreener python -m unittest
@@ -82,15 +86,17 @@ docker run --rm dealscreener python -m unittest
 
 The last line should say `OK`, just as on your own computer. To screen a listing, type:
 
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
 ```
 docker run -it --rm dealscreener
 ```
 
-It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program; `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
+It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program (`-i` keeps your typing connected to the program, `-t` makes it act like a terminal); `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
 
 The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs` and `REVIEW.md`: people read them, but the program doesn't need them.
 
-The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user.
+The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user. That line (`USER nobody`) is optional: if your own program writes files inside `/app` and gets "Permission denied", remove that line from your Dockerfile or ask Claude.
 
 ## What the numbers mean
 

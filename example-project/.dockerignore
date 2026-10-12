@@ -7,7 +7,7 @@
 # Python and Node.js add-on folders, in any folder: big, and rebuilt inside the image if needed.
 **/.venv
 **/venv
-node_modules
+**/node_modules
 
 # Python's saved bytecode, in any folder.
 **/__pycache__
