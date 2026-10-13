@@ -74,7 +74,7 @@ Google: "Cosine similarity is a good distance metric because it focuses on direc
 
 1. <https://aistudio.google.com/apikey> > **Create API key**
 2. School account first; if "you do not have access", a personal account (18+)
-3. One line in `.env`, no quotes: `GEMINI_API_KEY=AIza...`
+3. One line in `.env`, no quotes: `GEMINI_API_KEY=...your key...`
 4. **Don't** also set `GOOGLE_API_KEY`: it wins
 5. Leaked? Delete it in AI Studio **first**
 
@@ -199,7 +199,7 @@ Never a key, never a traceback.
 - `safe-and-private`: keys, `.env`, the index, the documents, real calls in tests
 - Docker: `--env-file .env`, share the documents folder (read-only) and the index file
 - `docker run --rm <image> ls -a`: no `.env`, no index
-- Files changed: Find `sk-ant-` and `AIza`: only fakes
+- Files changed: Find `GEMINI_API_KEY=` and `ANTHROPIC_API_KEY=`: only fakes
 - Merge on GitHub, then pull
 
 ---

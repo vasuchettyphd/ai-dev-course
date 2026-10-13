@@ -2,7 +2,7 @@
 
 **Goal:** make your program find information by **meaning**, not just matching words, and answer questions from **your own documents**, naming which documents it used. You'll get a Google AI key safely, turn sentences into embeddings and compare them, see each step of RAG on the deal screener's notes, and add RAG over your own course-safe documents to your project, merged through a pull request.
 
-**Time:** about 20 minutes before class to get the Google key (step 2), then plan for about 2 to 3 hours of your own time (an estimate). **Cost:** Google's embeddings are free of charge on the free tier (step 2 explains the catch: what you send may be read to improve Google's products). The answers come from Claude Haiku, paid from your week 9 API credit: a fraction of a cent per question.
+**Time:** about 20 minutes before class to get the Google key (step 2), then plan for about 2 to 3 hours of your own time (an estimate). **Cost:** Google's pricing page lists embeddings as "Free of charge" on the free tier, so the course expects no Google charge for this week's use (being tested for the model this course uses); step 2c explains the catch: what you send may be read to improve Google's products. The answers come from Claude Haiku, paid from your week 9 API credit: a fraction of a cent per question.
 
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
@@ -77,7 +77,7 @@ The model answers from your documents instead of from memory, and you can check 
 
 **b. Create the key.** Go to Google AI Studio's API keys page (<https://aistudio.google.com/apikey>), sign in, and click **Create API key**. Copy it (Google keys usually start with `AIza`, being tested). Don't paste it anywhere except your `.env` file, next.
 
-**c. Know what the free tier does with what you send.** The free tier costs nothing, but Google's terms (<https://ai.google.dev/gemini-api/terms>, read 13 October 2026) say:
+**c. Know what the free tier does with what you send.** The free tier should cost you nothing (being tested), but Google's terms (<https://ai.google.dev/gemini-api/terms>, read 13 October 2026) say:
 
 > "When you use Unpaid Services, including, for example, Google AI Studio and the unpaid quota on Gemini API, Google uses the content you submit to the Services and any generated responses to provide, improve, and develop Google products and services and machine learning technologies, including Google's enterprise features, products, and services, consistent with our Privacy Policy."
 >
@@ -85,7 +85,7 @@ The model answers from your documents instead of from memory, and you can check 
 >
 > "Do not submit sensitive, confidential, or personal information to the Unpaid Services."
 
-On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". This course uses the free tier, so **treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
+On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". Google also counts AI Studio as paid for some school and work ("Workspace enterprise") accounts; whether a UVU account is one of them is not known, so **check with your instructor**, and until you hear otherwise **treat your use as the free tier**. So **treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
 
 **d. Save it in `.env`.** Add a second line to your `.env` files, with a text editor, exactly as in week 9 step 2d (no spaces, no quote marks):
 
@@ -97,7 +97,7 @@ Do it in `~/first-call/.env` now, and later in `~/semester-project/.env` (step 5
 
 Use the name `GEMINI_API_KEY`, and **don't** also set `GOOGLE_API_KEY`: Google's library reads both, and "If both are set, `GOOGLE_API_KEY` takes precedence" (<https://ai.google.dev/gemini-api/docs/api-key>), which leads to confusing "wrong key" errors.
 
-**e. If a Google key leaks.** On the same API keys page in AI Studio, delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
+**e. Restrict it, and if it leaks, delete it.** Google: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." (<https://ai.google.dev/gemini-api/docs/api-key>): if the key's settings in AI Studio let you limit it to the Gemini API, do (being tested). If a Google key leaks, on the same API keys page delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
 
 **f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time.
 
@@ -293,7 +293,7 @@ Push the rag branch to GitHub and open a pull request into main titled "Add RAG 
 
 Plain **Yes**, after `git status` shows no `.env` and no index file.
 
-**b. Read Files changed yourself.** You should see your code and tests, the documents folder (course-safe documents only), the requirements and Dockerfile, `.env.example` with **fake** keys, `.gitignore` and `.dockerignore` listing the index file, your README and `REVIEW.md`. **No `.env`, no real key, no index file.** Use the browser's Find for `sk-ant-` and `AIza`: only fake values are allowed. If a real key is there, don't merge: delete it first (week 9 step 2f, or step 2e here).
+**b. Read Files changed yourself.** You should see your code and tests, the documents folder (course-safe documents only), the requirements and Dockerfile, `.env.example` with **fake** keys, `.gitignore` and `.dockerignore` listing the index file, your README and `REVIEW.md`. **No `.env`, no real key, no index file.** Use the browser's Find for `ANTHROPIC_API_KEY=` and `GEMINI_API_KEY=` (each should show only the fake value in `.env.example`), and for `sk-ant-` and `AIza` (the usual starts of the two kinds of key; being tested for Google): only fake values are allowed. If a real key is there, don't merge: delete it first (week 9 step 2f, or step 2e here).
 
 **c. Merge on GitHub, then pull,** as in week 9. Check: "What branch am I on, and do all the tests pass?" says `main`, and yes.
 
