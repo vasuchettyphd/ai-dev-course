@@ -2,7 +2,7 @@
 import unittest
 
 from dealscreener.__main__ import run
-from dealscreener.extract import ExtractionError
+from dealscreener.extract import ExtractionError, encode_listing
 from tests.test_extract import GOOD, FakeAPIError, FakeClient, reply
 
 # Listing B, in the order the program asks: price, rent, tax, insurance,
@@ -202,7 +202,8 @@ class ListingStepTest(unittest.TestCase):
         self.assertIn("Purchase price ($) [from the listing: 150000]: ", console.prompts)
         self.assertIn("Monthly HOA fee ($, 0 if none) [from the listing: 0]: ", console.prompts)
         self.assertIn("Used 400 input and 60 output tokens", console.output())
-        self.assertIn("line one\n\nline two", client.calls[0]["messages"][0]["content"])
+        # Week 13: the listing now goes to the model JSON encoded, so the new lines are escaped.
+        self.assertIn(encode_listing("line one\n\nline two"), client.calls[0]["messages"][0]["content"])
         self.assertEqual(len(client.calls), 1)
 
     def test_typing_a_number_replaces_the_listing_value(self):
