@@ -43,7 +43,7 @@ The same as week 9: you ask Claude Code in plain English, and this page shows th
 | Put a key in any file, print `.env`, or run code that prints the environment | **No**. Type: "Never read or print .env. Read the keys from the environment." |
 | Add documents with personal, customer or confidential information | **No** |
 | Tests that call Google or Anthropic every time they run | **No**. Type: "Tests must use a fake embedder and a fake model. Make the live test run only when I ask for it." |
-| Commit the saved index file, if your documents aren't public | **No**: it holds their full text (step 5d) |
+| Commit the saved index file | **No**: it holds your documents' full text (step 5d) |
 | `git add`, `git commit`, `git push` on your `rag` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
 | Anything that changes `main`, or `reset --hard`, `--force`, `git clean`, `rm -rf` | **No** |
 
@@ -85,7 +85,7 @@ The model answers from your documents instead of from memory, and you can check 
 >
 > "Do not submit sensitive, confidential, or personal information to the Unpaid Services."
 
-On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". Google also counts AI Studio as paid for some school and work ("Workspace enterprise") accounts; whether a UVU account is one of them is not known, so **check with your instructor**, and until you hear otherwise **treat your use as the free tier**, and **treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
+On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". Your program's calls to the Gemini API count as paid only when they go through a Google Cloud project with billing switched on (Google's terms), and this course doesn't use billing, so **your calls are on the free tier**. **Treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
 
 **d. Save it in `.env`.** Add a second line to your `.env` files, with a text editor, exactly as in week 9 step 2d (no spaces, no quote marks):
 
@@ -172,7 +172,7 @@ HOA question vs contractor note: 0.653
 
 The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
 
-If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, which Google supports until at least May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
+If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, whose announced shutdown date is 14 May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
 
 ### 4. RAG step by step, on the deal screener
 
@@ -190,7 +190,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`python3 --version` must show 3.10 or newer, as in week 9 step 3a. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`.
+`python3 --version` must show 3.10 or newer, as in week 9 step 3a. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`. Then check the Google line is in it: `grep -c '^GEMINI_API_KEY=' .env` prints `1`. If it prints `0` (an older `.env` from week 9 was already there, so `cp -n` left it alone), add the `GEMINI_API_KEY=` line to this `.env` with a text editor, as in step 2d.
 
 **b. Chunk and index.** In the same window:
 
@@ -268,7 +268,7 @@ Then build it as in week 9:
 
 Answer as in the table at the top. The official packages are `google-genai` (Google) and `anthropic` (Anthropic). For a Node.js project, Google's package is `@google/genai` (being tested; Google lists its libraries at <https://ai.google.dev/gemini-api/docs/libraries>) and Anthropic's is `@anthropic-ai/sdk`. Any other name: ask "Is this the official package?" before answering Yes.
 
-**e. Try it.** In your second terminal window (not the Claude Code one), in `~/semester-project`: activate `.venv` if it has one, load the keys with `set -a; . ./.env; set +a`, build the index, and ask your program three questions the way its README says, including **one your documents can't answer**. Write down, for each: the question, the documents it retrieved, and the answer. You hand these in.
+**e. Try it.** In your second terminal window (not the Claude Code one), in `~/semester-project`: activate `.venv` if it has one, load the keys with `set -a; . ./.env; set +a`, build the index, and ask your program three questions the way its README says, including **one your documents can't answer**. Write down, for each: the question, the documents it retrieved, and the answer. Take a screenshot of the index being built (check nothing secret is on screen). You hand these in.
 
 **f. Run the tests.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your keys, run them once more yourself with `.env` moved out of the folder, as in week 9 steps 5e and 5f (move it out, run the tests, move it back, and check `ls -a` shows `.env` again).
 

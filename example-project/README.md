@@ -28,7 +28,7 @@ The class builds this project up week by week, alongside your own:
 | 10 | investor notes you can ask questions of: `python3 -m dealscreener.notes index` turns each note into an embedding (Google's `gemini-embedding-001`), and `ask` finds the notes closest in meaning to your question and has Claude Haiku answer from those notes only, naming its sources; tests use fake embeddings and a fake model, so they need no keys and cost nothing |
 | 11 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-08` exist now, the week 9 state will get the tag `week-09` once week 9 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-09` exist now, the week 10 state will get the tag `week-10` once week 10 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
 ## What's here now (week 10)
 
@@ -39,7 +39,7 @@ Everything from week 9 (listed below), plus:
   - `index` reads every `.md` and `.txt` file in `notes/`, cuts each into chunks of at most 800 characters (whole paragraphs where it can), and asks Google's embedding model for one embedding per chunk: a list of 768 numbers that stands for the chunk's meaning. It saves the chunks, their embeddings and a fingerprint of each file in `notes-index.json`.
   - `ask "your question"` gets an embedding for the question, compares it with every chunk's embedding (cosine similarity), prints the three best matches with their scores, and sends just those three chunks and the question to Claude Haiku 5.5. The instructions tell Claude to answer only from those notes, to list the file names it used after the word `Sources:`, and to reply exactly `My notes don't say.` when the notes don't answer the question. It prints the answer and what the Claude call cost.
   - If you add, change or delete a note after indexing, `ask` stops and tells you to run `index` again, so answers never come from old notes. If the Claude call fails (for example, no Anthropic key), `ask` still prints the matching notes themselves. Each kind of failed Google call (no key, a key that isn't accepted, too many requests, no internet) becomes one plain sentence, and neither key is ever printed.
-- `tests/test_notes.py`: 37 tests for `notes.py`. A fake embedder stands in for Google: it counts words for a few ideas, so "association dues" and "HOA" count as the same idea, and a fake client stands in for Claude. They run with plain `python3`, no keys, no internet and no packages. They cover chunking, reading the notes folder (including a file that isn't text), search by meaning, sending the notes in batches, spotting changed notes, the answer instructions, a cut-off answer and a refusal, every error sentence (with a key hidden in the error, which must never show), and the command itself.
+- `tests/test_notes.py`: 40 tests for `notes.py`. A fake embedder stands in for Google: it counts words for a few ideas, so "association dues" and "HOA" count as the same idea, and a fake client stands in for Claude. They run with plain `python3`, no keys, no internet and no packages. They cover chunking, reading the notes folder (including a file that isn't text), search by meaning, sending the notes in batches, spotting changed notes, the answer instructions, a cut-off answer and a refusal, every error sentence (with a key hidden in the error, which must never show), and the command itself.
 - `tests/test_notes_live.py`: one real run, skipped unless you ask for it (see [How to ask your notes](#how-to-ask-your-notes)).
 - `requirements.txt`: adds `google-genai`, Google's official library, pinned to the version the course tested (2.30.0).
 - `.env.example`: adds a `GEMINI_API_KEY` line.
@@ -290,7 +290,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 python3 -m dealscreener.notes ask "What are the association dues like in Riverside?"
 ```
 
-It prints `Notes that match best:` and the three best notes with their similarity scores (like `  riverside-association-dues.md part 1 (similarity 0.xx)`), then Claude's answer with a `Sources:` line, then a line like `Used ... input and ... output tokens on Claude, about $0.0000x.` The course's real output is being tested. Then try:
+It prints `Notes that match best:` and the three best notes with their similarity scores then Claude's answer with a `Sources:` line, then what the Claude call cost. In the course's run of the live test with this question, the first match was `  riverside-association-dues.md part 1 (similarity 0.77)`, and the call used 725 input and 296 output tokens, about $0.00022. Then try:
 
 - `"What repairs reserve did I use for listing B?"`: the answer should be 8% of the rent, from `listing-b-write-up.md`.
 - `"What did I note about solar panels?"`: no note mentions solar panels, so the answer should be exactly `My notes don't say.` The matches are still printed, but they are only the closest of a poor set.
@@ -342,9 +342,9 @@ What the course's real runs cost, on 13 October 2026 (Claude at $0.10 / $0.50 pe
 | Run | Google (embeddings) | Claude input tokens | Claude output tokens | Claude cost |
 |---|---|---|---|---|
 | `index` (9 chunks) | 9 embeddings, no token count returned | none | none | none |
-| Riverside association dues question | 1 embedding | 585 | 268 | about $0.00019 |
-| listing B repairs reserve question | 1 embedding | 739 | 276 | about $0.00021 |
-| solar panels question (answer: `My notes don't say.`) | 1 embedding | 620 | 151 | about $0.00014 |
+| `What are the HOA fees like in Riverside?` | 1 embedding | 585 | 268 | about $0.00019 |
+| `What repairs reserve did I use for listing B?` | 1 embedding | 739 | 276 | about $0.00021 |
+| `What did I note about solar panels?` (answer: `My notes don't say.`) | 1 embedding | 620 | 151 | about $0.00014 |
 
 Google's embedding responses reported no token counts, so the program prints only Claude's cost.
 
