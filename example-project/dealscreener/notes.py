@@ -113,8 +113,11 @@ def load_notes(folder: str = NOTES_DIR) -> tuple[list[Chunk], dict, list[str]]:
         path = os.path.join(folder, name)
         if not name.lower().endswith((".md", ".txt")) or not os.path.isfile(path):
             continue
-        with open(path, "rb") as note_file:
-            data = note_file.read()
+        try:
+            with open(path, "rb") as note_file:
+                data = note_file.read()
+        except OSError:
+            raise NotesError(f"Couldn't read {name}.") from None
         fingerprints[name] = hashlib.sha256(data).hexdigest()
         try:
             text = data.decode("utf-8-sig")
@@ -263,7 +266,7 @@ def is_connection_error(error) -> bool:
     """True for a call that never reached Google: no internet, or no answer in time.
     The library's own connection errors are named like ConnectError or ReadTimeout."""
     name = type(error).__name__
-    return isinstance(error, (OSError, ConnectionError, TimeoutError)) or \
+    return isinstance(error, (ConnectionError, TimeoutError)) or \
         "Connect" in name or "Timeout" in name
 
 

@@ -503,6 +503,26 @@ class MainTest(unittest.TestCase):
         code, output = self.run_main(["index"], embed_factory=lambda: offline)
         self.assertEqual((code, output), (1, "Couldn't reach Google. Check your internet connection."))
 
+    def test_a_mistake_in_the_program_while_asking_is_not_blamed_on_google(self):
+        self.run_main(["index"])
+        broken = FakeEmbedClient(error=ValueError("a bug in our own code"))
+        with self.assertRaises(ValueError):
+            self.run_main(["ask", "dues?"], embed_factory=lambda: broken)
+
+    def test_a_file_error_is_not_called_a_connection_error(self):
+        self.assertFalse(notes.is_connection_error(PermissionError("not allowed")))
+        self.assertFalse(notes.is_connection_error(FileNotFoundError("gone")))
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root can read any file")
+    def test_an_unreadable_note_says_which_file(self):
+        path = os.path.join(self.notes_dir, "locked.md")
+        pathlib.Path(path).write_text("secret dues", encoding="utf-8")
+        os.chmod(path, 0)
+        self.addCleanup(os.chmod, path, 0o644)
+        with self.assertRaises(notes.NotesError) as caught:
+            notes.load_notes(self.notes_dir)
+        self.assertEqual(str(caught.exception), "Couldn't read locked.md.")
+
     def test_main_usage_errors_return_2(self):
         for argv in ([], ["ask"], ["ask", "   "], ["search", "dues"]):
             with self.subTest(argv=argv):
