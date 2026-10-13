@@ -266,7 +266,9 @@ def is_connection_error(error) -> bool:
     """True for a call that never reached Google: no internet, or no answer in time.
     The library's own connection errors are named like ConnectError or ReadTimeout."""
     name = type(error).__name__
-    return isinstance(error, (ConnectionError, TimeoutError)) or \
+    if isinstance(error, OSError) and getattr(error, "filename", None):
+        return False  # a file problem on this computer, not the network
+    return isinstance(error, (OSError, ConnectionError, TimeoutError)) or \
         "Connect" in name or "Timeout" in name
 
 

@@ -510,8 +510,8 @@ class MainTest(unittest.TestCase):
             self.run_main(["ask", "dues?"], embed_factory=lambda: broken)
 
     def test_a_file_error_is_not_called_a_connection_error(self):
-        self.assertFalse(notes.is_connection_error(PermissionError("not allowed")))
-        self.assertFalse(notes.is_connection_error(FileNotFoundError("gone")))
+        self.assertFalse(notes.is_connection_error(PermissionError(13, "Permission denied", "notes/a.md")))
+        self.assertFalse(notes.is_connection_error(FileNotFoundError(2, "No such file", "notes-index.json")))
 
     @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root can read any file")
     def test_an_unreadable_note_says_which_file(self):
