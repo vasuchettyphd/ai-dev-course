@@ -197,12 +197,10 @@ It splits each note into chunks of up to 800 characters (most notes are one chun
 python3 -m dealscreener.notes ask "What are the HOA fees like in Riverside?"
 ```
 
-The program turns your question into an embedding, picks the 3 closest chunks, and prints them with their similarity scores, under `Notes that match best:`. The Riverside "association dues" note should be first (being tested). Then it sends **only those 3 chunks** to Claude Haiku with these rules (the program's `SYSTEM_PROMPT`):
+The program turns your question into an embedding, picks the 3 closest chunks, and prints them with their similarity scores, under `Notes that match best:`. The Riverside "association dues" note should be first (being tested). Then it sends **only those 3 chunks** to Claude Haiku with these instructions (the program's `SYSTEM_PROMPT`, word for word):
 
 ```text
-Answer only from the notes below.
-After your answer, list the file names you used, after the word Sources:.
-If the notes do not answer the question, reply exactly: My notes don't say.
+You answer questions about a property investor's own notes. Answer only from the notes below. Do not use anything else you know. After your answer, list the file names you used, after the word Sources:. If the notes do not answer the question, reply exactly: My notes don't say.
 ```
 
 and prints the answer, its `Sources:` line, and what the Claude call cost.
