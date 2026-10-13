@@ -16,7 +16,7 @@
 You need:
 
 - Weeks 9 and 10 done: your Anthropic key in `.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, `~/first-call/.venv` (week 9 step 3), and the course repo's `example-project` set up as in week 10 step 4a (its own `.venv` and `.env`).
-- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, if `python3 --version` says 3.10 or lower, install a newer Python as in week 9 step 3a.
+- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows. Claude Code and your MCP server both run there; on Windows, nothing this week goes in PowerShell.
@@ -256,7 +256,7 @@ claude mcp list
 Add a small MCP server for my <tool name> tool, using the official mcp Python package pinned to mcp[cli]==2.3.0 and MCPServer (not FastMCP). It must call the same function and the same input checks as my agent's tool, need no API key and never read .env. Add a test that starts the server and calls the tool through the mcp package's client, skipped when mcp isn't installed. Then tell me the exact claude mcp add command for it, with --scope project, -e PYTHONPATH and the full path to the .venv's Python, but don't run it.
 ```
 
-Run the `claude mcp add` command yourself, in a second terminal window, after reading it. For a Node.js project, the official TypeScript package is `@modelcontextprotocol/server` (being tested; <https://github.com/modelcontextprotocol/typescript-sdk>). To remove a server: `claude mcp remove <name> -s project`.
+Run the `claude mcp add` command yourself after reading it, in a second terminal window with no key loaded, in your project folder, after checking `.venv/bin/python --version` says 3.11 or newer (if not, see Troubleshooting, "No module named 'mcp'"). For a Node.js project, the official TypeScript package is `@modelcontextprotocol/server` (being tested; <https://github.com/modelcontextprotocol/typescript-sdk>). To remove a server: `claude mcp remove <name> -s project`.
 
 `.mcp.json` holds the full path of **your** laptop's folder. Whether to commit it is your choice: it's no secret (no key in it), but it won't work on anyone else's laptop as it is.
 
