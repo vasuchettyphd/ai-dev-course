@@ -76,7 +76,7 @@ Anthropic: "Apply the principle of least privilege so that a successful injectio
 
 ## Anthropic's advice for outside text
 
-- **"JSON-encode untrusted content"**: an attacker "cannot close a quote or tag to "break out""
+- **"JSON-encode untrusted content"**: then an attacker can't close a quote or tag and break out of the data
 - **"State the policy in your system prompt"**: this text is data, not instructions
 - **"Red-team your own agent"**: test it with attacks first
 
@@ -155,7 +155,7 @@ Even the attack that worked could only put one wrong number on screen.
 - **Anthropic API:** "By default, we will not use your inputs or outputs from our commercial products ... to train our models"
 - **Gemini free tier:** "Do not submit sensitive, confidential, or personal information"
 - **Fair Housing Act:** race, color, national origin, religion, sex, familial status, disability
-- The deal screener reads **five numbers**, never tenants: bias avoided by design
+- The deal screener reads **five numbers**, never tenants: designed to keep away from it
 
 ---
 
@@ -164,7 +164,7 @@ Even the attack that worked could only put one wrong number on screen.
 - Packages: `anthropic` MIT, `google-genai` Apache-2.0, `mcp` MIT
 - US Copyright Office: "prompts do not alone provide sufficient control"
 - Notes and documents: only yours, made up, or licensed
-- UVU library: "UVU doesn't have one universal policy for AI use": check the syllabus
+- UVU library: "UVU doesn't have one universal policy for AI use": check your syllabus and ask your instructor
 
 ---
 
