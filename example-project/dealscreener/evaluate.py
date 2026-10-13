@@ -4,6 +4,7 @@ and count how many numbers it got right.
     python3 -m dealscreener.evaluate              # the 15 dev cases
     python3 -m dealscreener.evaluate --held-out   # the 5 held-out cases, once, after your change
     python3 -m dealscreener.evaluate --all        # all 20
+    python3 -m dealscreener.evaluate --injection  # the 8 hostile listings (week 13)
 
 Run it from the example-project folder. The scoring rule is in evals/README.md. This file uses
 only Python's standard library when it loads; the anthropic package is needed only for a real
@@ -30,18 +31,23 @@ RESULTS_DIR = "evals/results"
 CASE_COUNT = 20
 HELD_OUT_COUNT = 5
 
+# The prompt injection set (week 13): 8 hostile listings, none held out.
+INJECTION_FILE = "evals/injection/expected.json"
+INJECTION_COUNT = 8
+
 # The same sentence the listing step (week 9) shows when there is no key.
 NO_KEY = "No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README)."
 
 HELD_OUT_REMINDER = ("You are running the held-out cases. "
                      "Run them once, after your change, and report what you get.")
 
-USAGE = ("Usage: python3 -m dealscreener.evaluate [--held-out | --all]\n"
+USAGE = ("Usage: python3 -m dealscreener.evaluate [--held-out | --all | --injection]\n"
          "  no flag     the 15 dev cases\n"
          "  --held-out  the 5 held-out cases (once, after your change)\n"
-         "  --all       all 20 cases")
+         "  --all       all 20 cases\n"
+         "  --injection the 8 hostile listings (week 13)")
 
-WHICH = {"": "dev", "--held-out": "held-out", "--all": "all"}
+WHICH = {"": "dev", "--held-out": "held-out", "--all": "all", "--injection": "injection"}
 
 
 class EvalError(Exception):
@@ -64,10 +70,11 @@ def is_amount(value) -> bool:
             and math.isfinite(value) and value >= 0)
 
 
-def load_cases(path=CASES_FILE, folder=None) -> list:
+def load_cases(path=CASES_FILE, folder=None, case_count=CASE_COUNT, held_out_count=HELD_OUT_COUNT) -> list:
     """Read the cases file, check it, and add each listing's text as "text".
 
     Listing files are found in `folder`, which is the cases file's own folder unless given.
+    The file must have exactly `case_count` cases, `held_out_count` of them held out.
     Raises EvalError, naming the case, if anything is wrong.
     """
     folder = os.path.dirname(path) if folder is None else folder
@@ -80,12 +87,12 @@ def load_cases(path=CASES_FILE, folder=None) -> list:
         raise EvalError(f"The cases file {path} isn't valid JSON.") from None
     if not isinstance(cases, list) or not all(isinstance(case, dict) for case in cases):
         raise EvalError(f"The cases file {path} must be a list of cases.")
-    if len(cases) != CASE_COUNT:
-        raise EvalError(f"The cases file {path} has {len(cases)} cases; it needs exactly {CASE_COUNT}.")
+    if len(cases) != case_count:
+        raise EvalError(f"The cases file {path} has {len(cases)} cases; it needs exactly {case_count}.")
     held_out = sum(1 for case in cases if case.get("held_out") is True)
-    if held_out != HELD_OUT_COUNT:
+    if held_out != held_out_count:
         raise EvalError(f"The cases file {path} marks {held_out} cases as held out; "
-                        f"it needs exactly {HELD_OUT_COUNT}.")
+                        f"it needs exactly {held_out_count}.")
     seen = set()
     for number, case in enumerate(cases, start=1):
         case_id = case.get("id")
@@ -252,7 +259,10 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
         print_fn(NO_KEY)
         return 1
     try:
-        cases = load_cases(CASES_FILE)
+        if which == "injection":
+            cases = load_cases(INJECTION_FILE, case_count=INJECTION_COUNT, held_out_count=0)
+        else:
+            cases = load_cases(CASES_FILE)
         client = client_factory()
     except (EvalError, extract.ExtractionError) as error:
         print_fn(str(error))
