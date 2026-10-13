@@ -8,7 +8,7 @@
 
 - The official Python package `anthropic` 1.13.0 (released 9 October 2026; it needs Python 3.10 or newer), installed in a virtual environment with Python 3.12.3 on Ubuntu 24.04 Linux (in a container).
 - The model `claude-haiku-5-5` (Claude Haiku 5.5), at $0.10 per million input tokens and $0.50 per million output tokens (<https://platform.claude.com/docs/en/about-claude/pricing>, read 12 October 2026). Model names and prices change: check that page on the day you start.
-- The deal screener example's new "paste the listing" step and its 90 offline tests, with Python 3.14.4 and, in a container, Python 3.12.
+- The deal screener example's new "paste the listing" step and its 92 offline tests, with Python 3.14.4 and, in a container, Python 3.12.
 - Real calls to `claude-haiku-5-5`, made on 12 October 2026 with a workspace key (step 2d), from Python 3.12 in a container: the first-call and structured-output programs below, and the deal screener's listing step. The replies, token counts and costs shown below are from those runs; yours will differ a little. **Being tested:** every step in the Claude Console, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
 
 ## Before you start
@@ -343,7 +343,7 @@ Answer as in the table at the top. Watch especially for:
 Purchase price ($) [from the listing: 150000]:
 ```
 
-Press Enter to keep the number, or type the right one. Numbers the listing doesn't state are asked normally, the loan questions are always yours, and the maths is unchanged. With no key (no `.env` in the folder, and none loaded), it says `No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README). For now, type the numbers yourself.` and carries on. Its 90 tests never touch the network. See [`example-project/README.md`](../../example-project/README.md) and [`dealscreener/extract.py`](../../example-project/dealscreener/extract.py).
+Press Enter to keep the number, or type the right one. Numbers the listing doesn't state are asked normally, the loan questions are always yours, and the maths is unchanged. With no key (no `.env` in the folder, and none loaded), it says `No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README). For now, type the numbers yourself.` and carries on. Its 92 tests never touch the network. See [`example-project/README.md`](../../example-project/README.md) and [`dealscreener/extract.py`](../../example-project/dealscreener/extract.py).
 
 ### 6. Review and run
 

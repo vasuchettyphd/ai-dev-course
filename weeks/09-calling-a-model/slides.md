@@ -15,7 +15,7 @@ AI Development Course
 
 Your program asks a model, and you keep the key safe
 
-<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container) real calls to claude-haiku-5-5 and the deal screener's 90 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). The Console, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container) real calls to claude-haiku-5-5 and the deal screener's 92 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). The Console, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
 
 ---
 
@@ -254,7 +254,7 @@ Each one, then: "For now, type the numbers yourself." Never the key, never a tra
 - Tests use a **fake model**: no network, no credit, no key
 - One **live** test, only when you ask: `RUN_LIVE_TESTS=1`
 - A test for "no key"
-- The deal screener: 90 tests, all offline
+- The deal screener: 92 tests, all offline
 
 ---
 

@@ -312,7 +312,7 @@ class ListingStepTest(unittest.TestCase):
         self.assertIn("Paste the listing text, then type done on a line by itself and press Enter. "
                       "To skip and type the numbers yourself, type done now.", console.lines)
         self.assertIn("Asking the model to read the listing...", console.lines)
-        self.assertIn("Used 1000 input and 200 output tokens, about $0.0002.", console.lines)
+        self.assertIn("Used 1000 input and 200 output tokens, about $0.00020.", console.lines)
 
 
 if __name__ == "__main__":

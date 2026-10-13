@@ -129,6 +129,16 @@ class DescribeErrorTest(unittest.TestCase):
         for status, words in cases.items():
             self.assertIn(words, extract.describe_error(FakeAPIError(status)), status)
 
+    def test_any_5xx_means_busy(self):
+        for status in (502, 503, 504):
+            self.assertIn("busy", extract.describe_error(FakeAPIError(status)), status)
+
+    def test_a_key_without_a_workspace_is_named(self):
+        message = extract.describe_error(FakeAPIError(
+            400, "This API key is not scoped to a workspace, so this request must include the "
+                 "anthropic-workspace-id header"))
+        self.assertIn("isn't tied to a workspace", message)
+
     def test_low_credit_is_named(self):
         message = extract.describe_error(FakeAPIError(400, "Your credit balance is too low"))
         self.assertIn("credit has run out", message)

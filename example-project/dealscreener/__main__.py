@@ -108,7 +108,7 @@ def listing_step(input_fn, print_fn, client_factory) -> dict:
         print_fn(f"{extract.describe_error(error)} For now, type the numbers yourself.")
         return {}
     cost = extract.cost_usd(result.input_tokens, result.output_tokens)
-    print_fn(f"Used {result.input_tokens} input and {result.output_tokens} output tokens, about ${cost:.4f}.")
+    print_fn(f"Used {result.input_tokens} input and {result.output_tokens} output tokens, about ${cost:.5f}.")
     print_fn("Check each number from the listing: press Enter to keep it, or type the right number.")
     return result.values
 

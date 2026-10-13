@@ -167,8 +167,15 @@ def describe_error(error) -> str:
     if status == 400 and "reached your specified" in str(error).lower():
         return ("Your monthly spend limit has been reached. "
                 "Raise it in the Anthropic Console, or wait until it resets.")
+    # A key made for the whole organization, not a workspace: Anthropic's message says
+    # "This API key is not scoped to a workspace" (seen on 12 October 2026).
+    if status == 400 and "scoped to a workspace" in str(error).lower():
+        return ("This API key isn't tied to a workspace. Make a new key in the Anthropic "
+                "Console and choose a workspace for it.")
     if status == 402 or (status == 400 and "credit" in str(error).lower()):
         return "Your API credit has run out. Add credit in the Anthropic Console."
+    if status >= 500:
+        return "Anthropic's service is busy or having a problem. Try again later."
     messages = {
         400: "Anthropic couldn't read the request.",
         401: "The API key was not accepted. Check the key in your .env file.",
@@ -176,8 +183,6 @@ def describe_error(error) -> str:
         404: "The model name wasn't found.",
         413: "The listing text is too long.",
         429: "Too many requests or tokens for now. Wait a minute and try again.",
-        500: "Anthropic's service is busy or having a problem. Try again later.",
-        529: "Anthropic's service is busy or having a problem. Try again later.",
     }
     return messages.get(status, "The call to the model failed.")
 
