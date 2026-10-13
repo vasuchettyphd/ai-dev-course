@@ -63,6 +63,12 @@ The deal screener gets an injection test set and one defence (tag `week-13`). Th
 
 ---
 
+## Amendment (2026-10-13, during execution)
+
+Task 2's defence changed from XML tags to **JSON encoding**, following Anthropic's "Mitigate jailbreaks and prompt injections" page (<https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks>): "JSON-encode untrusted content", so "an attacker cannot close a quote or tag to "break out" into an instruction context." `extract.encode_listing(text)` returns `json.dumps({"listing": text}, ensure_ascii=False)`; the system prompt's added sentence says the listing comes as a JSON object of untrusted text, to be treated as data. The tag version was built and run first; its runs stay in the history and the example README as a first attempt.
+
+---
+
 ### Task 1: Fact sheet
 
 **Files:** none in the repo. Write the report only (in the SDD workspace).
