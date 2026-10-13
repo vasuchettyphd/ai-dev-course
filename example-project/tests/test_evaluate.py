@@ -298,6 +298,7 @@ class MainTest(unittest.TestCase):
     def test_the_default_runs_the_15_dev_cases(self):
         self.assertEqual(self.run_main([]), 0)
         self.assertEqual(len(self.client.calls), 15)
+        self.assertIn(f"Running the 15 dev cases with {extract.MODEL}.", self.lines)
         case_lines = [line for line in self.lines if line.startswith("case-")]
         self.assertEqual(len(case_lines), 15)
         self.assertNotIn("case-03", " ".join(case_lines))
@@ -313,6 +314,7 @@ class MainTest(unittest.TestCase):
     def test_all_runs_20(self):
         self.assertEqual(self.run_main(["--all"]), 0)
         self.assertEqual(len(self.client.calls), 20)
+        self.assertIn(f"Running all 20 cases with {extract.MODEL}.", self.lines)
 
     def test_score_cost_and_saved_lines(self):
         self.assertEqual(self.run_main(["--all"]), 0)

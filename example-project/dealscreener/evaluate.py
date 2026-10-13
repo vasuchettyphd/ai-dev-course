@@ -260,7 +260,8 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
         cases = [case for case in cases if not case["held_out"]]
     elif which == "held-out":
         cases = [case for case in cases if case["held_out"]]
-    print_fn(f"Running {len(cases)} {which} cases with {extract.MODEL}.")
+    group = f"all {len(cases)}" if which == "all" else f"the {len(cases)} {which}"
+    print_fn(f"Running {group} cases with {extract.MODEL}.")
     results = run_cases(cases, lambda text: extract.extract_listing(text, client), print_fn)
     summary = summarise(results)
     print_fn(score_line(summary))
