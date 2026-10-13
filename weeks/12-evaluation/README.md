@@ -2,7 +2,7 @@
 
 **Goal:** find out how well your AI feature really works, with evidence instead of impressions. You'll read how the course measured another model (Jev), watch the deal screener's listing step get scored on 20 test cases, build your own 20-case test set with the right answers written first, write a script that scores your feature, and report what the score does and doesn't tell you, merged through a pull request.
 
-**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 to 60 calls in all, from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
+**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 calls in all (an estimate: three dev runs and one held-out run), from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
 
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
@@ -87,7 +87,7 @@ git pull
 python3 -m dealscreener.evaluate
 ```
 
-It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`, or the fields it missed), then the score and the cost, and saves the results in `evals/results/`. `--held-out` runs the 5 held-out cases and first reminds you to run them only once; `--all` runs all 20. To run it in Docker instead, use the command in the [example README's evaluation section](../../example-project/README.md) (it needs the `--user` and `-v` parts to save results).
+It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`, or the fields it missed), then the score and the cost, and saves the results in `evals/results/`. `--held-out` runs the 5 held-out cases and first reminds you to run them only once; `--all` runs all 20. To run it in Docker instead, use the command in the [example README's evaluation section](../../example-project/README.md#how-to-evaluate-the-listing-step) (it needs the `--user` and `-v` parts to save results).
 
 **b. The course's results** (13 October 2026, Claude Haiku 5.5):
 
