@@ -34,12 +34,12 @@ Each week's finished state is marked with a **git tag** named after the week: `w
 
 Everything from week 9 (listed below), plus:
 
-- `notes/`: eight short investor notes, each marked "Fictional notes written for this course example; no real people or addresses." They cover the Riverside association dues, the university district, a rule of thumb for the repairs reserve, the write-up of listing B, a lender's notes on down payments, property tax after a sale, an insurance quote, and one note with nothing about money (how a contractor likes to be called), which should never match a money question. The Riverside note says "association dues" and never "HOA", so asking about HOA fees shows that the search goes by meaning, not by the same words. `listing-b-write-up.md` is longer than one chunk (800 characters), so it is split into two parts.
+- `notes/`: eight short investor notes, each marked "Fictional notes written for this course example; no real people or addresses." They cover the Riverside association dues, the university district, a rule of thumb for the repairs reserve, the write-up of listing B, a lender's notes on down payments, property tax after a sale, an insurance quote, and one note with nothing about money (how a contractor likes to be called), there to show that a note unrelated to a money question should score low against it. The Riverside note says "association dues" and never "HOA", so asking about HOA fees shows that the search goes by meaning, not by the same words. `listing-b-write-up.md` is longer than one chunk (800 characters), so it is split into two parts.
 - `dealscreener/notes.py`: the notes command, `python3 -m dealscreener.notes`.
   - `index` reads every `.md` and `.txt` file in `notes/`, cuts each into chunks of at most 800 characters (whole paragraphs where it can), and asks Google's embedding model for one embedding per chunk: a list of 768 numbers that stands for the chunk's meaning. It saves the chunks, their embeddings and a fingerprint of each file in `notes-index.json`.
   - `ask "your question"` gets an embedding for the question, compares it with every chunk's embedding (cosine similarity), prints the three best matches with their scores, and sends just those three chunks and the question to Claude Haiku 5.5. The instructions tell Claude to answer only from those notes, to list the file names it used after the word `Sources:`, and to reply exactly `My notes don't say.` when the notes don't answer the question. It prints the answer and what the Claude call cost.
   - If you add, change or delete a note after indexing, `ask` stops and tells you to run `index` again, so answers never come from old notes. If the Claude call fails (for example, no Anthropic key), `ask` still prints the matching notes themselves. Each kind of failed Google call (no key, a key that isn't accepted, too many requests, no internet) becomes one plain sentence, and neither key is ever printed.
-- `tests/test_notes.py`: 33 tests for `notes.py`. A fake embedder stands in for Google: it counts words for a few ideas, so "association dues" and "HOA" count as the same idea, and a fake client stands in for Claude. They run with plain `python3`, no keys, no internet and no packages. They cover chunking, reading the notes folder (including a file that isn't text), search by meaning, sending the notes in batches, spotting changed notes, the answer instructions, a cut-off answer and a refusal, every error sentence (with a key hidden in the error, which must never show), and the command itself.
+- `tests/test_notes.py`: 37 tests for `notes.py`. A fake embedder stands in for Google: it counts words for a few ideas, so "association dues" and "HOA" count as the same idea, and a fake client stands in for Claude. They run with plain `python3`, no keys, no internet and no packages. They cover chunking, reading the notes folder (including a file that isn't text), search by meaning, sending the notes in batches, spotting changed notes, the answer instructions, a cut-off answer and a refusal, every error sentence (with a key hidden in the error, which must never show), and the command itself.
 - `tests/test_notes_live.py`: one real run, skipped unless you ask for it (see [How to ask your notes](#how-to-ask-your-notes)).
 - `requirements.txt`: adds `google-genai`, Google's official library, pinned to the version the course tested (2.30.0).
 - `.env.example`: adds a `GEMINI_API_KEY` line.
@@ -231,7 +231,7 @@ These ran on 12 October 2026. The same listing can use a different number of out
 
 From week 10 you can ask questions of your own investor notes in plain English. The notes are the files in `notes/`. You build an index once, then ask as many questions as you like.
 
-**How it finds the right notes.** An embedding is a list of numbers that stands for the meaning of a piece of text: two texts about the same idea get lists that point in nearly the same direction, even when they use different words. The program compares them with cosine similarity, a score from -1 to 1 where higher means closer in meaning. Google's [embeddings page](https://ai.google.dev/gemini-api/docs/embeddings) (read 2026-10-13) puts it this way: "Cosine similarity is a good distance metric because it focuses on direction rather than magnitude." The program uses `gemini-embedding-001`, which Google supports until 14 May 2028 ([deprecations page](https://ai.google.dev/gemini-api/docs/deprecations)). Google's newer model, `gemini-embedding-2`, also reads images, audio and PDFs, but it is called differently, so the course stays with 001 for now.
+**How it finds the right notes.** An embedding is a list of numbers that stands for the meaning of a piece of text: two texts about the same idea get lists that point in nearly the same direction, even when they use different words. The program compares them with cosine similarity, a score from -1 to 1 where higher means closer in meaning. Google's [embeddings page](https://ai.google.dev/gemini-api/docs/embeddings) (read 2026-10-13) puts it this way: "Cosine similarity is a good distance metric because it focuses on direction rather than magnitude." The program uses `gemini-embedding-001`, which Google supports until 14 May 2028 ([deprecations page](https://ai.google.dev/gemini-api/docs/deprecations)). Google's newer model, `gemini-embedding-2`, also takes images, video, audio and PDFs ([its model page](https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2), read 2026-10-13), but it is called differently, so the course stays with 001 for now.
 
 **What it costs.**
 
@@ -248,7 +248,7 @@ On the paid tier Google says it doesn't use your prompts or responses to improve
 
 You need two keys now: the Anthropic key from week 9 and a Google key. The [week 10 page](../weeks/10-embeddings-and-rag/README.md) (published with this week) walks through getting the Google key; in short:
 
-- **Google key:** sign in to Google AI Studio and create an API key, as Google's [API key page](https://ai.google.dev/gemini-api/docs/api-key) describes (read 2026-10-13). You must be 18 or older. A school Google account works only if your school hasn't turned AI Studio off (check with your instructor); a personal Google account is the fallback. Restrict the key to the Gemini API in AI Studio.
+- **Google key:** sign in to Google AI Studio and create an API key, as Google's [API key page](https://ai.google.dev/gemini-api/docs/api-key) describes (read 2026-10-13). You must be 18 or older. A school Google account works only if your school hasn't turned AI Studio off (check with your instructor); a personal Google account is the fallback. Google's API key page also says: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." Look at your key's settings in AI Studio for a restriction to the Gemini API (the exact screens are being tested).
 - **Safety:** both keys go only in `.env`, typed with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a pull request. If a key is ever shared by mistake, delete it first (in AI Studio for the Google key, in the Anthropic Console for the other), then make a new one.
 
 **1. Add the Google key to `.env`, with a text editor.** If you made `.env` in week 9, open it in a text editor (not in Claude Code) and add a new line `GEMINI_API_KEY=` followed by your key, with no quote marks. If you don't have a `.env` yet, copy `.env.example` first (`cp .env.example .env`, in the Terminal on a Mac or the Ubuntu window on Windows), then replace each `put-your-key-here`. Use the name `GEMINI_API_KEY` only: don't also set `GOOGLE_API_KEY`, which Google's library would read in its place. Then check git still ignores `.env`.
@@ -306,23 +306,34 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 
 ```
 set -a; . ./.env; set +a
-RUN_LIVE_TESTS=1 python -m unittest tests.test_notes_live -v
+RUN_LIVE_TESTS=1 python3 -m unittest tests.test_notes_live -v
 ```
 
-**6. With Docker.** Build the image again (`docker build -t dealscreener .`, as in [How to run with Docker](#how-to-run-with-docker)). The image never holds your keys or the index: `.dockerignore` leaves out `.env` and `notes-index.json`. So each command below hands the container this folder and your keys while it runs.
+The first line copies both keys from `.env` into this window, without showing them, so the test can use them: `set -a` marks every setting read next for passing on to programs, `. ./.env` reads the file, and `set +a` turns the marking off again. The keys stay in this window only until you close it.
+
+**6. With Docker.** Build the image again (`docker build -t dealscreener .`, as in [How to run with Docker](#how-to-run-with-docker)). The image never holds your keys or the index: `.dockerignore` leaves out `.env` and `notes-index.json`. So each command below hands the container your keys, your notes folder and the index file while it runs. First make an empty index file, once, so Docker has a file to connect (without it, Docker would make a folder of that name instead).
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
 ```
-docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD:/app" dealscreener python -m dealscreener.notes index
-docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD:/app" dealscreener python -m dealscreener.notes ask "What are the association dues like in Riverside?"
+touch notes-index.json
+```
+
+Then build the index and ask a question.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/notes:/app/notes:ro" -v "$PWD/notes-index.json:/app/notes-index.json" dealscreener python -m dealscreener.notes index
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/notes:/app/notes:ro" -v "$PWD/notes-index.json:/app/notes-index.json" dealscreener python -m dealscreener.notes ask "What are the association dues like in Riverside?"
 ```
 
 - `--env-file .env` hands both keys to this one container while it runs.
-- `-v "$PWD:/app"` lets the container use this folder (`$PWD` means "the folder you're in") in place of the copy inside the image, so it reads your current notes and saves `notes-index.json` here, next to them. Without it, `index` can't save the file: the program runs as the `nobody` user, which can't write inside the image, and it says `Couldn't save the index file notes-index.json.`
-- `--user "$(id -u):$(id -g)"` runs the program as you, so the saved index belongs to you, not to another user.
+- `-v "$PWD/notes:/app/notes:ro"` lets the container read your current `notes` folder in place of the copy inside the image (`$PWD` means "the folder you're in"; `:ro` means read only, so the container can't change your notes). Nothing else from this folder goes in.
+- `-v "$PWD/notes-index.json:/app/notes-index.json"` connects that one file, so `index` saves the index into your folder and `ask` reads it from there. Without it, `index` can't save: the program runs as the `nobody` user, which can't write inside the image, and it says `Couldn't save the index file notes-index.json.`
+- `--user "$(id -u):$(id -g)"` runs the program as you, so it is allowed to write to your index file.
 
-The course checked these commands in the container with a made-up key (the index was saved to the folder and belonged to the right user; the made-up key was refused with the plain sentence); the run with real keys is being tested.
+The course checked both commands in the container with a made-up key: the folders connected, the made-up key was refused with the plain sentence, and a stand-in index was saved to the file and read back. The `--user` part was checked on Windows (WSL) only and is being tested on a Mac; the run with real keys is being tested too.
 
 ### Notes cost record
 

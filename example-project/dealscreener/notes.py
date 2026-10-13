@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
 from dataclasses import dataclass
 
@@ -79,7 +80,8 @@ def chunk_text(text: str, source: str, max_chars: int = CHUNK_CHARS) -> list[Chu
     """Cut one note into chunks of at most max_chars characters, keeping paragraphs whole
     where it can."""
     pieces = []
-    for paragraph in text.split("\n\n"):
+    text = text.replace("\r\n", "\n").replace("\r", "\n")  # Windows line endings
+    for paragraph in re.split(r"\n(?:[ \t]*\n)+", text):  # one or more blank lines
         paragraph = paragraph.strip()
         while len(paragraph) > max_chars:  # too long on its own: cut at the last space
             cut = paragraph.rfind(" ", 0, max_chars + 1)
@@ -109,7 +111,7 @@ def load_notes(folder: str = NOTES_DIR) -> tuple[list[Chunk], dict, list[str]]:
     chunks, fingerprints, skipped = [], {}, []
     for name in sorted(os.listdir(folder)):
         path = os.path.join(folder, name)
-        if not name.endswith((".md", ".txt")) or not os.path.isfile(path):
+        if not name.lower().endswith((".md", ".txt")) or not os.path.isfile(path):
             continue
         with open(path, "rb") as note_file:
             data = note_file.read()
@@ -197,8 +199,11 @@ def load_index(path: str = INDEX_FILE) -> dict:
 
 def check_fresh(index: dict, folder) -> None:
     """Stop if a note was added, edited or deleted since the index was built."""
+    if index.get("model") != EMBED_MODEL or index.get("dimensions") != EMBED_DIMENSIONS \
+            or not isinstance(index.get("fingerprints"), dict):
+        raise NotesError(f"The index was built differently from what this program uses. {RUN_INDEX}")
     _, fingerprints, _ = load_notes(folder)
-    if fingerprints != index.get("fingerprints"):
+    if fingerprints != index["fingerprints"]:
         raise NotesError(f"Your notes changed since the index was built. {RUN_INDEX}")
 
 
@@ -245,12 +250,37 @@ def make_embed_client():
     return genai.Client(api_key=key)
 
 
+def http_status(error):
+    """The HTTP status a failed Google call carries in .code (google-genai's errors keep it
+    there), or None if there isn't one."""
+    code = getattr(error, "code", None)
+    if isinstance(code, int) and not isinstance(code, bool) and 100 <= code <= 599:
+        return code
+    return None
+
+
+def is_connection_error(error) -> bool:
+    """True for a call that never reached Google: no internet, or no answer in time.
+    The library's own connection errors are named like ConnectError or ReadTimeout."""
+    name = type(error).__name__
+    return isinstance(error, (OSError, ConnectionError, TimeoutError)) or \
+        "Connect" in name or "Timeout" in name
+
+
+def is_google_failure(error) -> bool:
+    """A failed Google call (an HTTP error or a connection problem), as opposed to a
+    mistake in this program, which should show up as one."""
+    return http_status(error) is not None or is_connection_error(error)
+
+
 def describe_google_error(error) -> str:
     """One plain sentence for a failed Google call. Fixed sentences only: never the error's
     own text, which could hold details we don't want on screen."""
-    code = getattr(error, "code", None)  # google-genai's errors keep the HTTP status in .code
-    if not isinstance(code, int) or isinstance(code, bool):
-        return "Couldn't reach Google. Check your internet connection."
+    code = http_status(error)
+    if code is None:
+        if is_connection_error(error):
+            return "Couldn't reach Google. Check your internet connection."
+        return "The call to Google failed."
     # A wrong key comes back as 400 with "API key not valid" (seen on 13 October 2026).
     if code in (401, 403) or (code == 400 and "api key not valid" in str(error).lower()):
         return ("The Google API key was not accepted, or isn't allowed to do that. "
@@ -291,6 +321,8 @@ def run_index(print_fn, embed_factory) -> int:
         print_fn(str(problem))
         return 1
     except Exception as error:  # a failed Google call: a plain sentence, never the key
+        if not is_google_failure(error):
+            raise  # a mistake in this program: show it, don't blame Google
         print_fn(describe_google_error(error))
         return 1
     note_count = len({chunk.source for chunk in chunks})
@@ -307,6 +339,8 @@ def run_ask(question, print_fn, embed_factory, claude_factory) -> int:
         print_fn(str(problem))
         return 1
     except Exception as error:
+        if not is_google_failure(error):
+            raise
         print_fn(describe_google_error(error))
         return 1
     matches = top_chunks(question_vector, index)

@@ -35,7 +35,10 @@ class FakeEmbedClient:
         self.calls.append({"model": model, "contents": list(contents), "config": config})
         if self.error:
             raise self.error
-        return SimpleNamespace(embeddings=[SimpleNamespace(values=fake_vector(t)) for t in contents])
+        # Like Google, give vectors of the size asked for: the concept counts, then zeros.
+        size = config["output_dimensionality"]
+        return SimpleNamespace(embeddings=[
+            SimpleNamespace(values=(fake_vector(t) + [0.0] * size)[:size]) for t in contents])
 
 
 class FakeGoogleError(Exception):
@@ -44,6 +47,14 @@ class FakeGoogleError(Exception):
     def __init__(self, code, message="error"):
         super().__init__(message)
         self.code = code
+
+
+class ConnectError(Exception):
+    """Named like the connection errors of httpx, the library google-genai uses."""
+
+
+class ReadTimeout(Exception):
+    """Named like httpx's error when Google doesn't answer in time."""
 
 
 def answer_reply(text="Dues are $240 a month.\n\nSources: riverside-association-dues.md",
@@ -86,6 +97,11 @@ class ChunkTextTest(unittest.TestCase):
         self.assertEqual(second[0].number, 1)
         self.assertEqual({c.source for c in second}, {"b.md"})
 
+    def test_windows_line_endings_and_extra_blank_lines_still_split_paragraphs(self):
+        text = "a" * 30 + "\r\n\r\n" + "b" * 30 + "\n\n\n \n" + "c" * 30
+        chunks = notes.chunk_text(text, "n.md", max_chars=40)
+        self.assertEqual([c.text for c in chunks], ["a" * 30, "b" * 30, "c" * 30])
+
     def test_whitespace_only_text_gives_no_chunks(self):
         self.assertEqual(notes.chunk_text("  \n\n \t\n", "a.md"), [])
 
@@ -108,6 +124,14 @@ class LoadNotesTest(unittest.TestCase):
         self.assertEqual(set(fingerprints), {"a.md", "b.txt", "empty.md"})
         self.assertTrue(all(len(v) == 64 for v in fingerprints.values()))
         self.assertEqual(skipped, [])
+
+    def test_capital_letter_endings_are_read_too(self):
+        with tempfile.TemporaryDirectory() as folder:
+            write(folder, "A.MD", "Capital md.")
+            write(folder, "B.TXT", "Capital txt.")
+            chunks, fingerprints, _ = notes.load_notes(folder)
+        self.assertEqual([c.source for c in chunks], ["A.MD", "B.TXT"])
+        self.assertEqual(set(fingerprints), {"A.MD", "B.TXT"})
 
     def test_non_utf8_file_is_skipped_with_a_message(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -166,6 +190,7 @@ class EmbedTextsTest(unittest.TestCase):
         self.assertEqual([len(c["contents"]) for c in client.calls], [10, 10, 5])
         self.assertEqual([t for c in client.calls for t in c["contents"]], texts)
         self.assertEqual(len(vectors), 25)
+        self.assertEqual({len(v) for v in vectors}, {notes.EMBED_DIMENSIONS})
         for text, vector in zip(texts, vectors):
             expected = fake_vector(text)
             length = math.sqrt(sum(x * x for x in expected))
@@ -203,7 +228,7 @@ class IndexTest(unittest.TestCase):
             loaded = notes.load_index(path)
         self.assertEqual(loaded, index)
         self.assertEqual(loaded["model"], notes.EMBED_MODEL)
-        self.assertEqual(loaded["dimensions"], len(CONCEPTS))
+        self.assertEqual(loaded["dimensions"], notes.EMBED_DIMENSIONS)
         self.assertEqual(set(loaded["fingerprints"]), {"dues.md", "calls.md"})
         self.assertEqual([(c["source"], c["number"]) for c in loaded["chunks"]],
                          [("calls.md", 1), ("dues.md", 1)])
@@ -236,6 +261,18 @@ class IndexTest(unittest.TestCase):
                 with self.assertRaises(notes.NotesError) as caught:
                     notes.check_fresh(index, folder)
                 self.assertEqual(str(caught.exception), stale)
+
+    def test_index_from_another_model_size_or_shape_is_refused(self):
+        with tempfile.TemporaryDirectory() as folder:
+            write(folder, "a.md", "First note.")
+            index = notes.build_index(folder, FakeEmbedClient())
+            broken = [dict(index, model="another-model"), dict(index, dimensions=3072),
+                      {key: value for key, value in index.items() if key != "fingerprints"},
+                      {"chunks": index["chunks"]}]
+            for bad in broken:
+                with self.subTest(keys=sorted(bad)), self.assertRaises(notes.NotesError) as caught:
+                    notes.check_fresh(bad, folder)
+                self.assertTrue(str(caught.exception).endswith("Run: python3 -m dealscreener.notes index"))
 
     def test_missing_index_says_run_index(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -331,7 +368,13 @@ class KeysAndErrorsTest(unittest.TestCase):
             (FakeGoogleError(429, key), "Too many requests for the free tier right now. Wait a minute and try again."),
             (FakeGoogleError(500, key), "Google's service is busy or having a problem. Try again later."),
             (FakeGoogleError(503, key), "Google's service is busy or having a problem. Try again later."),
+            (FakeGoogleError(418, key), "The call to Google failed."),
             (OSError(f"connection failed {key}"), "Couldn't reach Google. Check your internet connection."),
+            (ConnectError(f"no route {key}"), "Couldn't reach Google. Check your internet connection."),
+            (ReadTimeout(f"slow {key}"), "Couldn't reach Google. Check your internet connection."),
+            (FakeGoogleError("UNAVAILABLE", key), "The call to Google failed."),
+            (FakeGoogleError(7, key), "The call to Google failed."),
+            (ValueError(key), "The call to Google failed."),
         ]
         for error, sentence in cases:
             with self.subTest(error=repr(error)):
@@ -451,6 +494,14 @@ class MainTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(output, "Too many requests for the free tier right now. Wait a minute and try again.")
         self.assertFalse(os.path.exists(self.index_file))
+
+    def test_a_mistake_in_the_program_is_not_blamed_on_google(self):
+        broken = FakeEmbedClient(error=ValueError("a bug in our own code"))
+        with self.assertRaises(ValueError):
+            self.run_main(["index"], embed_factory=lambda: broken)
+        offline = FakeEmbedClient(error=ConnectError("no network"))
+        code, output = self.run_main(["index"], embed_factory=lambda: offline)
+        self.assertEqual((code, output), (1, "Couldn't reach Google. Check your internet connection."))
 
     def test_main_usage_errors_return_2(self):
         for argv in ([], ["ask"], ["ask", "   "], ["search", "dues"]):
