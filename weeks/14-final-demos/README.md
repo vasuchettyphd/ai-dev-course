@@ -113,7 +113,7 @@ If that isn't possible in time, you'll load the key once with `set -a; . ./.env;
 Read example-project/DEMO.md in the course repo at ~/ai-dev-course as a model. Then write DEMO.md for my project in the same shape: a table with the columns Time, Show, Command and where to type it, Say, and If it fails, ending at 3:00 or less; then "Before you start", "If it fails" and "What to cut first if you're over time". Use only commands from my README. Show my AI feature working once, and one honest limit. No command may print a key or .env. Don't run anything that calls a real model. Then commit DEMO.md.
 ```
 
-**b. Rehearse twice with a timer,** in a window with no key loaded, running the real commands. Change `DEMO.md` until it fits in 3 minutes. Cut the thing `DEMO.md` says to cut first, not the honest limit.
+**b. Rehearse twice with a timer,** in a window set up as on the day (step 6), running the real commands. Change `DEMO.md` until it fits in 3 minutes. Cut the thing `DEMO.md` says to cut first, not the honest limit.
 
 **c. Rehearse the fallback once.** Pretend the network failed at your AI step: switch to your offline tests and your results files, and say what the live run would have shown.
 
@@ -135,7 +135,7 @@ Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. 
 
 ### 6. On the day
 
-- **Before your turn:** open one terminal window with **no key loaded** (if your program can't read `.env` itself, load the key with `set -a; . ./.env; set +a` now, before you share your screen, and skip the check) (`[ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
+- **Before your turn:** open one terminal window with **no key loaded** (`[ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. If your program can't read `.env` itself (step 2d), load the key once with `set -a; . ./.env; set +a` in that window now, before you share your screen. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
 - **During:** follow `DEMO.md`. If a step fails, say so in one sentence and switch to the fallback. Don't debug in front of the room.
 - **If a key ever shows on screen:** it's leaked. Pause and delete it in the Console first (week 9 step 2f; for a Google key, week 10 step 2e): it takes about 30 seconds. Then carry on with the fallback (the live steps won't work until you make a new key), and tell your instructor afterwards.
 

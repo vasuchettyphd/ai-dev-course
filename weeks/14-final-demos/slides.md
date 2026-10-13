@@ -145,7 +145,7 @@ Say less, don't talk faster.
 
 ## On the day
 
-- A window with **no key loaded**
+- A window with **no key loaded** (or loaded once, before sharing)
 - Large text; notifications off; other tabs closed
 - `DEMO.md` on paper or your phone, not on screen
 - A step fails: one sentence, then the fallback
