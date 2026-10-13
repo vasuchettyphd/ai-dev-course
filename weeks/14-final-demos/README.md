@@ -24,7 +24,7 @@ As in weeks 9 to 13: plain-English prompts, plain **Yes** for git, a branch firs
 
 **The demo rules, new this week:**
 
-1. **No key ever on screen.** Demo from a window where no key is loaded, with programs that read `.env` themselves. Never run `cat .env`, `env` or `printenv` while sharing your screen.
+1. **No key ever on screen.** Demo from a window where no key is loaded, with programs that read `.env` themselves (if yours can't yet, see step 2d). Never run `cat .env`, `env` or `printenv` while sharing your screen.
 2. **Every number is real.** Your write-up only uses numbers that are in a file in your repo, and links to that file.
 3. **Show one honest limit.** Every project has one. Saying it is worth points.
 4. **Have a fallback.** If the network or the model fails in the room, you switch to your offline tests and your committed results files.

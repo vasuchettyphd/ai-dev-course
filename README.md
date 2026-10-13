@@ -14,7 +14,7 @@ Each week lives in its own folder. Follow that week's README from inside the fol
 ## Costs
 
 - **Claude Pro, about $20/month**, for Claude Code. Week 2 walks you through signing up.
-- **About $5 of one-time API credit**, used in weeks 9-11 when your own code calls a model. Claude Pro doesn't cover this.
+- **About $5 of one-time API credit**, used in weeks 9-14 when your own code calls a model (each call costs a fraction of a cent). Claude Pro doesn't cover this.
 
 Some advanced topics need their own API key and credit, beyond the costs above; the table under Advanced topics says which. Keep API keys in a `.env` file: the course's `.gitignore` keeps `.env` files out of commits.
 

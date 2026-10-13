@@ -12,7 +12,7 @@ Follow the [week 14 README](README.md) on your own laptop, in your private `seme
 2. `REVIEW.md` has a Decision and a Reason for every finding.
 3. Your week 12 evaluation results and week 13 injection results are committed.
 4. No key anywhere in the history.
-5. The README says exactly how to run it, and `docker build` builds it and runs the tests.
+5. The README says exactly how to run it, and Docker builds it and runs the tests in the container (week 7 step 4c).
 
 **(c) Your write-up.** `FINAL.md` on `main`, about two pages, under these seven headings:
 
