@@ -134,7 +134,7 @@ From week 9 the program can read a pasted listing for you. It sends the text to 
 
 You need three things: an API key with credit on it, a `.env` file holding the key, and the `anthropic` package. The [week 9 page](../weeks/09-calling-a-model/README.md) (published with this week) walks through each step; in short:
 
-- **Key:** in the Anthropic Console, go to Settings > API keys (https://platform.claude.com/settings/keys) and click **Create key**. The Console shows the key, which starts with `sk-ant-`, only once, so put it straight into `.env` (step 1 below).
+- **Key:** in the Anthropic Console, go to Settings > API keys (https://platform.claude.com/settings/keys) and click **Create key**. Choose a **workspace** for it (a key not tied to a workspace was refused with "This API key is not scoped to a workspace"). The Console shows the key, which starts with `sk-ant-`, only once, so put it straight into `.env` (step 1 below).
 - **Spend limit, before your first call:** in Settings > Billing (https://platform.claude.com/settings/billing), set a monthly spend limit in the "Spend limits" section, so a mistake can't cost more than you chose.
 - **Safety:** the key goes only in `.env`, typed with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a pull request.
 

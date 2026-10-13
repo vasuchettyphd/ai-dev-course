@@ -15,7 +15,7 @@ AI Development Course
 
 Your program asks a model, and you keep the key safe
 
-<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container) real calls to claude-haiku-5-5 and the deal screener's 92 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). The Console, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container), real calls to claude-haiku-5-5, and the deal screener's 92 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). The Console, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
 
 ---
 
@@ -81,7 +81,7 @@ Every reply says exactly how many tokens it used.
 1. <https://platform.claude.com>: create an account
 2. **Settings > Billing**: buy the smallest amount of credit, auto-reload **off**
 3. **Settings > Billing > Spend limits**: set a small limit
-4. **Settings > API keys > Create key**: shown **once**, starts `sk-ant-`
+4. **Settings > API keys > Create key**: choose a **workspace**; shown **once**, starts `sk-ant-`
 5. `~/first-call/.env`, one line, no quote marks:
 
 ```text
@@ -180,6 +180,7 @@ schema = {
 
 message = client.messages.create(
     model="claude-haiku-5-5", max_tokens=1000,
+    system="Pull numbers out of real estate listings. Use null for any number the listing does not state.",
     messages=[{"role": "user", "content": "Cozy 3 bed, 2 bath bungalow, now $189,000."}],
     output_config={"format": {"type": "json_schema", "schema": schema}},
 )
@@ -242,7 +243,7 @@ Each one, then: "For now, type the numbers yourself." Never the key, never a tra
 ## Your feature
 
 1. Branch `ai-feature` first
-2. `git check-ignore .env` prints `.env`, **then** `cp ~/first-call/.env .`
+2. `git check-ignore .env` prints `.env`, **then** block Claude Code from reading it (`.claude/settings.json`: `"deny": ["Read(./.env)"]`), **then** `cp -n ~/first-call/.env .`
 3. Pick one small job: pull fields out of text, sort into categories, or a one-sentence summary
 4. `/superpowers:writing-plans` with the guardrails in the prompt, then `/superpowers:subagent-driven-development`
 5. **No** to reading `.env`, keys in files, tests that call the real API

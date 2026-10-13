@@ -44,7 +44,7 @@ What to answer this week:
 |---|---|
 | Create or edit your project's code and tests on your `ai-feature` branch | **Yes** |
 | Create `.env.example` (a sample file with a fake key in it) | **Yes** |
-| Read `.env`, print it, `cat .env`, or put your key in any file | **No**. Type: "Never read or print .env. Read the key from the environment." |
+| Put your key in any file, or show it on screen | **No**. Type: "Never read or print .env. Read the key from the environment." (Claude Code reads files in your project **without asking**, so step 5b adds a rule that blocks it from reading `.env` at all.) |
 | Write the key, or anything starting `sk-ant-`, into your code | **No** |
 | A test that calls the real API every time the tests run | **No**. Type: "Tests must use a fake model. Make the live test run only when I ask for it." |
 | `pip install` inside your project's `.venv`, or `npm install` for a Node.js project | **Yes**, after you check the package name is the official one (step 5) |
@@ -178,7 +178,7 @@ print(f"Cost: about ${cost:.6f}")
 EOF
 ```
 
-It's Anthropic's own first example (<https://platform.claude.com/docs/en/get-started>) with three changes: the cheaper `claude-haiku-5-5` model, a real-estate question, and the lines at the end that show the tokens and the cost. Notice what the program does **not** contain: your key. The package reads it from the environment, from a variable called `ANTHROPIC_API_KEY` (Anthropic: "The client SDK reads `ANTHROPIC_API_KEY` automatically").
+It's Anthropic's own first example (<https://platform.claude.com/docs/en/get-started>) with four changes: the cheaper `claude-haiku-5-5` model, a real-estate question, a loop that prints only the text blocks, and the lines at the end that show the tokens and the cost. Notice what the program does **not** contain: your key. The package reads it from the environment, from a variable called `ANTHROPIC_API_KEY` (Anthropic: "The client SDK reads `ANTHROPIC_API_KEY` automatically").
 
 Why the `for block in message.content` loop? A reply is a list of **blocks**. Haiku 5.5 sometimes "thinks" first, and its thinking comes back as a block of its own before the answer, so the program picks out the `text` blocks instead of assuming the first block is the answer. Anthropic: "Select content blocks by their `type` field rather than by position."
 
@@ -297,7 +297,20 @@ cd ~/semester-project
 git check-ignore .env
 ```
 
-It should print `.env`. If it prints nothing, **stop**: in Claude Code, type "Add .env and .venv to .gitignore and commit only .gitignore on this branch.", plain **Yes**, and run `git check-ignore .env` again until it prints `.env`. Only then copy the key file from step 2, without opening it:
+It should print `.env`. If it prints nothing, **stop**: in Claude Code, type "Add .env and .venv to .gitignore and commit only .gitignore on this branch.", plain **Yes**, and run `git check-ignore .env` again until it prints `.env`. Next, stop Claude Code from ever reading `.env`. Claude Code reads files in your project, and runs commands like `cat`, **without asking you** (Claude Code's permissions page lists file reads as needing no approval in your working directory), so answering No isn't enough. A **deny rule** blocks it: "To block Claude's file tools from reading a file or directory, add a `Read` deny rule for its path, such as `Read(./.env)`" (<https://code.claude.com/docs/en/permissions>). In Claude Code:
+
+```text
+Create the file .claude/settings.json with exactly this content, keeping any settings already in it, then commit only that file on this branch with the message "Block Claude Code from reading .env":
+{
+  "permissions": {
+    "deny": ["Read(./.env)"]
+  }
+}
+```
+
+Plain **Yes**. Then type `/exit` and start `claude` again, so the rule is loaded. Check it: ask "Show me what is in .env." Claude Code should say it can't (being tested; if it shows anything, stop and go to step 2f). The rule also covers commands like `cat .env`, but not a program that opens the file by itself, so never ask Claude to run code that prints the environment.
+
+Only then copy the key file from step 2, without opening it:
 
 ```bash
 cp -n ~/first-call/.env ~/semester-project/.env
@@ -317,7 +330,7 @@ Pick the one that fits your project, and keep it to one call.
 **d. Plan and build it with Superpowers, with the guardrails in the prompt.** In Claude Code (replace the part in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Anthropic's official package for this project's language, pinned to an exact version, with the model claude-haiku-5-5 and structured output (output_config with a JSON schema) if the answer must be read by the program. Rules: read the key only from the ANTHROPIC_API_KEY environment variable, loaded from .env, and never read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; check stop_reason and check every value the model returns before using it; print the input tokens, output tokens and cost of each call; tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Anthropic's official package for this project's language, pinned to an exact version, with the model claude-haiku-5-5 and structured output (output_config with a JSON schema) if the answer must be read by the program. Rules: the program reads the key only from the ANTHROPIC_API_KEY environment variable (it may load .env into the environment when it starts), and you, Claude, must never open, read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; check stop_reason and check every value the model returns before using it; print the input tokens, output tokens and cost of each call; tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
 ```
 
 Then build it as in [week 5 step 5](../05-building-with-ai/README.md#5-build-with-subagent-driven-development):
@@ -328,14 +341,14 @@ Then build it as in [week 5 step 5](../05-building-with-ai/README.md#5-build-wit
 
 Answer as in the table at the top. Watch especially for:
 
-- **No** to anything that reads or prints `.env`. Type: "Never read or print .env. Read the key from the environment."
+- **No** to anything that prints `.env` or the key, or runs code that prints the environment. Type: "Never read or print .env. Read the key from the environment." (The deny rule from step 5b blocks Claude's own reads.)
 - **No** to a key, or anything starting `sk-ant-`, in a file. `.env.example` may only hold a fake one like `put-your-key-here`.
 - **No** to a test that calls the real API whenever the tests run.
 - For a package install: Python's official package is `anthropic`; for a Node.js project it's `@anthropic-ai/sdk` (Anthropic's other official packages are listed at <https://platform.claude.com/docs/en/cli-sdks-libraries/overview>). Any other name: ask "Is this Anthropic's official package?" before answering Yes.
 
-**e. Try it.** When the build is done, in a **second** terminal window (not the one running Claude Code), in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key. Your program may read `.env` by itself, so move the file out of the folder for a moment: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, `mv .env ~/semester-project-key.env`, run your program again, then put the file back with `mv ~/semester-project-key.env .env`, even if the run went wrong, and check `ls -a` shows `.env` again. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
+**e. Try it.** When the build is done, in a **second** terminal window (not the one running Claude Code), in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key. Your program may read `.env` by itself, so move the file out of the folder for a moment: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, activate the `.venv` again if it has one (`source .venv/bin/activate`), `mv .env ~/semester-project-key.env`, run your program again, then put the file back with `mv ~/semester-project-key.env .env`, even if the run went wrong, and check `ls -a` shows `.env` again. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
 
-**f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass with no key loaded. Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
+**f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your key, run them once more yourself with `.env` moved out, as in step 5e (move it out, run the tests, move it back). Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
 
 **The deal screener's version** (run live on 12 October 2026). It got an optional "paste the listing" step: `python3 -m dealscreener --listing` asks you to paste a listing's text, sends it to `claude-haiku-5-5` with a schema for the five property numbers, then shows each number for you to confirm:
 
@@ -350,7 +363,7 @@ Press Enter to keep the number, or type the right one. Numbers the listing doesn
 **a. Review it with `safe-and-private`.** As in week 7 step 5, run only that reviewer, on what changed. In Claude Code:
 
 ```text
-Run the safe-and-private reviewer as a subagent on the files changed on this branch compared with main (git diff main --name-only), and on .gitignore, .dockerignore and the Dockerfile. Focus on: an API key or anything starting sk-ant- in any file; whether .env could be committed or copied into the Docker image; whether the key could ever be printed or logged, including in error messages; whether any test calls the real API by default. Do not read .env itself. Then add a section at the end of REVIEW.md, headed "## Week 9: AI feature review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings A1, A2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
+Run the safe-and-private reviewer as a subagent on the files changed on this branch compared with main (git diff main --name-only), and on .gitignore, .dockerignore and the Dockerfile. Focus on: an API key or anything starting sk-ant- in any file tracked by git (search with git grep only, never grep -r, and never open .env); whether .env could be committed or copied into the Docker image; whether the key could ever be printed or logged, including in error messages; whether any test calls the real API by default. Do not read .env itself. Then add a section at the end of REVIEW.md, headed "## Week 9: AI feature review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings A1, A2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
 ```
 
 **Yes** to editing `REVIEW.md` only. Triage the findings as in week 6 step 5 (every Must fix is `Fix`), fix them, and commit.
@@ -404,14 +417,14 @@ The deal screener's week 9 changes are on this page (it works once week 9 is pub
 | `python3 -m venv .venv` fails with "ensurepip is not available" (Ubuntu) | Step 3b: `sudo apt install python3-venv`, delete only the broken `.venv` folder with `rm -r .venv`, try again. |
 | `pip install anthropic==1.13.0` says no matching version, or it needs Python 3.10 | Your Python is too old: step 3a. |
 | `TypeError: ... unexpected keyword argument 'temperature'` | Current models and the package don't take `temperature`: remove that line (step 4a). |
-| `This API key is not scoped to a workspace` (error 400) | Your key belongs to the whole organization, not a workspace. Make a new key and choose a workspace when you create it (step 2d), put it in `.env`, and delete the old key. |
+| `This API key is not scoped to a workspace` (error 400), or "This API key isn't tied to a workspace" | Your key belongs to the whole organization, not a workspace. Make a new key and choose a workspace when you create it (step 2d), put it in `.env`, and delete the old key. |
 | Error 401 (`invalid x-api-key`), or "The API key was not accepted" | The key is wrong, expired, deleted, or has quote marks or spaces around it. Check `.env` is exactly `ANTHROPIC_API_KEY=sk-ant-...` on one line, or make a new key (step 2d). |
 | Error 403 | This key isn't allowed to do that. Make a new key linked to yourself (step 2d). |
 | Error 404 (`model: ...`), or "The model name wasn't found" | Check the model name exactly: `claude-haiku-5-5`. Names change: check the models page. |
 | Error 429, or "Too many requests" | You (or your whole class, on one network) sent too many calls too fast, or hit your plan's cap. Wait a minute and try again. If it continues, check the Console's **Rate limits** page. |
 | "You have reached your specified API usage limits", or "Your monthly spend limit has been reached" | Your spend limit worked. Raise it a little in **Settings > Billing**, or wait until it resets. |
 | Calls stop working and your credit balance is $0, or "Your API credit has run out" | Buy a little more credit (step 2b). |
-| Error 529, or "busy or having a problem" | Anthropic is overloaded. Wait a few minutes and try again. |
+| Error 529 or another 5xx, or "busy or having a problem" | Anthropic is overloaded or having a problem. Wait a few minutes and try again. |
 | `Stopped because: max_tokens`, and the answer is cut off or missing | Raise `max_tokens` (1000 is a good start), and make your program check `stop_reason`. |
 | The model's numbers or fields are wrong | That's why your program checks them and a person confirms what matters. Make the prompt and the schema's descriptions more specific, then try again. |
 | You pasted a key into Claude Code, a chat or a screenshot, or committed it | Step 2f, now: delete the key in the Console first, then make a new one. |
