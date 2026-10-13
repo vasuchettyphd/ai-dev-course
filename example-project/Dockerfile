@@ -6,8 +6,9 @@ FROM python:3.12-slim
 # Work in a folder called /app inside the container.
 WORKDIR /app
 
-# Copy the list of packages first, on its own, and install them. Week 9's listing step
-# needs one package (anthropic, the official library for calling Claude). Doing this before
+# Copy the list of packages first, on its own, and install them. The listing step (week 9)
+# and the notes command (week 10) need two packages: anthropic (for Claude) and google-genai
+# (for Google's embeddings). Doing this before
 # copying the code lets Docker reuse this slow step when only your code changes.
 # --no-cache-dir stops pip keeping its download files, so the image stays smaller.
 COPY requirements.txt .
