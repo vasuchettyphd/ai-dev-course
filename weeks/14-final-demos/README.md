@@ -33,6 +33,7 @@ As in weeks 9 to 13: plain-English prompts, plain **Yes** for git, a branch firs
 |---|---|
 | Check your project against the "ready on main" list and tell you what's missing | **Yes** |
 | Draft `DEMO.md` or `FINAL.md` from your repo | **Yes**, then edit them yourself |
+| Read files in `~/ai-dev-course` (the course's model `DEMO.md` and `FINAL.md`) | **Yes**: it only reads them |
 | Change code, tests or results files while checking or drafting | **No**: fix things yourself, one at a time, with your own prompt |
 | Read or print `.env`, or put a key in any file | **No** |
 | `git add`, `git commit`, `git push` on your `final` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
@@ -66,9 +67,9 @@ Plain **Yes** to each git command. Check: "What branch am I on?" says `final`.
 | Tests pass with `.env` moved out | weeks 9 to 13 | step 2c |
 | `REVIEW.md` is triaged: every finding has a Decision and a Reason | weeks 6, 7, 9 to 13 | open `REVIEW.md` |
 | Your week 12 evaluation results and week 13 injection results are committed | weeks 12, 13 | `ls` your results folder; open the files |
-| No key anywhere in the history | week 13 step 1 | `git log --all --oneline -- .env` prints nothing; `git log --all -S'sk-ant-' --oneline` and `git log --all -S'AIza' --oneline` show only fake values |
+| No key anywhere in the history | week 13 step 1 | `git log --all --oneline -- .env` prints nothing; `git log --all -S'sk-ant-' --oneline` and `git log --all -S'AIza' --oneline` list no commit that adds a real key (a fake value in `.env.example` or a test is fine: `git show --stat --format=%s <id>` shows which files) |
 | The README says how to run it, with exact commands | weeks 5 to 13 | read it as a stranger would |
-| Your repo is private, with your instructor as a collaborator | week 4 | on GitHub, **Settings > Collaborators** |
+| Your repo is private, with your instructor as a collaborator (not scored, but your instructor needs it to grade) | week 4 | on GitHub, **Settings > Collaborators** |
 | Docker builds and runs your tests | week 7 | `docker build -t semester-project .`, then run your tests in the container as in week 7 step 4c |
 
 In Claude Code:
@@ -85,7 +86,7 @@ Then do the key checks in the table yourself, in a second terminal window, in `~
 [ ! -e ~/env-aside ] && mv .env ~/env-aside && echo moved
 ```
 
-If it doesn't print `moved`, stop and ask your instructor. Run your tests the way your README says. Then:
+If it doesn't print `moved` (for example, it says `No such file`), stop and ask your instructor. Run your tests the way your README says. Then:
 
 ```bash
 [ ! -e .env ] && mv ~/env-aside .env && echo restored
@@ -113,7 +114,7 @@ Read example-project/DEMO.md in the course repo at ~/ai-dev-course as a model. T
 **a. Draft it.** In Claude Code:
 
 ```text
-Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. Then draft FINAL.md for my project, about two pages, under exactly these seven headings: What it does and who it's for; How it's built, and which parts are AI; What I measured; What went wrong and what I changed; Risks and responsible use; What AI did and what I decided; What I'd do next. Every number must come from a file in my repo and link to that file; if a number isn't in a file, leave it out and tell me. Use my week 13 answers on privacy, bias, licensing and academic integrity for "Risks and responsible use". Don't invent anything. Never read or print .env. Then commit FINAL.md.
+Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. Then draft FINAL.md for my project, about two pages, under exactly these seven headings: What it does and who it's for; How it's built, and which parts are AI; What I measured; What went wrong and what I changed; Risks and responsible use; What AI did and what I decided; What I'd do next. Every number must come from a file in my repo and link to that file; if a number isn't in a file, leave it out and tell me. For "Risks and responsible use", use my week 13 answers on privacy, bias, licensing and academic integrity, which I paste here: <paste your four answers>. Don't invent anything. Never read or print .env. Then commit FINAL.md.
 ```
 
 **b. Make it yours.** Read it all and rewrite anything that isn't true or isn't how you'd say it. Heading 6 matters most: say plainly what Claude Code wrote, what you decided (the plan, the tests, which review findings to fix, the expected answers), and what you'd do differently.
@@ -122,11 +123,11 @@ Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. 
 
 ### 5. Pull request and finish
 
-**Push, open a pull request, read Files changed** (your fixes, `DEMO.md`, `FINAL.md`; no `.env` and no real key: use the browser's Find for `sk-ant-`, `ANTHROPIC_API_KEY=`, `AIza` and `GEMINI_API_KEY=`; only a fake value, as in `.env.example`, is allowed), as in week 10 step 7. **Merge with "Create a merge commit"**, as in weeks 12 and 13. Then pull.
+**Push, open a pull request, read Files changed** (your fixes, `DEMO.md`, `FINAL.md`; no `.env` and no real key: use the browser's Find for `sk-ant-`, `ANTHROPIC_API_KEY=`, `AIza` and `GEMINI_API_KEY=`; only a fake value, as in `.env.example`, is allowed), as in week 10 step 7. **Merge with "Create a merge commit"**, as in weeks 12 and 13. Then, in your terminal in `~/semester-project`: `git switch main && git pull`.
 
 ### 6. On the day
 
-- **Before your turn:** open one terminal window with **no key loaded** (`[ -z "$ANTHROPIC_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
+- **Before your turn:** open one terminal window with **no key loaded** (`[ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
 - **During:** follow `DEMO.md`. If a step fails, say so in one sentence and switch to the fallback. Don't debug in front of the room.
 - **If a key ever shows on screen:** it's leaked. Keep going with the fallback, then delete the key in the Console straight after your demo (week 9 step 2f; for a Google key, week 10 step 2e), and tell your instructor.
 

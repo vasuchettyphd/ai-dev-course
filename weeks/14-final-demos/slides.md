@@ -81,8 +81,7 @@ Rehearsed estimate: about 2:40.
 
 ## Each row of DEMO.md
 
-| Time | Show | Command and where to type it | Say | If it fails |
-|---|---|---|---|---|
+Five columns: **Time**, **Show**, **Command and where to type it**, **Say**, **If it fails**
 
 - **Say:** one or two plain sentences
 - **If it fails:** what you switch to, and the one sentence you say
@@ -136,7 +135,7 @@ Say less, don't talk faster.
 
 ## Heading 6 matters most
 
-> Claude Code wrote nearly all of the code, the tests and most of the text in this folder, working from plans in the Superpowers format.
+> Claude Code wrote nearly all of the code, the tests, the evaluation cases and most of the text in this folder, working from plans that I approved
 
 - What did AI write?
 - What did **you** decide: the plan, the rules, the fixes?
@@ -160,7 +159,7 @@ Say less, don't talk faster.
 |---|---|
 | Demo: works or good fallback 4, AI feature 2, honest limit 2, on time 2 | 10 |
 | Project on main: tests 2, REVIEW.md 2, results 2, no key 2, run and Docker 2 | 10 |
-| Write-up: seven headings 4, numbers traceable 3, honest heading 6 | 10 |
+| Write-up: seven headings 4, numbers traceable 3, heading 6 honest 3 | 10 |
 
 ---
 
