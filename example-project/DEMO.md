@@ -28,7 +28,7 @@ If a key ever shows on screen, treat it as leaked: delete it in the Anthropic Co
 
 ## The script
 
-Each time is when the step starts and ends, counted from 0:00. The last step ends at 3:00. A timed read-through with the real output below took about 2:40, which leaves 20 seconds spare for a slow call.
+Each time is when the step starts and ends, counted from 0:00. The last step ends at 3:00. A timed read-through, speaking the Say column over the real output below and allowing 10 seconds for each live call, came to about 2:40, which leaves 20 seconds spare.
 
 | Time | Show | Command and where to type it | Say | If it fails |
 |---|---|---|---|---|
