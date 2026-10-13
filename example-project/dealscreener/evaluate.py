@@ -266,7 +266,13 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
     summary = summarise(results)
     print_fn(score_line(summary))
     print_fn(cost_line(summary))
-    print_fn(f"Saved: {write_results(results, summary, which)}")
+    try:
+        path = write_results(results, summary, which)
+    except OSError:
+        # For example a Docker container that can't write to evals/results (see the README).
+        print_fn(f"Couldn't save the results file in {RESULTS_DIR}. The score above is still right: copy it down.")
+        return 1
+    print_fn(f"Saved: {path}")
     return 0
 
 

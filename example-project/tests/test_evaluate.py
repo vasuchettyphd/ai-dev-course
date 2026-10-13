@@ -330,6 +330,15 @@ class MainTest(unittest.TestCase):
         # Every reply is listing B's numbers, so almost every case has misses.
         self.assertEqual(self.run_main([]), 0)
 
+    def test_a_results_folder_that_cant_be_written_is_reported(self):
+        blocker = os.path.join(self.folder, "a-file")
+        pathlib.Path(blocker).write_text("not a folder", encoding="utf-8")
+        with mock.patch.object(evaluate, "RESULTS_DIR", os.path.join(blocker, "results")):
+            self.assertEqual(self.run_main(["--held-out"]), 1)
+        self.assertEqual(len(self.client.calls), 5)
+        self.assertTrue(any(line.startswith("Score: ") for line in self.lines))
+        self.assertTrue(self.lines[-1].startswith("Couldn't save the results file"))
+
     def test_an_unknown_flag_prints_usage_and_returns_2(self):
         self.assertEqual(self.run_main(["--everything"]), 2)
         self.assertEqual(self.client.calls, [])
