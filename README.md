@@ -43,7 +43,7 @@ A laptop running macOS 15 (Sequoia) or later, or Windows 10 (version 2004 or lat
 
 ## Your project
 
-In week 4 you choose a small tool to build, something useful for your work, studies or a business idea. Every week after that you apply what you learned to it, and in week 14 you demo it. The class examples use a shared project, a rental property deal screener. From week 4 it will live in `example-project/`, with a git tag (`week-04` to `week-13`) marking its finished state at the end of each week.
+In week 4 you choose a small tool to build, something useful for your work, studies or a business idea. Every week after that you apply what you learned to it, and in week 14 you demo it. The class examples use a shared project, a rental property deal screener. From week 4 it will live in `example-project/`, with a git tag (`week-04` to `week-14`) marking its finished state at the end of each week.
 
 ## Grading
 

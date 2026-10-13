@@ -13,7 +13,7 @@ Do these 10 minutes before your turn, not during it.
    Type in: the Terminal.
 
    ```
-   [ -z "$ANTHROPIC_API_KEY" ] && echo "No key loaded"
+   [ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo "No key loaded"
    ```
 
    It should print `No key loaded`. If it prints nothing, close the window and open a new one.
@@ -28,13 +28,13 @@ If a key ever shows on screen, treat it as leaked: delete it in the Anthropic Co
 
 ## The script
 
-Each time is when the step starts and ends, counted from 0:00. The last step ends at 3:00. A timed read-through, speaking the Say column over the real output below and allowing 10 seconds for each live call, came to about 2:40, which leaves 20 seconds spare.
+Each time is when the step starts and ends, counted from 0:00. The last step ends at 3:00. An estimated read-through (the Say column at about 150 words a minute, over the real output below, allowing 10 seconds for each live call) came to about 2:40, which leaves 20 seconds spare. A stopwatch run is being tested.
 
 | Time | Show | Command and where to type it | Say | If it fails |
 |---|---|---|---|---|
 | 0:00 to 0:15 | Your face, or the README's first lines | None | "Someone buying their first rental property needs to know in a minute whether a listing is worth a closer look. This tool tells them, using their own rules." | Nothing can fail here. |
 | 0:15 to 1:05 | The listing step reading listing B, you confirming each number, the verdict | Terminal: `python3 -m dealscreener --listing`, then paste `listings/listing-b.txt`, type `done` and press Enter. Press Enter five times to keep the listing's numbers, then type `25`, `7`, `30`, `6000` for the loan. | "A model reads the listing and offers five numbers; I check each one. The verdict: PASS, $430.53 a month of cash flow." | If it says "For now, type the numbers yourself.", type them: 150000, 1700, 2400, 1200, 0, then 25, 7, 30, 6000. Say: "The model call failed, so it falls back to typing. The maths doesn't need the model." |
-| 1:05 to 1:45 | The agent calling the calculator tool, and the same numbers in its answer | Terminal: `python3 -m dealscreener.agent "Should I buy this rental? The price is \$150,000 and the rent is \$1,700 a month. Property tax is \$2,400 a year, insurance is \$1,200 a year and there is no HOA fee. I'd put 25% down on a 30-year loan at 7% interest, with \$6,000 in closing costs."` (paste it from this file; don't type it) | "Here I just ask in plain English. Claude doesn't do the sums: it calls my calculator, so the $430.53 is the same as before." | If it prints an error sentence, show the [agent cost record](README.md#agent-cost-record) in the README and say: "The call failed; this is the answer from the course's run." |
+| 1:05 to 1:45 | The agent calling the calculator tool, and the same numbers in its answer | Terminal: `python3 -m dealscreener.agent "Should I buy this rental? The price is \$150,000 and the rent is \$1,700 a month. Property tax is \$2,400 a year, insurance is \$1,200 a year and there is no HOA fee. I'd put 25% down on a 30-year loan at 7% interest, with \$6,000 in closing costs."` (paste it from this file; don't type it) | "Here I just ask in plain English. Claude doesn't do the sums: it calls my calculator, so the $430.53 is the same as before." | If it prints an error sentence, show the course's run in the README ([How to ask the agent](README.md#how-to-ask-the-agent)) and say: "The call failed; this is the answer from the course's run." |
 | 1:45 to 2:20 | The committed evaluation results: week 12, then week 13 before and after | Terminal: `head -7 evals/results/2026-10-13-all.md`, then `head -7 evals/results/2026-10-13-injection.md evals/results/2026-10-13-injection-3.md` | "On 20 made-up listings, with the answers written first, it got 100 of 100 numbers right. Of 8 hostile listings, one attack worked before my fix and none after." (These are the saved runs: the model answers a little differently each time, so the file is the record.) | These need no key and no network, so they work offline. If the terminal misbehaves, open the same files in a text editor. |
 | 2:20 to 2:45 | One honest limit: case 14 answered two ways | Terminal: `grep case-14 evals/results/2026-10-13-held-out.md evals/results/2026-10-13-all.md` | "Case 14 gives a price range: once the model guessed 187500, later it said there's no single price. One run isn't the last word, so I confirm every number." | Works offline. |
 | 2:45 to 3:00 | Close | None | "Claude Code wrote nearly all the code and tests, from plans I approved. I decided the plan and the rules, checked the answers, and decided which fixes to make." | Nothing can fail here. |

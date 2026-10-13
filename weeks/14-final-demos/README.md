@@ -95,7 +95,15 @@ ls -a
 
 `ls -a` must show `.env` again.
 
-**d. Fix what's missing,** one thing at a time, with your own prompt for each, as in weeks 5 to 13. Commit each fix. If a feature doesn't work yet and can't be fixed in time, don't hide it: add a "Known problems" section to your README saying so, and say it in `FINAL.md`.
+**d. Make your program read `.env` itself.** On demo day you'll run it from a window with no key loaded, so it has to find the key on its own, as the deal screener does. If you've been loading the key with `set -a; . ./.env; set +a`, in Claude Code:
+
+```text
+Make my program read its API keys from the .env file in this folder by itself, without printing them, the way the deal screener's extract.load_env_file does in ~/ai-dev-course/example-project. A key already loaded in the environment wins. Keep every test passing and offline, write a test for it with a made-up .env in a temporary folder, never read or print my real .env, and commit.
+```
+
+If that isn't possible in time, you'll load the key once with `set -a; . ./.env; set +a` in your demo window before you share your screen (step 6), and never print it.
+
+**e. Fix what's missing,** one thing at a time, with your own prompt for each, as in weeks 5 to 13. Commit each fix. If a feature doesn't work yet and can't be fixed in time, don't hide it: add a "Known problems" section to your README saying so, and say it in `FINAL.md`.
 
 ### 3. Write your 3-minute demo
 
@@ -127,9 +135,9 @@ Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. 
 
 ### 6. On the day
 
-- **Before your turn:** open one terminal window with **no key loaded** (`[ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
+- **Before your turn:** open one terminal window with **no key loaded** (if your program can't read `.env` itself, load the key with `set -a; . ./.env; set +a` now, before you share your screen, and skip the check) (`[ -z "$ANTHROPIC_API_KEY$GEMINI_API_KEY" ] && echo clear` prints `clear`), in `~/semester-project`, with your `.venv` active. Make the text large. Close other tabs and windows, and turn notifications off. Have `DEMO.md` open on paper or your phone, not on the shared screen.
 - **During:** follow `DEMO.md`. If a step fails, say so in one sentence and switch to the fallback. Don't debug in front of the room.
-- **If a key ever shows on screen:** it's leaked. Keep going with the fallback, then delete the key in the Console straight after your demo (week 9 step 2f; for a Google key, week 10 step 2e), and tell your instructor.
+- **If a key ever shows on screen:** it's leaked. Pause and delete it in the Console first (week 9 step 2f; for a Google key, week 10 step 2e): it takes about 30 seconds. Then carry on with the fallback (the live steps won't work until you make a new key), and tell your instructor afterwards.
 
 The deal screener's week 14 changes are on this page (it works once week 14 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-13...week-14>.
 
@@ -148,7 +156,8 @@ The deal screener's week 14 changes are on this page (it works once week 14 is p
 | The demo runs over 3 minutes | Cut what `DEMO.md` says to cut first. Keep the AI step and the honest limit. Say less, don't talk faster. |
 | No internet, or a 429, on the day | Switch to the fallback: your offline tests and your committed results files. Say what the live run would show. |
 | A feature doesn't work yet | Demo what does work. Say plainly what doesn't and why, in the demo and in `FINAL.md`. |
-| A key appears on screen | Keep going with the fallback; afterwards delete the key first (week 9 step 2f), then tell your instructor. |
+| A key appears on screen | Pause and delete the key in the Console first (week 9 step 2f), then carry on with the fallback, and tell your instructor afterwards. |
+| The AI step says there's no key | Your program doesn't read `.env` itself: step 2d, or load the key before you share your screen (step 6). |
 | A number in `FINAL.md` has no file to link to | Leave it out, or run the thing again and commit the results first. |
 | `docker build` fails | See [week 7's Troubleshooting](../07-running-with-docker/README.md#troubleshooting). |
 | Anthropic errors (401, 429, credit, workspace) | See [week 9's Troubleshooting](../09-calling-a-model/README.md#troubleshooting). |

@@ -149,7 +149,7 @@ Say less, don't talk faster.
 - Large text; notifications off; other tabs closed
 - `DEMO.md` on paper or your phone, not on screen
 - A step fails: one sentence, then the fallback
-- A key shows: keep going; delete it straight after
+- A key shows: pause, delete it first, then the fallback
 
 ---
 
