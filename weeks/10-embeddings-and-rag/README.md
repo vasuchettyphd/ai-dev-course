@@ -85,7 +85,7 @@ The model answers from your documents instead of from memory, and you can check 
 >
 > "Do not submit sensitive, confidential, or personal information to the Unpaid Services."
 
-On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". Google also counts AI Studio as paid for some school and work ("Workspace enterprise") accounts; whether a UVU account is one of them is not known, so **check with your instructor**, and until you hear otherwise **treat your use as the free tier**. So **treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
+On the paid tier (a Google Cloud project with billing switched on) Google says it "doesn't use your prompts ... or responses to improve our products". Google also counts AI Studio as paid for some school and work ("Workspace enterprise") accounts; whether a UVU account is one of them is not known, so **check with your instructor**, and until you hear otherwise **treat your use as the free tier**, and **treat everything you send to Google as something a stranger might read**: that's why your documents must be course-safe (step 5c).
 
 **d. Save it in `.env`.** Add a second line to your `.env` files, with a text editor, exactly as in week 9 step 2d (no spaces, no quote marks):
 
@@ -99,7 +99,7 @@ Use the name `GEMINI_API_KEY`, and **don't** also set `GOOGLE_API_KEY`: Google's
 
 **e. Restrict it, and if it leaks, delete it.** Google: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." (<https://ai.google.dev/gemini-api/docs/api-key>): if the key's settings in AI Studio let you limit it to the Gemini API, do (being tested). If a Google key leaks, on the same API keys page delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
 
-**f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time. The free tier needs no billing account, so it can't charge you: **don't add billing** for this course.
+**f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time. The free tier needs no billing account, so it shouldn't be able to charge you (being tested): **don't add billing** for this course.
 
 ### 3. Your first embeddings
 
@@ -261,7 +261,7 @@ Answer as in the table at the top. The official packages are `google-genai` (Goo
 
 **e. Try it.** In your second terminal window (not the Claude Code one), in `~/semester-project`: activate `.venv` if it has one, load the keys with `set -a; . ./.env; set +a`, build the index, and ask your program three questions the way its README says, including **one your documents can't answer**. Write down, for each: the question, the documents it retrieved, and the answer. You hand these in.
 
-**f. Run the tests.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your keys, run them once more yourself with `.env` moved out of the folder, as in week 9 step 5e (move it out, run the tests, move it back, and check `ls -a` shows `.env` again).
+**f. Run the tests.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your keys, run them once more yourself with `.env` moved out of the folder, as in week 9 steps 5e and 5f (move it out, run the tests, move it back, and check `ls -a` shows `.env` again).
 
 **The deal screener's version:** `python3 -m dealscreener.notes index` and `python3 -m dealscreener.notes ask "..."`, in [`dealscreener/notes.py`](../../example-project/dealscreener/notes.py), with offline tests in [`tests/test_notes.py`](../../example-project/tests/test_notes.py). See [its README](../../example-project/README.md#how-to-ask-your-notes).
 
