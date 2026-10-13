@@ -10,7 +10,7 @@ Every listing is a **fictional listing written for this course example**: no rea
 
 - `listings/case-01.txt` to `listings/case-20.txt`: the listings.
 - `expected.json`: one entry per listing, with its id, its file, whether it is held out, its category, the five expected numbers, and a note saying why those are the right answers. `null` means "the listing doesn't state this number".
-- `results/`: one Markdown file per run, named `<date>-<which>.md` (`dev`, `held-out` or `all`). Each holds the date, the model, the score, a table of the misses, any errors and the cost. No keys.
+- `results/`: one Markdown file per run, named `<date>-<which>.md` (`dev`, `held-out` or `all`); a second run of the same kind on the same day gets `-2`, then `-3`, so nothing is overwritten. Each holds the date, the model, the score, a table of the misses, any errors and the cost. No keys.
 
 ## The 20 cases
 
@@ -44,9 +44,9 @@ Five cases are **held out**: 03 (clean), 07 (messy), 11 (missing), 14 (trap) and
 
 ## What 20 cases can and can't show
 
-Anthropic's guidance on evaluations says to "Prioritize volume over quality", and its examples use from 50 to 10,000 cases. This set does the opposite on purpose: 20 cases, each written and checked by hand, so you can read every listing and every answer yourself.
+Anthropic's guidance on evaluations ([Anthropic: develop tests](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests), read 13 October 2026) says to "Prioritize volume over quality", and its examples use from 50 to 10,000 cases. This set does the opposite on purpose: 20 cases, each written and checked by hand, so you can read every listing and every answer yourself.
 
-Twenty cases can show gross failures (a whole kind of listing the model gets wrong) and patterns (the same mistake in several cases). They can't give a precise accuracy rate: one case is 5 points out of 100%, so 17 of 20 and 18 of 20 are the same result within the noise. The same run twice can also give different answers, because the model doesn't answer the same way every time.
+Twenty cases can show gross failures (a whole kind of listing the model gets wrong) and patterns (the same mistake in several cases). They can't give a precise accuracy rate: one case is 5 points out of 100%, so 17 of 20 and 18 of 20 are the same result within the noise. The same run twice can also give different answers, because the model doesn't answer the same way every time. In the course's runs, case 14 (a price range) got 187500 in the held-out run and `null` in the `--all` run.
 
 ## How to run it
 

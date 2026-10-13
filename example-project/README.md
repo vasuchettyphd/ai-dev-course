@@ -274,7 +274,7 @@ python3 -m dealscreener.evaluate --held-out
 
 `--all` runs all 20. Each run is saved in `evals/results/`, named after the date and the set; a second run on the same day gets `-2` on the end.
 
-**3. With Docker.** Build the image again (`docker build -t dealscreener .`). The container needs your key and somewhere to save the results: `-v` connects your `evals/results` folder to the one inside the container, and `--user` lets the container write there as you.
+**3. With Docker.** Build the image again (`docker build -t dealscreener .`). The container needs your key and somewhere to save the results: `-v` connects your `evals/results` folder to the one inside the container, and `--user` lets the container write there as you (checked on Windows (WSL) only; being tested on a Mac).
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 
@@ -282,7 +282,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
 docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/evals/results":/app/evals/results dealscreener python -m dealscreener.evaluate
 ```
 
-The live test runs the 15 dev cases and passes when at least 80% of the fields are right (the plan's floor; the first real run scored 100%, so it stays at 80%, which leaves room for a run where the model answers differently):
+The live test runs the 15 dev cases and passes when at least 80% of the fields are right (the first real run scored 100%; the test stays at 80% to leave room for a run where the model answers differently):
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
 
@@ -299,8 +299,10 @@ Run on 13 October 2026 with Claude Haiku 5.5 and the week 9 `extract.py` unchang
 |---|---|---|---|---|---|---|
 | Dev, first run | 75 of 75 fields (100%) | 15 of 15 | 0 | 11,199 | 1,112 | about $0.0017 |
 | Dev, second run | 75 of 75 fields (100%) | 15 of 15 | 0 | 11,199 | 1,056 | about $0.0016 |
-| Held out, once | 24 of 25 fields (96%) | 4 of 5 | 0 | 3,729 | 303 | about $0.0005 |
+| Held out, run on its own once | 24 of 25 fields (96%) | 4 of 5 | 0 | 3,729 | 303 | about $0.0005 |
 | All 20 | 100 of 100 fields (100%) | 20 of 20 | 0 | 14,928 | 1,556 | about $0.0023 |
+
+The `--all` run includes the 5 held-out cases, so they were run twice in total: once on their own, then once more inside all 20. In your own work, run `--held-out` once and skip `--all` until the report is written.
 
 The live test, run once more on the dev cases, also scored 75 of 75 (about $0.0017). All five runs together cost under one cent.
 

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import math
 import os
 import sys
 from dataclasses import dataclass
@@ -58,9 +59,9 @@ class CaseResult:
 
 
 def is_amount(value) -> bool:
-    """True for a number of 0 or more (True and False don't count as numbers here)."""
+    """True for a finite number of 0 or more (True and False don't count as numbers here)."""
     return (not isinstance(value, bool) and isinstance(value, (int, float))
-            and value == value and value >= 0)
+            and math.isfinite(value) and value >= 0)
 
 
 def load_cases(path=CASES_FILE, folder=None) -> list:
@@ -273,6 +274,9 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
         print_fn(f"Couldn't save the results file in {RESULTS_DIR}. The score above is still right: copy it down.")
         return 1
     print_fn(f"Saved: {path}")
+    if results and summary["errors"] == len(results):
+        print_fn("Every case failed, so there is no score. Read the errors above, fix the cause, and run it again.")
+        return 1
     return 0
 
 

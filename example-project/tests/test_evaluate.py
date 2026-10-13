@@ -47,6 +47,16 @@ class FieldOkTest(unittest.TestCase):
         self.assertFalse(evaluate.field_ok(0, None))
 
 
+class IsAmountTest(unittest.TestCase):
+    def test_numbers_of_zero_or_more(self):
+        self.assertTrue(evaluate.is_amount(0))
+        self.assertTrue(evaluate.is_amount(1700.5))
+
+    def test_not_amounts(self):
+        for value in (-1, float("nan"), float("inf"), True, "1700", None):
+            self.assertFalse(evaluate.is_amount(value), value)
+
+
 class LoadCasesTest(unittest.TestCase):
     def setUp(self):
         self.folder = tempfile.mkdtemp()
@@ -338,6 +348,14 @@ class MainTest(unittest.TestCase):
         self.assertEqual(len(self.client.calls), 5)
         self.assertTrue(any(line.startswith("Score: ") for line in self.lines))
         self.assertTrue(self.lines[-1].startswith("Couldn't save the results file"))
+
+    def test_every_case_failing_returns_1(self):
+        def broken(**kwargs):
+            raise FakeAPIError(401, "invalid x-api-key")
+        self.client.create = broken
+        self.assertEqual(self.run_main(["--held-out"]), 1)
+        self.assertTrue(any(line.startswith("Saved: ") for line in self.lines))
+        self.assertTrue(self.lines[-1].startswith("Every case failed"))
 
     def test_an_unknown_flag_prints_usage_and_returns_2(self):
         self.assertEqual(self.run_main(["--everything"]), 2)
