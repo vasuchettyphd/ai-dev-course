@@ -214,3 +214,119 @@ python3 -m dealscreener.notes ask "What did I note about solar panels?"
 Retrieval still finds the 3 "closest" chunks (something is always closest), but none of them mentions solar panels, so the answer should be `My notes don't say.` (being tested). That's **grounding**: without the rule, a model would happily answer from general knowledge, sounding just as sure, and you couldn't tell which answers came from your notes.
 
 **e. Without a Claude key.** If the Anthropic key is missing or the call fails, `ask` still prints the matching notes and says why there's no answer: retrieval alone is useful.
+
+### 5. Add RAG to your project
+
+> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version was built and tested offline on 13 October 2026.
+
+**a. Make the branch first.** Open a **new** terminal window (no keys loaded in it), `cd ~/semester-project`, start `claude`, and in Claude Code:
+
+```text
+Switch to main, pull the latest changes from GitHub, then create a new branch called rag and switch to it.
+```
+
+Plain **Yes** to each git command. Check: "What branch am I on?" says `rag`.
+
+**b. Check the safety setup from week 9.** In a second terminal window, in `~/semester-project`:
+
+```bash
+git check-ignore .env
+grep -c 'Read(./.env)' .claude/settings.json
+```
+
+The first prints `.env`; the second prints `1`. If either doesn't, redo week 9 step 5b before going on. Then add your Google key line to `~/semester-project/.env` with a text editor (step 2d), and check: `grep -c '^GEMINI_API_KEY=' .env` prints `1`.
+
+**c. Pick course-safe documents.** RAG is only as good, and as safe, as the documents you give it. Choose 5 to 15 short text or Markdown files that fit your project, and put them in a folder such as `docs/` or `notes/`.
+
+| Good | Not allowed |
+|---|---|
+| Notes, guides or FAQs **you wrote** for your project | Anything with names, emails, phone numbers or addresses of real people |
+| Public material you're allowed to copy (with its source written at the top) | Customer, employer or client documents |
+| Made-up example documents, labelled as made up, like the deal screener's notes | Anything confidential, or anything you'd mind a stranger reading (step 2c) |
+
+**d. Plan and build it, with the guardrails in the prompt.** In Claude Code (replace the parts in angle brackets):
+
+```text
+/superpowers:writing-plans Write an implementation plan to add RAG to this project: answer questions about the documents in <folder> using <one sentence: what the questions are for>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-embedding-001 (task_type RETRIEVAL_DOCUMENT for the documents and RETRIEVAL_QUERY for questions, 768 dimensions), and Anthropic's anthropic package with claude-haiku-5-5 for the answers. Chunk the documents, embed each chunk once, save the embeddings in an index file, retrieve the 3 closest chunks by cosine similarity, and tell the model to answer only from them, name the files it used, and reply "My notes don't say." when they don't answer the question. Rules: the program reads GEMINI_API_KEY and ANTHROPIC_API_KEY only from the environment (it may load .env when it starts), and you, Claude, must never open, read, print or log .env or the keys; rebuild or refuse when the documents change after indexing; add the index file to .gitignore and .dockerignore; if a key is missing or a call fails, say what happened in one plain sentence and carry on as far as possible; print the cost of each Claude call; tests must use a fake embedder and a fake model and never call Google or Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no Google key"; update the Dockerfile and requirements; add GEMINI_API_KEY to .env.example with a fake value. I'm not a programmer, so keep each task small.
+```
+
+Then build it as in week 9:
+
+```text
+/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.
+```
+
+Answer as in the table at the top. The official packages are `google-genai` (Google) and `anthropic` (Anthropic). For a Node.js project, Google's package is `@google/genai` (being tested; Google lists its libraries at <https://ai.google.dev/gemini-api/docs/libraries>) and Anthropic's is `@anthropic-ai/sdk`. Any other name: ask "Is this the official package?" before answering Yes.
+
+**e. Try it.** In your second terminal window (not the Claude Code one), in `~/semester-project`: activate `.venv` if it has one, load the keys with `set -a; . ./.env; set +a`, build the index, and ask your program three questions the way its README says, including **one your documents can't answer**. Write down, for each: the question, the documents it retrieved, and the answer. You hand these in.
+
+**f. Run the tests.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your keys, run them once more yourself with `.env` moved out of the folder, as in week 9 step 5e (move it out, run the tests, move it back, and check `ls -a` shows `.env` again).
+
+**The deal screener's version:** `python3 -m dealscreener.notes index` and `python3 -m dealscreener.notes ask "..."`, in [`dealscreener/notes.py`](../../example-project/dealscreener/notes.py), with offline tests in [`tests/test_notes.py`](../../example-project/tests/test_notes.py). See [its README](../../example-project/README.md#how-to-ask-your-notes).
+
+### 6. Review and run
+
+**a. Review it with `safe-and-private`.** In Claude Code:
+
+```text
+Run the safe-and-private reviewer as a subagent on the files changed on this branch compared with main (git diff main --name-only), and on .gitignore, .dockerignore and the Dockerfile. Focus on: an API key in any file tracked by git (search with git grep only, never grep -r, and never open .env); whether .env or the index file could be committed or copied into the Docker image; whether a key could ever be printed or logged; whether any test calls Google or Anthropic by default; whether any document in the documents folder holds personal or confidential information. Then add a section at the end of REVIEW.md, headed "## Week 10: RAG review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings R1, R2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
+```
+
+**Yes** to editing `REVIEW.md` only. Triage, fix and commit as in week 6 step 5.
+
+**b. Run it in Docker.** Your week 9 Dockerfile installs your requirements, and `--env-file .env` hands both keys to the container. The index lives on your laptop, so share just the documents folder (read-only) and the index file with the container. For the deal screener, in `~/ai-dev-course/example-project`, after `docker build -t dealscreener .` and `touch notes-index.json` (once, so Docker shares a file, not a folder):
+
+```bash
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/notes:/app/notes:ro" -v "$PWD/notes-index.json:/app/notes-index.json" dealscreener python -m dealscreener.notes index
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/notes:/app/notes:ro" -v "$PWD/notes-index.json:/app/notes-index.json" dealscreener python -m dealscreener.notes ask "What are the association dues like in Riverside?"
+```
+
+(`--user "$(id -u):$(id -g)"` lets the container write the index file as you; tested on Windows (WSL), being tested on a Mac.) Ask Claude Code for the same two commands for your project, with your folder and index file names. Check the image holds neither: `docker run --rm <your image> ls -a` shows no `.env` and no index file.
+
+### 7. Finish
+
+**a. Push and open a pull request.** In Claude Code:
+
+```text
+Push the rag branch to GitHub and open a pull request into main titled "Add RAG over my documents".
+```
+
+Plain **Yes**, after `git status` shows no `.env` and no index file.
+
+**b. Read Files changed yourself.** You should see your code and tests, the documents folder (course-safe documents only), the requirements and Dockerfile, `.env.example` with **fake** keys, `.gitignore` and `.dockerignore` listing the index file, your README and `REVIEW.md`. **No `.env`, no real key, no index file.** Use the browser's Find for `sk-ant-` and `AIza`: only fake values are allowed. If a real key is there, don't merge: delete it first (week 9 step 2f, or step 2e here).
+
+**c. Merge on GitHub, then pull,** as in week 9. Check: "What branch am I on, and do all the tests pass?" says `main`, and yes.
+
+The deal screener's week 10 changes are on this page (it works once week 10 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-09...week-10>.
+
+## Check it worked
+
+- `git check-ignore .env` and `git check-ignore <your index file>` both print the file name, and GitHub shows neither in your pull request.
+- Your program answers a question from your documents and names the files it used.
+- A question your documents can't answer gets "My notes don't say." (or your program's version of it).
+- All tests pass with `.env` moved out of the folder.
+- You have three questions written down, each with the retrieved documents and the answer.
+
+## Troubleshooting
+
+| What you see | What to do |
+|---|---|
+| `ValueError` mentioning an API key, or "No Google API key found" | The Google key isn't loaded: `set -a; . ./.env; set +a` in the folder with `.env`, and check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. |
+| "We are sorry, but you do not have access to Google AI Studio..." | Your school account can't use AI Studio. Use a personal Google account (18 or older), and tell your instructor. |
+| AI Studio says it isn't available in your country, or asks you to verify your age | Google's limits (<https://ai.google.dev/gemini-api/docs/available-regions>). Use a personal account that meets them, or ask your instructor. |
+| `API key not valid`, or "The Google API key was not accepted" | The key is wrong, deleted, or has quote marks or spaces: check the `.env` line, or make a new key (step 2b). |
+| "Using GOOGLE_API_KEY" in a warning | You also set `GOOGLE_API_KEY`, which wins: remove it (step 2d). |
+| Error 429, or "Too many requests for the free tier" | You hit a free-tier limit. Wait a minute (or until the next day for a daily limit) and try again; see your limits in AI Studio. |
+| Error 404, or "The embedding model name wasn't found" | Check the model name: `gemini-embedding-001`. |
+| `ModuleNotFoundError: No module named 'google'` | The `.venv` isn't active, or `google-genai` isn't installed in it: `source .venv/bin/activate`, then `pip install -r requirements.txt`. |
+| "Your notes changed since the index was built" | Rebuild the index (`index`), then ask again. |
+| "No index yet" | Build it first (`index`). |
+| "My notes don't say." when you know they do | The right chunk wasn't retrieved, or was cut in half: ask with words closer to the document's, or try bigger chunks; check which chunks it printed. |
+| The answer cites the wrong document | Look at the retrieved chunks: two documents may say similar things. Make the documents more distinct, or ask a more specific question. |
+| "The notes folder has no notes in it", or "No notes folder found" | Check the folder name and that it has `.md` or `.txt` files. |
+| "Skipped <name>: not plain text." | That file isn't plain text (a Word file or PDF, say): save it as `.txt` or `.md`. |
+| "Couldn't read <name>." | Your laptop won't let the program open that file: check its permissions. |
+| The index file shows in `git status` | Add it to `.gitignore` before committing (step 5d's prompt asks for this). |
+| An Anthropic error (401, 429, credit, workspace) | See [week 9's Troubleshooting](../09-calling-a-model/README.md#troubleshooting). |
+| A key was pasted into a chat or committed | Delete it first (step 2e for Google, week 9 step 2f for Anthropic), then make a new one. |
+| Work was committed to `main` | Use [week 5's rescue](../05-building-with-ai/README.md#if-it-committed-to-main). |
