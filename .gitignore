@@ -7,3 +7,5 @@ templates/*.pdf
 __pycache__/
 # Python virtual environments (week 9 makes one in example-project)
 .venv/
+# The notes index (week 10): it holds the text of your notes
+notes-index.json

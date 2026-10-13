@@ -36,5 +36,11 @@ REVIEW.md
 BUGS.md
 FEEDBACK.md
 
+# The notes index (week 10): it holds the text of your notes, which can be private. To use it
+# in a container, mount it at run time (see the README) instead of building it into the image.
+**/notes-index.json
+
 # Kept in the image on purpose: listings/ (two small sample listings). The program doesn't
 # read them, but the live test (tests/test_live.py) does, so it can run inside the container.
+# notes/ (the course's fictional investor notes) is kept too, so the index can be built and
+# the notes live test can run inside the container.
