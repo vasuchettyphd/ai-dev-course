@@ -171,6 +171,7 @@ claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/
 claude mcp list
 ```
 
+- In a **new window with no key loaded**: Claude Code's servers would get it
 - `--scope project`: saved in `.mcp.json`, this project only
 - `-e PYTHONPATH="$PWD"`: Python can find your code from anywhere
 - Full path to the `.venv`'s Python: saved exactly as typed
