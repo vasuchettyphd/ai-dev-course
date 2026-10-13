@@ -78,7 +78,7 @@ The deal screener's listing step (week 9) reads a pasted listing and pulls out f
 - `expected.json`: the right five numbers for each, with a note on why, and `null` where the listing doesn't say;
 - the scoring rule in [`evals/README.md`](../../example-project/evals/README.md): a number is right if it's within $1 of the expected one; `null` is right only if the model also says "not stated"; a guess where the listing gives nothing is a miss.
 
-All of that was committed **before** the first run (look at the commit history: it's the first week 12 commit). Five of the cases are held out.
+All of that was committed **before** the first run (look at the commit history: the commit "Week 12: 20 evaluation listings, expected answers and scoring rule, written before any run" comes before the evaluator and every results file). Five of the cases are held out.
 
 **a. Run it.** In your terminal, in `~/ai-dev-course/example-project`, with `(.venv)` showing (the evaluator reads your key from this folder's `.env` itself):
 
