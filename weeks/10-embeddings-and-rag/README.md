@@ -55,7 +55,7 @@ Say your notes say "the association dues are $185 a month", and you search for "
 
 An **embedding** lets a program see that too. An embedding model turns a piece of text into a long list of numbers (`gemini-embedding-001` gives 3,072 of them by default; this course keeps 768). Texts that **mean** similar things get similar lists of numbers, even when they use different words. Then "find notes about HOA fees" becomes "find the notes whose numbers are closest to the question's numbers".
 
-"Closest" is measured with **cosine similarity**: a score from -1 to 1, where 1 means "pointing the same way". Google's embeddings guide: "Cosine similarity is a good distance metric because it focuses on direction rather than magnitude." (<https://ai.google.dev/gemini-api/docs/embeddings>). You don't need the maths: the score is just "how alike are these two meanings?".
+"Closest" is measured with **cosine similarity**: a score from -1 to 1, where 1 means "pointing the same way". Google's embeddings guide says cosine similarity "is a good distance metric because it focuses on direction rather than magnitude" (<https://ai.google.dev/gemini-api/docs/embeddings>). You don't need the maths: the score is just "how alike are these two meanings?".
 
 **RAG** (retrieval-augmented generation) puts this together with week 9:
 
@@ -99,7 +99,7 @@ Use the name `GEMINI_API_KEY`, and **don't** also set `GOOGLE_API_KEY`: Google's
 
 **e. Restrict it, and if it leaks, delete it.** Google: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." (<https://ai.google.dev/gemini-api/docs/api-key>): if the key's settings in AI Studio let you limit it to the Gemini API, do (being tested). If a Google key leaks, on the same API keys page delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
 
-**f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time.
+**f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time. The free tier needs no billing account, so it can't charge you: **don't add billing** for this course.
 
 ### 3. Your first embeddings
 
@@ -273,7 +273,7 @@ Answer as in the table at the top. The official packages are `google-genai` (Goo
 Run the safe-and-private reviewer as a subagent on the files changed on this branch compared with main (git diff main --name-only), and on .gitignore, .dockerignore and the Dockerfile. Focus on: an API key in any file tracked by git (search with git grep only, never grep -r, and never open .env); whether .env or the index file could be committed or copied into the Docker image; whether a key could ever be printed or logged; whether any test calls Google or Anthropic by default; whether any document in the documents folder holds personal or confidential information. Then add a section at the end of REVIEW.md, headed "## Week 10: RAG review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings R1, R2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
 ```
 
-**Yes** to editing `REVIEW.md` only. Triage, fix and commit as in week 6 step 5.
+**Yes** to editing `REVIEW.md` only. Triage, fix and commit as in week 6 steps 5 and 6.
 
 **b. Run it in Docker.** Your week 9 Dockerfile installs your requirements, and `--env-file .env` hands both keys to the container. The index lives on your laptop, so share just the documents folder (read-only) and the index file with the container. For the deal screener, in `~/ai-dev-course/example-project`, after `docker build -t dealscreener .` and `touch notes-index.json` (once, so Docker shares a file, not a folder):
 
@@ -318,6 +318,10 @@ The deal screener's week 10 changes are on this page (it works once week 10 is p
 | `API key not valid`, error 400, 401 or 403, or "The Google API key was not accepted" | The key is wrong, deleted, or has quote marks or spaces: check the `.env` line, or make a new key (step 2b). |
 | "Using GOOGLE_API_KEY" in a warning | You also set `GOOGLE_API_KEY`, which wins: remove it (step 2d). |
 | Error 429, or "Too many requests for the free tier" | You hit a free-tier limit. Wait a minute (or until the next day for a daily limit) and try again; see your limits in AI Studio. |
+| "Google couldn't read the request." (error 400) | Usually a changed package or model name: check `google-genai==2.30.0` and `gemini-embedding-001`, and that your notes aren't empty. |
+| "Couldn't reach Google. Check your internet connection." | Check your internet connection, then try again. |
+| "Google's service is busy or having a problem. Try again later." | Wait a few minutes and try again. |
+| "Couldn't save the index file ..." | The program can't write in that folder (in Docker, check the `--user` part and that you ran `touch notes-index.json` first). |
 | Error 404, or "The embedding model name wasn't found" | Check the model name: `gemini-embedding-001`. |
 | `ModuleNotFoundError: No module named 'google'` | The `.venv` isn't active, or `google-genai` isn't installed in it: `source .venv/bin/activate`, then `pip install -r requirements.txt`. |
 | "Your notes changed since the index was built" | Rebuild the index (`index`), then ask again. |

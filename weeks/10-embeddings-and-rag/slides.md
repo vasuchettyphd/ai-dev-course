@@ -52,7 +52,7 @@ Your search: **"HOA fees"**
 - Similar meaning, similar numbers, even with different words
 - **Cosine similarity**: how alike two meanings are, from -1 to 1
 
-Google: "Cosine similarity is a good distance metric because it focuses on direction rather than magnitude."
+Google: cosine similarity "focuses on direction rather than magnitude"
 
 ---
 
@@ -73,7 +73,7 @@ Google: "Cosine similarity is a good distance metric because it focuses on direc
 ## A Google key (before class)
 
 1. <https://aistudio.google.com/apikey> > **Create API key**
-2. School account first; if "you do not have access", a personal account (18+)
+2. School account first (does UVU allow it? **check with your instructor**); if "you do not have access", a personal account (18+)
 3. One line in `.env`, no quotes: `GEMINI_API_KEY=...your key...`
 4. **Don't** also set `GOOGLE_API_KEY`: it wins
 5. Leaked? Delete it in AI Studio **first**
