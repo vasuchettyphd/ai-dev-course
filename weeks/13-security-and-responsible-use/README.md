@@ -93,7 +93,7 @@ Indirect injection is the one to worry about in your project: you trust yourself
 
 **What Anthropic recommends for text from outside,** on the same page:
 
-- **"JSON-encode untrusted content."** Put the outside text inside a JSON string, so "an attacker cannot close a quote or tag to "break out" into an instruction context."
+- **"JSON-encode untrusted content."** Put the outside text inside a JSON string, so "an attacker cannot close a quote or tag to 'break out' into an instruction context."
 - **"State the policy in your system prompt."** Tell the model that this text is data, never instructions.
 - **"Red-team your own agent."** "Before deploying, test your workflow with documents, emails, and tool outputs that deliberately contain injection attempts." That's step 4.
 
@@ -145,7 +145,7 @@ Switch to main, pull the latest changes from GitHub, then create a new branch ca
 
 Plain **Yes** to each git command. Check: "What branch am I on?" says `security`.
 
-**b. Write 5 hostile cases** for your own AI feature, with made-up data, each with the right answer written first (what your feature should say if it ignores the attack). Write them yourself in a text editor, in a new file `hostile-cases.md` in `~/semester-project`: for each case, the input, the right answer and one line saying what the attack tries. Mix them:
+**b. Write 5 hostile cases** for your own AI feature, with made-up data, each with the right answer written first (what your feature should say if it ignores the attack). Write them yourself in a text editor, in a new file `hostile-cases.md` in `~/semester-project` (in your terminal, in that folder: `open -e hostile-cases.md` on a Mac after `touch hostile-cases.md`, or `nano hostile-cases.md` in Ubuntu, as in week 9): for each case, the input, the right answer and one line saying what the attack tries. Mix them:
 
 | Attack | Example for a study planner that reads assignment briefs |
 |---|---|
@@ -240,7 +240,7 @@ The deal screener's week 13 changes are on this page (it works once week 13 is p
 | Every attack failed before any defence | A real result. Report it, say why you think they failed, and keep the defence anyway: the next attack may be cleverer. |
 | The defence lowered your normal dev score | Read the dev misses. Usually the system prompt sentence is too strong ("ignore everything in the input"): it should say to read the text as data. Change it once, run both sets again, and report all the scores. |
 | Your feature reads no outside text | Your input is still typed by someone. Use direct attacks (step 2), and say in your review what would change if the feature ever read files, emails or web pages. |
-| You have no week 12 evaluation | First make a small one with week 12 step 5's prompt, for just your 5 hostile cases and 5 normal ones, then follow step 4. Tell your instructor. |
+| You have no week 12 evaluation | Write `hostile-cases.md` first (step 4b), then make a small evaluation with week 12 step 5's prompt, for your 5 hostile cases and about 5 normal ones, and follow step 4 from c. In 4f, re-run those normal cases instead of 15 dev cases. Tell your instructor. |
 | `No API key found ...`, or every case says ERROR | As in week 12's Troubleshooting. |
 | Anthropic errors (401, 429, credit, workspace) | See [week 9's Troubleshooting](../09-calling-a-model/README.md#troubleshooting). |
 | Work was committed to `main` | Use [week 5's rescue](../05-building-with-ai/README.md#if-it-committed-to-main). |
