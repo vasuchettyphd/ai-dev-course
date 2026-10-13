@@ -275,3 +275,143 @@ You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested).
 Anthropic's own advice for keeping costs down: "1. Begin implementation with Claude Haiku 5.5. 2. Test your use case thoroughly. 3. Evaluate if performance meets your requirements. 4. Upgrade only if necessary for specific capability gaps." (<https://platform.claude.com/docs/en/about-claude/models/choosing-a-model>). That's what this course does. To try another model, change only the `model=` line; the same call costs 20 times more on Sonnet 5.5 and 40 times more on Opus 5.5.
 
 You may hear of **fine-tuning**: training a model further on your own examples. This course doesn't cover it, and projects like yours don't need it: a clear prompt, structured output and checks in your code go a long way.
+
+### 5. Add one AI feature to your project
+
+> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version of it was built and tested offline on 12 October 2026 (see "The deal screener's version" below).
+
+**a. Make the branch first.** In your terminal, `cd ~/semester-project`, then start `claude`. In Claude Code:
+
+```text
+Switch to main, pull the latest changes from GitHub, then create a new branch called ai-feature and switch to it.
+```
+
+Plain **Yes** to each git command. Check: ask "What branch am I on?". It should say `ai-feature`.
+
+**b. Check git ignores `.env`, then copy your key in.** In a second terminal window:
+
+```bash
+cd ~/semester-project
+git check-ignore .env
+```
+
+It should print `.env`. If it prints nothing, **stop**: in Claude Code, type "Add .env and .venv to .gitignore and commit only .gitignore on this branch.", plain **Yes**, and run `git check-ignore .env` again until it prints `.env`. Only then copy the key file from step 2, without opening it:
+
+```bash
+cp ~/first-call/.env ~/semester-project/.env
+git status
+```
+
+`git status` must **not** list `.env`. (If it does, don't commit anything: ask your instructor.)
+
+**c. Pick one small feature.** One call to the model, one clear job, and the program still works without it. Ideas for business projects:
+
+- **Pull fields out of pasted text**: an invoice, an email, a job ad or a listing becomes the numbers or fields your program already uses (the deal screener does this).
+- **Sort something into categories**: customer comments into "praise / complaint / question", or expenses into your budget's categories.
+- **Write a short plain-English summary** of a result your program already works out, such as one sentence explaining a verdict.
+
+Pick the one that fits your project, and keep it to one call.
+
+**d. Plan and build it with Superpowers, with the guardrails in the prompt.** In Claude Code (replace the part in angle brackets):
+
+```text
+/superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Anthropic's official package for this project's language, pinned to an exact version, with the model claude-haiku-5-5 and structured output (output_config with a JSON schema) if the answer must be read by the program. Rules: read the key only from the ANTHROPIC_API_KEY environment variable, loaded from .env, and never read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; check stop_reason and check every value the model returns before using it; print the input tokens, output tokens and cost of each call; tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
+```
+
+Then build it as in [week 5 step 5](../05-building-with-ai/README.md#5-build-with-subagent-driven-development):
+
+```text
+/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.
+```
+
+Answer as in the table at the top. Watch especially for:
+
+- **No** to anything that reads or prints `.env`. Type: "Never read or print .env. Read the key from the environment."
+- **No** to a key, or anything starting `sk-ant-`, in a file. `.env.example` may only hold a fake one like `put-your-key-here`.
+- **No** to a test that calls the real API whenever the tests run.
+- For a package install: Python's official package is `anthropic`; for a Node.js project it's `@anthropic-ai/sdk` (Anthropic's other official packages are listed at <https://platform.claude.com/docs/en/cli-sdks-libraries/overview>). Any other name: ask "Is this Anthropic's official package?" before answering Yes.
+
+**e. Try it.** When the build is done, in your terminal, in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, and run it again. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
+
+**f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass with no key loaded. Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
+
+**The deal screener's version** (being tested live; built and tested offline). It got an optional "paste the listing" step: `python3 -m dealscreener --listing` asks you to paste a listing's text, sends it to `claude-haiku-5-5` with a schema for the five property numbers, then shows each number for you to confirm:
+
+```text
+Purchase price ($) [from the listing: 150000]:
+```
+
+Press Enter to keep the number, or type the right one. Numbers the listing doesn't state are asked normally, the loan questions are always yours, and the maths is unchanged. With no key, it says `No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README). For now, type the numbers yourself.` and carries on. Its 90 tests never touch the network. See [`example-project/README.md`](../../example-project/README.md) and [`dealscreener/extract.py`](../../example-project/dealscreener/extract.py).
+
+### 6. Review and run
+
+**a. Review it with `safe-and-private`.** As in week 7 step 5, run only that reviewer, on what changed. In Claude Code:
+
+```text
+Run the safe-and-private reviewer as a subagent on the files changed on this branch compared with main (git diff main --name-only), and on .gitignore, .dockerignore and the Dockerfile. Focus on: an API key or anything starting sk-ant- in any file; whether .env could be committed or copied into the Docker image; whether the key could ever be printed or logged, including in error messages; whether any test calls the real API by default. Do not read .env itself. Then add a section at the end of REVIEW.md, headed "## Week 9: AI feature review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings A1, A2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
+```
+
+**Yes** to editing `REVIEW.md` only. Triage the findings as in week 6 step 5 (every Must fix is `Fix`), fix them, and commit.
+
+**b. Run it in Docker, with the key given at run time.** In your terminal, in `~/semester-project`:
+
+```bash
+docker build -t semester-project .
+docker run --rm semester-project ls -a
+```
+
+The list must **not** include `.env` (your week 7 `.dockerignore` keeps it out). Then run your program with the key:
+
+```bash
+docker run -it --rm --env-file .env semester-project
+```
+
+`--env-file .env` hands the key to this one container while it runs; it never goes into the image. For the deal screener the command is `docker run -it --rm --env-file .env dealscreener python -m dealscreener --listing` (being tested). Run your tests in the container as in week 7 step 4c, without `--env-file`: they must pass with no key.
+
+### 7. Finish
+
+**a. Push and open a pull request.** In Claude Code:
+
+```text
+Push the ai-feature branch to GitHub and open a pull request into main titled "Add one AI feature: <short name>".
+```
+
+Plain **Yes** to each, after `git status` shows no `.env`.
+
+**b. Read Files changed yourself.** Open the pull request and click **Files changed**. You should see your code and tests, the package list (`requirements.txt` or `package.json`), the Dockerfile, `.env.example` with a **fake** key, your README and `REVIEW.md`. **No `.env`, and no real key anywhere**: use the browser's Find (`Cmd+F` or `Ctrl+F`) for `sk-ant-` on the page; the only hit allowed is a fake one. If a real key is there, don't merge: go to step 2f now.
+
+**c. Merge on GitHub, then pull,** as in week 8 step 6d. In Claude Code: "Switch back to main and pull the latest changes from GitHub." Check: ask "What branch am I on, and do all the tests pass?" It should say `main`, and yes.
+
+The deal screener's week 9 changes are on this page (it works once week 9 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-08...week-09>.
+
+## Check it worked
+
+- `git check-ignore .env` prints `.env` in `~/semester-project`, and GitHub shows no `.env` and no real key in your pull request.
+- Your feature works with the key loaded, and without a key it says so in one sentence and carries on.
+- All your tests pass with no key loaded (they use a fake model).
+- You have three real calls written down: input tokens, output tokens, and the cost you worked out from them.
+- The Console's **Usage** page shows roughly the same spend, and your spend limit is set.
+
+## Troubleshooting
+
+| What you see | What to do |
+|---|---|
+| `TypeError: "Could not resolve authentication method...` | The key isn't loaded. In the same terminal window, in the folder with `.env`, run `set -a; . ./.env; set +a`, then try again. |
+| `No API key found` (the deal screener, or your own program's message) | Same as above: load the key in this window. In Docker, add `--env-file .env`. |
+| `ModuleNotFoundError: No module named 'anthropic'` | The `.venv` isn't active: `source .venv/bin/activate` (your prompt shows `(.venv)`), then try again. In a new folder, install it first (step 3b). |
+| `python3 -m venv .venv` fails with "ensurepip is not available" (Ubuntu) | Step 3b: `sudo apt install python3-venv`, delete only the broken `.venv` folder with `rm -r .venv`, try again. |
+| `pip install anthropic==1.13.0` says no matching version, or it needs Python 3.10 | Your Python is too old: step 3a. |
+| `TypeError: ... unexpected keyword argument 'temperature'` | Current models and the package don't take `temperature`: remove that line (step 4a). |
+| Error 401, or "The API key was not accepted" | The key is wrong, expired, deleted, or has quote marks or spaces around it. Check `.env` is exactly `ANTHROPIC_API_KEY=sk-ant-...` on one line, or make a new key (step 2d). |
+| Error 403 | This key isn't allowed to do that. Make a new key linked to yourself (step 2d). |
+| Error 404, or "The model name wasn't found" | Check the model name exactly: `claude-haiku-5-5`. Names change: check the models page. |
+| Error 429, or "Too many requests" | You (or your whole class, on one network) sent too many calls too fast, or hit your plan's cap. Wait a minute and try again. If it continues, check the Console's **Rate limits** page. |
+| "You have reached your specified API usage limits", or "Your monthly spend limit has been reached" | Your spend limit worked. Raise it a little in **Settings > Billing**, or wait until it resets. |
+| Calls stop working and your credit balance is $0, or "Your API credit has run out" | Buy a little more credit (step 2b). |
+| Error 529, or "busy or having a problem" | Anthropic is overloaded. Wait a few minutes and try again. |
+| `Stopped because: max_tokens`, and the answer is cut off or missing | Raise `max_tokens` (1000 is a good start), and make your program check `stop_reason`. |
+| The model's numbers or fields are wrong | That's why your program checks them and a person confirms what matters. Make the prompt and the schema's descriptions more specific, then try again. |
+| You pasted a key into Claude Code, a chat or a screenshot, or committed it | Step 2f, now: delete the key in the Console first, then make a new one. |
+| A bigger bill than expected | Check the Console's **Usage** page, look for a loop that calls the model, and lower your spend limit (step 2c). |
+| `.env` shows in `git status` | Don't commit. Step 5b: add `.env` to `.gitignore` first. |
+| Work was committed to `main` | Use [week 5's rescue](../05-building-with-ai/README.md#if-it-committed-to-main). |
