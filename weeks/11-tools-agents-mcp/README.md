@@ -243,7 +243,7 @@ grep -c 'Read(./.env)' .claude/settings.json
 .venv/bin/python --version
 ```
 
-The first prints `clear` (no key loaded in this window). The second prints `1`: this folder holds your real `.env` from week 10, so the course repo comes with the week 9 deny rule in `example-project/.claude/settings.json`, which stops Claude Code reading it (being tested in a signed-in session). The third says 3.11 or newer. Then:
+The first prints `clear` (no key loaded in this window). The second prints `1`: this folder holds your real `.env` from week 10, so the course repo comes with the week 9 deny rule in `example-project/.claude/settings.json`, which stops Claude Code reading it (being tested in a signed-in session). The third says 3.11 or newer. You can test the server on its own first, without Claude Code: `.venv/bin/python -m unittest tests.test_mcp_server -v` starts it, lists its tool and screens listing B. Then:
 
 ```bash
 claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server

@@ -448,7 +448,7 @@ The tests start the server and talk to it with the MCP package's own client: the
 
 You can also start the server by hand with `python -m dealscreener.mcp_server`, but it prints nothing: it waits silently for an app to connect. Press Ctrl+C to stop it.
 
-**2. Add it to Claude Code.** Do this in a **new** terminal window where no key is loaded (no `set -a`): Claude Code, and the servers it starts, should never get your key. This folder holds your `.env`, so it comes with the week 9 deny rule in `.claude/settings.json` (`"deny": ["Read(./.env)"]`), which stops Claude Code reading it (being tested in a signed-in session). In the `example-project` folder:
+**2. Add it to Claude Code.** Do this in a **new** terminal window where no key is loaded (no `set -a`; check with `[ -z "$ANTHROPIC_API_KEY" ] && echo clear`, which prints `clear`): Claude Code, and the servers it starts, should never get your key. This folder holds your `.env`, so it comes with the week 9 deny rule in `.claude/settings.json` (`"deny": ["Read(./.env)"]`), which stops Claude Code reading it (being tested in a signed-in session). In the `example-project` folder:
 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
 
