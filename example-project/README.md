@@ -26,11 +26,24 @@ The class builds this project up week by week, alongside your own:
 | 8 | a real bug fixed test first: a classmate's feedback form found it ([`FEEDBACK.md`](FEEDBACK.md) is the instructor's example), [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
 | 9 | an optional "paste the listing" step: a model (Claude Haiku 5.5, through the Anthropic API) reads a pasted listing and offers its numbers, which you confirm or replace; tests use a fake model, so they need no key and cost nothing |
 | 10 | investor notes you can ask questions of: `python3 -m dealscreener.notes index` turns each note into an embedding (Google's `gemini-embedding-001`), and `ask` finds the notes closest in meaning to your question and has Claude Haiku answer from those notes only, naming its sources; tests use fake embeddings and a fake model, so they need no keys and cost nothing |
-| 11 onward | more of the tool, step by step, following the plan |
+| 11 | tools, an agent and MCP: the calculator becomes a tool (`screen_listing`) that Claude can call; `python3 -m dealscreener.agent "your question"` runs an agent loop (Claude asks for the tool, the program runs it and sends the result back, at most 5 calls to Claude), and `python -m dealscreener.mcp_server` offers the same tool to Claude Code as an MCP server; tests use a fake model, so they need no key and cost nothing |
+| 12 onward | more of the tool, step by step, following the plan |
 
 Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-09` exist now, the week 10 state will get the tag `week-10` once week 10 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 10)
+## What's here now (week 11)
+
+Everything from week 10 (listed below), plus:
+
+- `dealscreener/tools.py`: the `screen_listing` tool. `TOOL_SCHEMA` is what Claude is told about it: its name, a plain description (it says percentages are written as 25 for 25%, and that 5% vacancy and 8% repairs are already allowed for), and the nine numbers it needs, each with a type and a description, all required, nothing else allowed. `screen_listing` checks every number with the same rules as the program's questions, runs the calculator and the buy box, and returns the four results (rounded to cents), each rule's reason, and `PASS` or `FAIL`. A wrong number raises `ToolInputError` with one sentence naming the field, for example `interest_rate_pct is 250: it must be a percentage from 0 to 100.` A rate between 0 and 1 is refused with `interest_rate_pct is 0.07: percentages are written as 7 for 7%. Ask the user which they meant.` (the week 8 bug, now for the tool). The tool only calculates: it reads no files, writes nothing and sends nothing.
+- `dealscreener/agent.py`: the agent command, `python3 -m dealscreener.agent "your question"`. It sends the question and the tool's description to Claude Haiku 5.5. When Claude asks for the tool, the program prints `Calling screen_listing with` and the numbers, runs the tool, and sends the result back (or the error sentence, marked as an error, so Claude can fix it or ask you). It stops at Claude's final answer, or after 5 calls to Claude (the course's own limit, so a confused model can't run up a bill), and prints what all the calls cost together. The instructions tell Claude to use the tool for every number, to give the tool's numbers exactly, to ask for any of the nine numbers the question leaves out instead of guessing, and to explain the result for a beginner.
+- `dealscreener/mcp_server.py`: the same tool as an MCP server, for Claude Code (see [How to use the MCP server in Claude Code](#how-to-use-the-mcp-server-in-claude-code)). It needs no key and reads no `.env` file.
+- `tests/test_tools.py` (24 tests) and `tests/test_agent.py` (19 tests): a fake client plays Claude from a script of replies, so they run with plain `python3`, no key, no internet and no packages. They cover listing B (cash flow 430.53, `PASS`), listing A (`FAIL`), every kind of wrong input, a tool call and its result going back with the matching id, Claude's whole reply (including its thinking) going back unchanged, two tool calls in one reply, an unknown tool, the 5-call limit, a cut-off answer, a refusal, the cost line and the error sentences.
+- `tests/test_mcp_server.py` (4 tests): starts the real MCP server and talks to it the way Claude Code would, with the MCP package's own client. Skipped when the `mcp` package isn't installed.
+- `tests/test_agent_live.py`: one real run, skipped unless you ask for it (see [How to ask the agent](#how-to-ask-the-agent)).
+- `requirements.txt`: adds `mcp[cli]`, the official MCP package, pinned to the version the course tested (2.3.0). It needs Python 3.11 or newer; on an older Python, pip skips it and installs the rest.
+
+## What week 10 added
 
 Everything from week 9 (listed below), plus:
 
@@ -90,7 +103,7 @@ Everything from week 8 (listed below), plus:
 
 ## How to run it
 
-You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library. (The optional listing step from week 9 and the notes command from week 10 need more: see [How to use the listing step](#how-to-use-the-listing-step) and [How to ask your notes](#how-to-ask-your-notes).)
+You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library. (The optional listing step from week 9, the notes command from week 10 and the agent and MCP server from week 11 need more: see [How to use the listing step](#how-to-use-the-listing-step), [How to ask your notes](#how-to-ask-your-notes), [How to ask the agent](#how-to-ask-the-agent) and [How to use the MCP server in Claude Code](#how-to-use-the-mcp-server-in-claude-code).)
 
 Open the Terminal (Mac) or, on Windows, the Ubuntu window you set up in week 2, go to the folder where you cloned the course repo, and type:
 
@@ -347,6 +360,153 @@ What the course's real runs cost, on 13 October 2026 (Claude at $0.10 / $0.50 pe
 | `What did I note about solar panels?` (answer: `My notes don't say.`) | 1 embedding | 620 | 151 | about $0.00014 |
 
 Google's embedding responses reported no token counts, so the program prints only Claude's cost.
+
+## How to ask the agent
+
+From week 11 you can ask about a listing in plain English, and Claude works out the answer with the deal screener's own calculator. Claude doesn't do the sums itself: it asks for the `screen_listing` tool, the program runs the tool on your computer and sends the result back, and Claude explains it. This back and forth is the **agent loop**. The program allows at most 5 calls to Claude per question. Anthropic's documentation sets no limit: 5 is the course's own safety rule.
+
+You need the same things as the listing step: an Anthropic key in `.env`, and the packages from `requirements.txt` in a virtual environment (see steps 1 and 2 of [How to use the listing step](#how-to-use-the-listing-step)). The agent needs Python 3.10 or newer, like `anthropic`.
+
+**1. Ask a question with all nine numbers.**
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+python3 -m dealscreener.agent "Should I buy this rental? The price is \$150,000 and the rent is \$1,700 a month. Property tax is \$2,400 a year, insurance is \$1,200 a year and there is no HOA fee. I'd put 25% down on a 30-year loan at 7% interest, with \$6,000 in closing costs."
+```
+
+The `\` before each `$` stops the Terminal reading `$150` as a setting of its own. In the course's run it printed the tool call first:
+
+```
+Calling screen_listing with {"purchase_price":150000,"monthly_rent":1700,"yearly_property_tax":2400,"yearly_insurance":1200,"monthly_hoa":0,"down_payment_pct":25,"interest_rate_pct":7,"loan_term_years":30,"closing_costs":6000}
+```
+
+Then Claude's answer: the listing passes, with a monthly mortgage of $748.47, a monthly cash flow of $430.53, a cap rate of 9.43% and a cash-on-cash return of 11.88%, each explained in a sentence, the two buy-box rules, and what to check before buying (the real rent, the property's condition, the actual tax and insurance quotes). Last came the cost:
+
+```
+Used 3072 input and 988 output tokens on Claude in 2 turns, about $0.00080.
+```
+
+Two turns means two calls to Claude: one that asked for the tool, and one that answered with the tool's result. Claude's wording is different every time; the numbers come from the tool, so they are the same every time.
+
+**2. Leave numbers out.** Try `python3 -m dealscreener.agent "Should I buy a rental priced at \$150,000 that rents for \$1,700 a month?"`. In the course's run Claude didn't call the tool: it listed the seven missing numbers (tax, insurance, HOA, down payment, rate, loan term, closing costs) and asked for them. That took 1 turn: 1215 input and 378 output tokens, about $0.00031. The agent answers one question and stops, so ask again with all nine numbers.
+
+**3. Write the rate as a decimal.** Try the question from step 1 with `an interest rate of 0.07` in place of `7% interest`. In the course's run Claude sent 7 to the tool and said "I read your 0.07 interest rate as 7%." If Claude ever sends 0.07, the tool refuses it with `interest_rate_pct is 0.07: percentages are written as 7 for 7%. Ask the user which they meant.`, and Claude gets that sentence back as an error to act on. Either way, read the numbers in the `Calling screen_listing with` line: they are the ones the answer is based on.
+
+If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence and stops, the same sentences as the listing step. If Claude hasn't answered after 5 calls, it prints `Stopped after 5 turns without a final answer.` and what those calls cost. The tests never call Claude: `python3 -m unittest` stays free and works without a key.
+
+**4. The live test (optional).** One real run of the question from step 1: it checks that Claude called the tool at least once and that the answer contains 430.53.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+set -a; . ./.env; set +a
+RUN_LIVE_TESTS=1 python3 -m unittest tests.test_agent_live -v
+```
+
+**5. With Docker.** Build the image again (`docker build -t dealscreener .`), then hand the container your key while it runs.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+docker run --rm --env-file .env dealscreener python -m dealscreener.agent "Should I buy a rental priced at \$150,000 that rents for \$1,700 a month?"
+```
+
+### Agent cost record
+
+What the course's runs of the final code cost, on 13 October 2026 (Claude Haiku 5.5 at $0.10 / $0.50 per million input / output tokens). Every call sends the whole conversation so far, plus the tool's description, so a two-turn question costs more than twice a one-call question.
+
+| Question | Turns | Tool calls | Input tokens | Output tokens | Cost |
+|---|---|---|---|---|---|
+| Listing B, all nine numbers | 2 | 1 | 3072 | 988 | 3072 x $0.10 / 1,000,000 + 988 x $0.50 / 1,000,000 = about $0.00080 |
+| Price and rent only | 1 | 0 | 1215 | 378 | about $0.00031 |
+| Listing B with the rate as 0.07 | 2 | 1 | 3168 | 1056 | about $0.00084 |
+| Live test, three runs | 2 each | 1 each | 3072, 3072, 3068 | 977, 867, 1018 | about $0.0007 to $0.0008 each |
+
+**Two fixes the live runs led to.** In the first run Claude told the user the calculator leaves out vacancy and repairs, which is wrong (it allows 5% and 8% of the rent): the tool's description now says so. In the second run Claude rounded the cash flow to "about $431" and worked out a yearly figure itself, so the instructions now say to give the tool's numbers exactly, to the cent, and to do no sums of its own. The tests pin both. Reading the real answers, not only the tests, is what found them.
+
+## How to use the MCP server in Claude Code
+
+MCP (Model Context Protocol) is a standard way to connect AI apps to tools: the [MCP introduction](https://modelcontextprotocol.io/docs/getting-started/intro) (read 2026-10-13) calls it "like a USB-C port for AI applications". `dealscreener/mcp_server.py` offers the `screen_listing` tool to any MCP app. Here the app is Claude Code: once it is connected, you can ask Claude Code to screen a listing and it calls your tool. The server needs no key and reads no `.env` file.
+
+**An MCP server runs code on your computer.** Claude Code's [MCP page](https://code.claude.com/docs/en/mcp) (read 2026-10-13) says: "Verify you trust each server before connecting it. Servers that fetch external content can expose you to prompt injection risk." Add only servers you wrote yourself, like this one, or ones from a source you trust. Week 13 covers the risks in more depth.
+
+You need Python 3.11 or newer for the `mcp` package (type `python3 --version` to check) and Claude Code from week 2. On Windows, do every step in the Ubuntu window: Claude Code and the server both run in Ubuntu.
+
+**1. Install the package and test the server on its own.** In the `example-project` folder, with the virtual environment from week 9:
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 -m unittest tests.test_mcp_server -v
+```
+
+The tests start the server and talk to it with the MCP package's own client: they list its one tool, screen listing B (cash flow 430.53), and check that a wrong number comes back as an error. All four should say `ok`. If they say `skipped`, the `mcp` package isn't installed in this window: check that `(.venv)` is showing and that `python3 --version` is 3.11 or newer.
+
+You can also start the server by hand with `python -m dealscreener.mcp_server`, but it prints nothing: it waits silently for an app to connect. Press Ctrl+C to stop it.
+
+**2. Add it to Claude Code.** Still in the `example-project` folder:
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+claude mcp add --scope project dealscreener -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
+```
+
+- `dealscreener` is the name Claude Code shows for the server.
+- `--scope project` saves it in a file called `.mcp.json` in this folder, for this project only.
+- Everything after `--` is the command Claude Code runs to start the server. Claude Code stores it exactly as typed, so it uses the full path to the virtual environment's Python (`$PWD` means "the folder you're in"). With plain `python`, Claude Code would start a Python without the `mcp` package, and the server would fail.
+
+In the course's check (Claude Code 2.1.296, in a test container, not signed in) it printed:
+
+```
+Added stdio MCP server dealscreener with command: /home/student/example-project/.venv/bin/python -m dealscreener.mcp_server to project config
+File modified: /home/student/example-project/.mcp.json
+```
+
+and `.mcp.json` held this (your path will be your own folder):
+
+```
+{
+  "mcpServers": {
+    "dealscreener": {
+      "type": "stdio",
+      "command": "/home/student/example-project/.venv/bin/python",
+      "args": [
+        "-m",
+        "dealscreener.mcp_server"
+      ],
+      "env": {}
+    }
+  }
+}
+```
+
+No key is in it, and none is needed. This example doesn't commit its `.mcp.json`, because the path belongs to one computer.
+
+**3. Check it.**
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+claude mcp list
+```
+
+In the course's check it showed ``dealscreener: /home/student/example-project/.venv/bin/python -m dealscreener.mcp_server - ⏸ Pending approval (run `claude` to approve)``. For your safety, Claude Code asks you to approve a project's servers before it uses them. `claude mcp get dealscreener` shows the details.
+
+**4. Approve it and ask.** Start Claude Code in the `example-project` folder (type `claude`), approve the `dealscreener` server when it asks, and ask, for example: "Use the screen_listing tool to screen this listing: price 150000, rent 1700 a month, tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask your permission to run the tool, then answer with a cash flow of $430.53 and `PASS`. The approval screen, the permission prompt and the name Claude Code shows for the tool are being tested in a signed-in session; `/mcp` inside Claude Code shows the server's status.
+
+**5. Remove it** when you no longer want it:
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+claude mcp remove dealscreener --scope project
+```
+
+In the course's check this left `.mcp.json` with an empty list of servers.
 
 ## What the numbers mean
 
