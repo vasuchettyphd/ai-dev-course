@@ -110,3 +110,168 @@ The key is like a password to your credit. If you lose it, you can't see it agai
 **e. Check git would ignore it.** `~/first-call` isn't a git folder, so there's nothing to check yet. You'll do this in your project in step 5b, before any commit.
 
 **f. If a key leaks.** Pasted it into a chat, showed it on screen, committed it, or pushed it? **First**, in the Console, **Settings > API keys**, find the key and **Delete** it (Anthropic: "disable or delete any key you suspect has leaked"; **Disable** can be undone, **Delete** can't, and a leaked key should never come back). Then create a new key and put it in `.env`. Only then clean up the place it leaked: tell your instructor if it was committed or pushed, so you can fix the history together. Deleting the old key first matters more than cleaning up, because a pushed key can be copied within minutes.
+
+### 3. Your first call
+
+You'll do this in the scratch folder `~/first-call` from step 2d, not in your project, so nothing here can end up in a commit.
+
+**a. Check your Python.** In your terminal, type `python3 --version`. The `anthropic` package needs **Python 3.10 or newer**.
+
+- **Mac:** if it prints `Python 3.9` (Apple's own Python, from week 3) or lower, install a newer one from python.org exactly as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools), then close and reopen Terminal and check again (being tested). On an Apple chip Mac, `brew install python` works too.
+- **Windows (Ubuntu window):** Ubuntu 24.04 comes with Python 3.12, which is fine.
+
+**b. Make a virtual environment and install the package.** A **virtual environment** (a `.venv` folder) is a private box of Python packages for one folder, so installing a package can't break anything else on your laptop. In your terminal:
+
+```bash
+cd ~/first-call
+python3 -m venv .venv
+source .venv/bin/activate
+pip install anthropic==1.13.0
+```
+
+The `source` line **activates** the environment: your prompt now starts with `(.venv)`. You need to activate it again in every new terminal window (`cd ~/first-call` then `source .venv/bin/activate`). The `==1.13.0` pins the version the course tested.
+
+The last line should end with `Successfully installed ... anthropic-1.13.0 ...` (seen in the course's test). Check:
+
+```bash
+python -c "import anthropic; print(anthropic.__version__)"
+```
+
+It prints `1.13.0`.
+
+**On Windows (Ubuntu), if `python3 -m venv .venv` fails** with a message starting "The virtual environment was not created successfully because ensurepip is not available", Ubuntu is missing one package. The failed attempt also leaves a broken `.venv` folder behind. In the Ubuntu window:
+
+```bash
+sudo apt update
+sudo apt install python3-venv
+rm -r .venv
+```
+
+`sudo` asks for your Ubuntu password (nothing shows as you type). The `rm -r .venv` deletes **only** the broken `.venv` folder you just made, in `~/first-call`: type it exactly, with nothing added. Then run the four lines above again.
+
+**c. Write the first program.** In your terminal, in `~/first-call`, paste this whole block and press Enter. It creates a file called `first_call.py` (the lines between `<<'EOF'` and `EOF` go into the file):
+
+```bash
+cat > first_call.py <<'EOF'
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-haiku-5-5",
+    max_tokens=1000,
+    messages=[
+        {"role": "user", "content": "In one sentence, what is a cap rate in real estate?"}
+    ],
+)
+
+for block in message.content:
+    if block.type == "text":
+        print(block.text)
+
+print()
+print("Stopped because:", message.stop_reason)
+print("Input tokens:", message.usage.input_tokens)
+print("Output tokens:", message.usage.output_tokens)
+cost = (message.usage.input_tokens * 0.10 + message.usage.output_tokens * 0.50) / 1_000_000
+print(f"Cost: about ${cost:.6f}")
+EOF
+```
+
+It's Anthropic's own first example (<https://platform.claude.com/docs/en/get-started>) with three changes: the cheaper `claude-haiku-5-5` model, a real-estate question, and the lines at the end that show the tokens and the cost. Notice what the program does **not** contain: your key. The package reads it from the environment, from a variable called `ANTHROPIC_API_KEY` (Anthropic: "The client SDK reads `ANTHROPIC_API_KEY` automatically").
+
+Why the `for block in message.content` loop? A reply is a list of **blocks**. Haiku 5.5 sometimes "thinks" first, and its thinking comes back as a block of its own before the answer, so the program picks out the `text` blocks instead of assuming the first block is the answer. Anthropic: "Select content blocks by their `type` field rather than by position."
+
+**d. Run it.** In your terminal, in `~/first-call`, with `(.venv)` showing:
+
+```bash
+set -a; . ./.env; set +a
+python first_call.py
+```
+
+The first line loads the key from `.env` into this terminal window, without showing it. It lasts until you close the window; in a new window, run it again. You should see a one-sentence answer, then lines like these (being tested; your numbers will differ):
+
+```text
+Stopped because: end_turn
+Input tokens: ...
+Output tokens: ...
+Cost: about $0.000...
+```
+
+`end_turn` means the model finished its answer. Check the cost by hand with step 1's arithmetic, and check it against the Console's **Usage** page (<https://platform.claude.com/usage>) later: the Console may take a while to update.
+
+If you see `TypeError: "Could not resolve authentication method...`, the key isn't loaded: run the `set -a` line again, in `~/first-call`. Other errors: see Troubleshooting.
+
+### 4. The settings that matter
+
+Each change below is a small edit to `first_call.py`. Make it in a text editor (`open -e first_call.py` on a Mac, `nano first_call.py` in Ubuntu), or paste a new version with `cat > first_call.py <<'EOF'` as above.
+
+**a. The same question, three times.** Run the program three times in a row:
+
+```bash
+for i in 1 2 3; do python first_call.py; done
+```
+
+Compare the three answers. They'll probably be worded differently (being tested): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 also reject any other value (<https://platform.claude.com/docs/en/about-claude/models/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models. So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
+
+**b. A system prompt.** The `system` setting holds instructions that apply to the whole conversation (Anthropic: "Use the top-level `system` field for instructions that apply from the start"). Add this line just below `max_tokens=1000,`:
+
+```python
+    system="You explain real estate terms to beginners. Answer in one short sentence, with no jargon.",
+```
+
+Run it a few times. The answers keep their wording differences, but they all follow the rules. A specific prompt (exactly what to do, how long, in what form) is your strongest control.
+
+**c. `max_tokens`.** This caps how many output tokens the model may write, so it caps the cost of one call. Change `max_tokens=1000` to `max_tokens=20` and run it. The answer is probably cut off, and `Stopped because:` shows `max_tokens` (being tested). Thinking counts toward this cap too ("Thinking tokens count toward `max_tokens`"), so a very small number can stop the model before it writes any text at all. Your program must check `stop_reason` and not trust a cut-off answer. Put it back to `1000`.
+
+**d. Structured output: answers your program can read.** A sentence is fine for a person, but a program needs the answer in a fixed shape. **Structured output** makes the model answer in JSON (a standard text format for data, like `{"price": 150000}`) that follows a **schema**: a description of exactly which fields you want. Paste this into your terminal, in `~/first-call`, to create `structured.py`:
+
+```bash
+cat > structured.py <<'EOF'
+import json
+import anthropic
+
+client = anthropic.Anthropic()
+
+schema = {
+    "type": "object",
+    "properties": {
+        "price": {"type": ["number", "null"], "description": "Asking price in dollars"},
+        "bedrooms": {"type": ["number", "null"], "description": "Number of bedrooms"},
+    },
+    "required": ["price", "bedrooms"],
+    "additionalProperties": False,
+}
+
+message = client.messages.create(
+    model="claude-haiku-5-5",
+    max_tokens=1000,
+    system="Pull numbers out of real estate listings. Use null for any number the listing does not state.",
+    messages=[{"role": "user", "content": "Cozy 3 bed, 2 bath bungalow, now $189,000."}],
+    output_config={"format": {"type": "json_schema", "schema": schema}},
+)
+
+if message.stop_reason != "end_turn":
+    print("No usable answer. Stopped because:", message.stop_reason)
+else:
+    text = next(block.text for block in message.content if block.type == "text")
+    answer = json.loads(text)
+    print(answer)
+    print("Input tokens:", message.usage.input_tokens, "Output tokens:", message.usage.output_tokens)
+EOF
+python structured.py
+```
+
+You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested). The `output_config` part is Anthropic's **structured outputs** feature (<https://platform.claude.com/docs/en/build-with-claude/structured-outputs>). `null` lets the model say "the listing doesn't say" instead of guessing. Structured output fixes the **shape** of the answer, not whether it's **right**: a model can still misread a number, so your program checks the values, and a person confirms anything that matters.
+
+**e. Choosing a model.** Anthropic's three current families (<https://platform.claude.com/docs/en/about-claude/models/overview>, prices from <https://platform.claude.com/docs/en/about-claude/pricing>, both read 12 October 2026):
+
+| Model | ID to use in code | Price per million tokens (input / output) | Speed | Good for |
+|---|---|---|---|---|
+| Claude Haiku 5.5 | `claude-haiku-5-5` | $0.10 / $0.50 | fastest | high-volume tasks "such as classification, extraction, and routing" |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | $2 / $10 | fast | harder writing and reasoning |
+| Claude Opus 5.5 | `claude-opus-5-5` | $4 / $20 | moderate | the hardest tasks; Anthropic's default suggestion |
+
+Anthropic's own advice for keeping costs down: "1. Begin implementation with Claude Haiku 5.5. 2. Test your use case thoroughly. 3. Evaluate if performance meets your requirements. 4. Upgrade only if necessary for specific capability gaps." (<https://platform.claude.com/docs/en/about-claude/models/choosing-a-model>). That's what this course does. To try another model, change only the `model=` line; the same call costs 20 times more on Sonnet 5.5 and 40 times more on Opus 5.5.
+
+You may hear of **fine-tuning**: training a model further on your own examples. This course doesn't cover it, and projects like yours don't need it: a clear prompt, structured output and checks in your code go a long way.
