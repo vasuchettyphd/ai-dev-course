@@ -58,7 +58,7 @@ Models: `example-project/DEMO.md` and `example-project/FINAL.md`
 - Week 12 and 13 results committed
 - No key anywhere in the history (week 13 step 1)
 - The README says how to run it; Docker builds it and runs the tests
-- Private repo, your instructor a collaborator
+- Private repo, your instructor a collaborator (not scored, but needed)
 
 Branch `final`; Claude Code checks the list, **you** fix things.
 
