@@ -95,8 +95,10 @@ It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`,
 |---|---|---|---|
 | Dev, first run | 75 of 75 fields (100%) | 15 of 15 | about $0.0017 |
 | Dev, second run | 75 of 75 fields (100%) | 15 of 15 | about $0.0016 |
-| Held out, once | 24 of 25 fields (96%) | 4 of 5 | about $0.0005 |
+| Held out, run on its own once | 24 of 25 fields (96%) | 4 of 5 | about $0.0005 |
 | All 20 | 100 of 100 fields (100%) | 20 of 20 | about $0.0023 |
+
+The `--all` run includes the 5 held-out cases, so the course ran them a second time to show you the flip below. In your own work, run `--held-out` once and leave `--all` until your report is written.
 
 **c. Read the miss.** Case 14 says "The seller will consider offers between $180,000 and $195,000." There's no single asking price, so the written answer is `null`. In the held-out run the model answered 187500, the middle of the range: a guess. In the `--all` run, on the very same listing, it answered `null`. **The same input got two different answers in two runs.** That's why you run an evaluation more than once, and why one good run proves little.
 

@@ -121,7 +121,7 @@ One line per case, then the score, the misses and the cost. Saved in `evals/resu
 | Dev, run 1 | 75 of 75 (100%) | $0.0017 |
 | Dev, run 2 | 75 of 75 (100%) | $0.0016 |
 | Held out, once | 24 of 25 (96%) | $0.0005 |
-| All 20 | 100 of 100 (100%) | $0.0023 |
+| All 20 (held-out cases again) | 100 of 100 (100%) | $0.0023 |
 
 ---
 
