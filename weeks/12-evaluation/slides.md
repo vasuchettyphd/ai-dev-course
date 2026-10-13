@@ -57,15 +57,13 @@ A few good answers tell you less than they feel like.
 
 ---
 
-<style scoped>table { font-size: 21px; }</style>
-
 ## Jev: 300 harder cases
 
 | How | Right |
 |---|---|
 | Jev alone | 211 of 300 (70%) |
 | Facts prepared first | 236 of 300 (79%) |
-| Code applies the rules, Jev reads the message | 300 of 300 |
+| Code applies the rules, Jev reads the message (all 36 messages read right) | 300 of 300 |
 | Jev alone, within 3 days of a window's edge | 63 of 129 (49%) |
 
 300 generated cases from 36 messages, one run, written by the author: not a general accuracy.
@@ -173,9 +171,10 @@ Course-safe data. Scoring rule written first.
 
 1. Branch `eval`; commit the test set **alone**
 2. `/superpowers:writing-plans` for the script, with the guardrails
-3. Dev cases twice; read every miss
+3. Dev cases twice, in a second window (never the Claude Code one); read every miss
 4. One change; dev again
 5. Held-out, once
+6. Review, pull request (no `.env`, no key in any file), merge, pull
 
 ---
 
@@ -185,6 +184,6 @@ Course-safe data. Scoring rule written first.
 |---|---|
 | Test set: 20 cases, reasons, 5 held out, scoring rule, committed first | 3 |
 | Merged script: offline tests, score, misses, cost, results saved, no key | 3 |
-| Report: two dev scores, three misses, one change and held-out score, what it shows | 4 |
+| Report: two dev scores, three misses and corrections, one change and held-out score, what it shows | 4 |
 
 Next week: security and responsible use.
