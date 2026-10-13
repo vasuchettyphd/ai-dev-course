@@ -140,3 +140,76 @@ What happened:
 - That's **two calls**, and you pay for both: (432 + 511) x $0.10 / 1,000,000 + (71 + 56) x $0.50 / 1,000,000 = about $0.00016.
 
 Two details matter. Claude's turn goes back into the conversation **unchanged** (`first.content`): Anthropic's docs say any thinking in it must be passed back "complete and unmodified". And in your reply, the `tool_result` comes first.
+
+### 3. The agent loop, on the deal screener
+
+Step 2 handled one tool call by hand. Real questions can need several: the model calls a tool, looks at the result, maybe calls it again, then answers. An **agent** is that, in a loop:
+
+1. Send the question, the tool's description and the conversation so far.
+2. If Claude stopped with `end_turn`, print the answer: done.
+3. If it stopped with `tool_use`, run each tool it asked for, **after checking the inputs**, add the results to the conversation, and go back to 1.
+4. If you've gone round 5 times, stop and say so.
+
+The deal screener now has one: `python3 -m dealscreener.agent "your question"` ([`dealscreener/agent.py`](../../example-project/dealscreener/agent.py)). Its one tool, `screen_listing`, is the calculator you built in week 5: Claude decides the nine numbers from your question, and **your code** does every sum. The system prompt says "Use the screen_listing tool for every number you report; never work numbers out yourself."
+
+**a. Try it.** In your terminal:
+
+```bash
+cd ~/ai-dev-course
+git pull
+cd example-project
+source .venv/bin/activate
+pip install -r requirements.txt
+set -a; . ./.env; set +a
+python3 -m dealscreener.agent "Should I buy this rental? The price is \$150,000 and the rent is \$1,700 a month. Property tax is \$2,400 a year, insurance is \$1,200 a year and there is no HOA fee. I'd put 25% down on a 30-year loan at 7% interest, with \$6,000 in closing costs."
+```
+
+(The `\$` keeps your terminal from treating `$1` as something else.) The course's run printed the tool call, then the answer (shortened here):
+
+```text
+Calling screen_listing with {"purchase_price":150000,"monthly_rent":1700,"yearly_property_tax":2400,"yearly_insurance":1200,"monthly_hoa":0,"down_payment_pct":25,"interest_rate_pct":7,"loan_term_years":30,"closing_costs":6000}
+
+The screen says this listing passes your buy box. ...
+- Monthly mortgage payment: $748.47
+- Monthly cash flow: $430.53. ...
+...
+Used 3072 input and 988 output tokens on Claude in 2 turns, about $0.00080.
+```
+
+Those are exactly the numbers the program gives in week 5, because the program worked them out.
+
+**b. Leave numbers out.** Ask "Should I buy a rental priced at \$150,000 that rents for \$1,700 a month?". The prompt tells Claude: "If the question is missing any of the nine numbers, ask the user for them and do not call the tool." In the course's run it listed the seven missing numbers and called no tool (1 turn, about $0.00031).
+
+**c. What the tool checks.** The model can send anything, so `screen_listing` checks every input with the same rules the program uses for typed answers: every field present, numbers not words, no negatives, percentages up to 100, whole years. A rate sent as `0.07` is refused with a sentence telling Claude that percentages are written as 7 for 7% (the week 8 bug, now guarded at the tool too). A refusal goes back to Claude as a `tool_result` with `is_error: true`, so it can fix the request or ask you, and the loop carries on. In the course's run with "an interest rate of 0.07", Claude sent 7 and said "I read your 0.07 interest rate as 7%."
+
+**What the live runs taught.** The first versions of the prompt let Claude say the calculator left out vacancy and repairs (it doesn't), and round $430.53 to "about $431" and do its own sums. Two sentences fixed that: the tool's description now says 5% vacancy and 8% repairs are included, and the prompt says to give the tool's numbers exactly. Test your prompt with real runs, and read the answers.
+
+### 4. Give your project one tool
+
+> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version was built and tested on 13 October 2026.
+
+**a. Make the branch first.** In a **new** terminal window (no keys loaded), `cd ~/semester-project`, start `claude`, and in Claude Code:
+
+```text
+Switch to main, pull the latest changes from GitHub, then create a new branch called tool and switch to it.
+```
+
+**b. Pick one safe tool.** It should be a function your project **already has** or obviously needs, that **reads or calculates**:
+
+| Good first tools | Not this week |
+|---|---|
+| A calculator your project already has (a budget total, a grade average, a price with tax) | Anything that deletes, sends email or messages, pays, posts, or writes files |
+| Looking something up in your own course-safe data (your week 10 documents, a table in your project) | Anything that reaches other people's accounts or data |
+| Converting units, dates or currencies with fixed rates | Running commands or code the model writes |
+
+**c. Plan and build it.** In Claude Code (replace the parts in angle brackets):
+
+```text
+/superpowers:writing-plans Write an implementation plan to give my project one tool the model can call: <name>, which <what it reads or calculates>, using <the existing function, if there is one>. Use Anthropic's anthropic package with claude-haiku-5-5 and an agent loop: send the tool's name, description and input_schema; when stop_reason is tool_use, run the tool and send back a tool_result with the same tool_use_id (errors as text with is_error true), appending Claude's turn to the conversation unchanged; stop at end_turn; stop after 5 turns and say so; handle max_tokens and refusal with a plain sentence; omit tool_choice and temperature. Rules: the tool only reads or calculates; check every input the model sends, the same way the program checks a person's input; tell the model in the system prompt to use the tool for every number and to ask for missing inputs instead of guessing; print each tool call and the total tokens and cost; read the key only from the environment and never read or print .env; tests must use a fake model that asks for the tool, including a bad input, two tool calls in one reply, and hitting the 5-turn limit, and never call Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1. I'm not a programmer, so keep each task small.
+```
+
+Then `/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.` as in weeks 9 and 10. Answer as in the table at the top.
+
+**d. Try it.** In a second terminal window (not the Claude Code one): activate `.venv`, load the key, and ask your agent three questions: one it can answer with the tool, one with an input missing, and one with a bad input. Copy one run's printed output, with the tool calls and the cost line: you hand it in.
+
+**e. Run the tests** with `.env` moved out of the folder, as in week 9 step 5e: they must all pass.
