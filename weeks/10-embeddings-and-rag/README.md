@@ -75,7 +75,7 @@ The model answers from your documents instead of from memory, and you can check 
 - Try your **UVU** Google account first. Whether UVU has AI Studio switched on is **being tested: check with your instructor**.
 - If you see "We are sorry, but you do not have access to Google AI Studio. Please contact your Organization Administrator for access.", use a **personal** Google account instead (you must be 18 or older).
 
-**b. Create the key.** Go to Google AI Studio's API keys page (<https://aistudio.google.com/apikey>), sign in, and click **Create API key**. Copy it (Google keys usually start with `AIza`, being tested). Don't paste it anywhere except your `.env` file, next.
+**b. Create the key.** Go to Google AI Studio's API keys page (<https://aistudio.google.com/apikey>, being tested; Google's key page is <https://ai.google.dev/gemini-api/docs/api-key>), sign in, and click **Create API key**. Copy it (Google keys usually start with `AIza`, being tested). Don't paste it anywhere except your `.env` file, next.
 
 **c. Know what the free tier does with what you send.** The free tier should cost you nothing (being tested), but Google's terms (<https://ai.google.dev/gemini-api/terms>, read 13 October 2026) say:
 
@@ -161,7 +161,7 @@ set -a; . ./.env; set +a
 python embed.py
 ```
 
-The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested: your numbers will be close to these). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
+The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested: the course will add its real scores here). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
 
 If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, which Google supports until at least May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
 
@@ -175,12 +175,13 @@ The deal screener now has a `notes/` folder: 8 short notes an investor might kee
 cd ~/ai-dev-course
 git pull
 cd example-project
+python3 --version
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`.
+`python3 --version` must show 3.10 or newer, as in week 9 step 3a. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`.
 
 **b. Chunk and index.** In the same window:
 
@@ -314,7 +315,7 @@ The deal screener's week 10 changes are on this page (it works once week 10 is p
 | `ValueError` mentioning an API key, or "No Google API key found" | The Google key isn't loaded: `set -a; . ./.env; set +a` in the folder with `.env`, and check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. |
 | "We are sorry, but you do not have access to Google AI Studio..." | Your school account can't use AI Studio. Use a personal Google account (18 or older), and tell your instructor. |
 | AI Studio says it isn't available in your country, or asks you to verify your age | Google's limits (<https://ai.google.dev/gemini-api/docs/available-regions>). Use a personal account that meets them, or ask your instructor. |
-| `API key not valid`, or "The Google API key was not accepted" | The key is wrong, deleted, or has quote marks or spaces: check the `.env` line, or make a new key (step 2b). |
+| `API key not valid`, error 400, 401 or 403, or "The Google API key was not accepted" | The key is wrong, deleted, or has quote marks or spaces: check the `.env` line, or make a new key (step 2b). |
 | "Using GOOGLE_API_KEY" in a warning | You also set `GOOGLE_API_KEY`, which wins: remove it (step 2d). |
 | Error 429, or "Too many requests for the free tier" | You hit a free-tier limit. Wait a minute (or until the next day for a daily limit) and try again; see your limits in AI Studio. |
 | Error 404, or "The embedding model name wasn't found" | Check the model name: `gemini-embedding-001`. |
