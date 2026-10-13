@@ -100,3 +100,119 @@ Use the name `GEMINI_API_KEY`, and **don't** also set `GOOGLE_API_KEY`: Google's
 **e. If a Google key leaks.** On the same API keys page in AI Studio, delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
 
 **f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time.
+
+### 3. Your first embeddings
+
+You'll use the scratch folder and virtual environment from week 9 (`~/first-call`), so nothing here can end up in your project.
+
+**a. Install Google's package.** In your terminal:
+
+```bash
+cd ~/first-call
+source .venv/bin/activate
+pip install google-genai==2.30.0
+python -c "from google import genai; print(genai.__version__)"
+```
+
+The last line prints `2.30.0`. (`google-genai` is Google's official package, from <https://github.com/googleapis/python-genai>. It needs Python 3.10 or newer, like week 9's.)
+
+**b. Write the program.** In your terminal, in `~/first-call`, paste this whole block and press Enter. It creates `embed.py`:
+
+```bash
+cat > embed.py <<'EOF'
+import math
+from google import genai
+from google.genai import types
+
+client = genai.Client()  # reads GEMINI_API_KEY from the environment
+
+sentences = [
+    "The association dues on the Riverside condo are $185 a month.",
+    "How much are the HOA fees?",
+    "The contractor prefers a text message to a phone call.",
+]
+
+result = client.models.embed_content(
+    model="gemini-embedding-001",
+    contents=sentences,
+    config=types.EmbedContentConfig(task_type="SEMANTIC_SIMILARITY", output_dimensionality=768),
+)
+vectors = [embedding.values for embedding in result.embeddings]
+
+
+def cosine(a, b):
+    dot = sum(x * y for x, y in zip(a, b))
+    return dot / (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(y * y for y in b)))
+
+
+print("Numbers in each embedding:", len(vectors[0]))
+print("Dues note vs HOA question:      ", round(cosine(vectors[0], vectors[1]), 3))
+print("Dues note vs contractor note:   ", round(cosine(vectors[0], vectors[2]), 3))
+print("HOA question vs contractor note:", round(cosine(vectors[1], vectors[2]), 3))
+EOF
+```
+
+Three things to notice: there's no key in it (the package reads `GEMINI_API_KEY` itself); `output_dimensionality=768` keeps 768 numbers instead of 3,072; and `task_type="SEMANTIC_SIMILARITY"` tells the model what you'll use the embeddings for (Google's list of task types is at <https://ai.google.dev/api/embeddings>).
+
+**c. Run it.** In your terminal, in `~/first-call`, with `(.venv)` showing:
+
+```bash
+set -a; . ./.env; set +a
+python embed.py
+```
+
+The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested: your numbers will be close to these). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
+
+If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, which Google supports until at least May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
+
+### 4. RAG step by step, on the deal screener
+
+The deal screener now has a `notes/` folder: 8 short notes an investor might keep, made up for this course (no real people or addresses). One is about Riverside's "association dues" and never says "HOA"; one is about a contractor's phone habits and has nothing to do with money. You'll watch each RAG step on them.
+
+**a. Get the course files and set up.** In your terminal:
+
+```bash
+cd ~/ai-dev-course
+git pull
+cd example-project
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`.
+
+**b. Chunk and index.** In the same window:
+
+```bash
+set -a; . ./.env; set +a
+python3 -m dealscreener.notes index
+```
+
+It splits each note into chunks of up to 800 characters (most notes are one chunk; the listing B write-up is two), turns every chunk into an embedding with Google, and saves them all in `notes-index.json`. It prints `Indexed 9 chunks from 8 notes.` (being tested). That file holds the full text of your notes, so git and Docker both ignore it. You only rebuild it when the notes change: if you edit a note and ask again, the program says `Your notes changed since the index was built. Run: python3 -m dealscreener.notes index`.
+
+**c. Retrieve and answer.** Ask:
+
+```bash
+python3 -m dealscreener.notes ask "What are the HOA fees like in Riverside?"
+```
+
+The program turns your question into an embedding, picks the 3 closest chunks, and prints them with their similarity scores, under `Notes that match best:`. The Riverside "association dues" note should be first (being tested). Then it sends **only those 3 chunks** to Claude Haiku with these rules (the program's `SYSTEM_PROMPT`):
+
+```text
+Answer only from the notes below.
+After your answer, list the file names you used, after the word Sources:.
+If the notes do not answer the question, reply exactly: My notes don't say.
+```
+
+and prints the answer, its `Sources:` line, and what the Claude call cost.
+
+**d. Ask something the notes don't cover.**
+
+```bash
+python3 -m dealscreener.notes ask "What did I note about solar panels?"
+```
+
+Retrieval still finds the 3 "closest" chunks (something is always closest), but none of them mentions solar panels, so the answer should be `My notes don't say.` (being tested). That's **grounding**: without the rule, a model would happily answer from general knowledge, sounding just as sure, and you couldn't tell which answers came from your notes.
+
+**e. Without a Claude key.** If the Anthropic key is missing or the call fails, `ask` still prints the matching notes and says why there's no answer: retrieval alone is useful.
