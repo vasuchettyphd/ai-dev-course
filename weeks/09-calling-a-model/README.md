@@ -269,8 +269,8 @@ You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested).
 | Model | ID to use in code | Price per million tokens (input / output) | Speed | Good for |
 |---|---|---|---|---|
 | Claude Haiku 5.5 | `claude-haiku-5-5` | $0.10 / $0.50 | fastest | high-volume tasks "such as classification, extraction, and routing" |
-| Claude Sonnet 5.5 | `claude-sonnet-5-5` | $2 / $10 | fast | harder writing and reasoning |
-| Claude Opus 5.5 | `claude-opus-5-5` | $4 / $20 | moderate | the hardest tasks; Anthropic's default suggestion |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | $2 / $10 | fast | between the two in price and speed |
+| Claude Opus 5.5 | `claude-opus-5-5` | $4 / $20 | moderate | Anthropic's general default: "If you're unsure which model to use, start with Claude Opus 5.5 for most workloads" |
 
 Anthropic's own advice for keeping costs down: "1. Begin implementation with Claude Haiku 5.5. 2. Test your use case thoroughly. 3. Evaluate if performance meets your requirements. 4. Upgrade only if necessary for specific capability gaps." (<https://platform.claude.com/docs/en/about-claude/models/choosing-a-model>). That's what this course does. To try another model, change only the `model=` line; the same call costs 20 times more on Sonnet 5.5 and 40 times more on Opus 5.5.
 
