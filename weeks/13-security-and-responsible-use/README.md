@@ -89,9 +89,9 @@ OWASP, a non-profit that lists the most common security problems, puts it first 
 
 Indirect injection is the one to worry about in your project: you trust yourself, but you don't control what's written in a listing on a website or in a file someone sends you.
 
-**Why tools raise the stakes.** In week 11 your first tool could only read or calculate, and rule 1 of that week's tool rules said this week would cover what can go wrong when tools can do more. If a model can send email, delete files or pay, an injected "send this to everyone" becomes an action, not just a wrong answer. Anthropic's advice: "Limit Claude's access to sensitive data and actions. Apply the principle of least privilege so that a successful injection can do minimal damage" (<https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks>, read 13 October 2026). So a tool that can do something you can't undo needs three things: **a person to confirm each action**, **limits** on what it can touch (only your own calendar, only one folder), and **a log** of what it did.
+**Why tools raise the stakes.** In week 11 your first tool could only read or calculate, and rule 1 of that week's tool rules said this week would cover what can go wrong when tools can do more. If a model can send email, delete files or pay, an injected "send this to everyone" becomes an action, not just a wrong answer. Anthropic's advice: "Limit Claude's access to sensitive data and actions. Apply the principle of least privilege so that a successful injection can do minimal damage" (<https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks>, read 13 October 2026). The same goes for the MCP servers from week 11: a server is a program on your laptop, so only connect ones you wrote or trust (week 11 step 5a). So a tool that can do something you can't undo needs three things: **a person to confirm each action**, **limits** on what it can touch (only your own calendar, only one folder), and **a log** of what it did.
 
-**What Anthropic recommends for text from outside,** on the same page:
+**What Anthropic recommends for text from outside,** on the same page. Its first suggestion is to "Put untrusted content only in tool results": that needs a tool loop like week 11's agent, so for a single call like the deal screener's listing step this course uses three of its other suggestions:
 
 - **"JSON-encode untrusted content."** Put the outside text inside a JSON string, so "an attacker cannot close a quote or tag to 'break out' into an instruction context."
 - **"State the policy in your system prompt."** Tell the model that this text is data, never instructions.
@@ -163,7 +163,7 @@ If your feature is the week 10 search over your notes (RAG), put the attack insi
 Read hostile-cases.md and add my 5 hostile cases to my evaluation as a separate set (for example cases-injection.json with its own files), with the expected answer and a one-line reason for each, and add an --injection option to my evaluation script that runs only them. Write the tests for the new option first, with a fake model, and never call the real API in the tests. Commit hostile-cases.md, the cases and the expected answers first, on their own, with the message "Week 13 hostile cases, written before any run", then the script change in a second commit. Don't change my program's prompt yet. Never read or print .env, never run my evaluation against the real model (I'll do that), and stay on the security branch.
 ```
 
-**d. Run "before".** Type in: a second terminal window, **never** the one running Claude Code, in `~/semester-project`, with your project's `.venv` active and your key loaded the way your feature's README says (for most of you, `set -a; . ./.env; set +a`, as in week 9). Run your evaluation with `--injection` once. Write down the score and which attacks worked.
+**d. Run "before".** Type in: a second terminal window, **never** the one running Claude Code, in `~/semester-project`, with your project's `.venv` active and your key loaded the way your feature's README says (for most of you, `set -a; . ./.env; set +a`, as in week 9). Run your evaluation with `--injection` once. Write down the score and which attacks worked, then commit the results file with the prompt in g **before** you add the defence.
 
 **e. Add one defence.** In Claude Code:
 
@@ -188,7 +188,7 @@ If both scores were already perfect, that's a real result: write down why you th
 In Claude Code:
 
 ```text
-Run the safe-and-private reviewer as a subagent on the whole project, not only this branch's changes. Focus on: any API key or password in tracked files or results files (search tracked files with git grep only, never open .env); whether .claude/settings.json still has the Read(./.env) deny rule; whether requirements.txt pins every package with ==; whether any text from outside reaches the model without the JSON defence; whether any tool can send, delete, pay or write files, and if so whether a person must confirm each action; whether any test calls the real API by default; whether any test data or notes contain real personal information. Then add a section at the end of REVIEW.md, headed "## Week 13: security review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings S1, S2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
+Run the safe-and-private reviewer as a subagent on the whole project, not only this branch's changes. Focus on: any API key or password in tracked files or results files (search tracked files with git grep -l, which prints file names only, never the matching lines, and never open .env); whether .claude/settings.json still has the Read(./.env) deny rule; whether requirements.txt pins every package with ==; whether any text from outside reaches the model without the JSON defence; whether any tool can send, delete, pay or write files, and if so whether a person must confirm each action; whether any test calls the real API by default; whether any test data or notes contain real personal information. Then add a section at the end of REVIEW.md, headed "## Week 13: security review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings S1, S2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
 ```
 
 Then add your step 1 results as rows of your own (Found by: you): the `.env` history check, the two key searches and the deny rule. Triage, fix and commit as in week 6 steps 5 and 6.
@@ -218,7 +218,7 @@ That's why the course has used made-up or course-safe data since week 4. **Your 
 
 ### 7. Pull request and finish
 
-**Push, open a pull request, read Files changed** (the hostile cases and expected answers, the script change and its tests, the defence and its tests, the results files, `REVIEW.md`; no `.env` and no real key: use the browser's Find for `sk-ant-` and `ANTHROPIC_API_KEY=`, including in the results files; only a fake value, as in `.env.example`, is allowed), as in week 10 step 7. In the pull request's **Commits** tab, the hostile cases commit must come before the defence. **Merge with "Create a merge commit"**, as in week 12, so `main` keeps that order. Then pull.
+**Push, open a pull request, read Files changed** (the hostile cases and expected answers, the script change and its tests, the defence and its tests, the results files, `REVIEW.md`; no `.env` and no real key: use the browser's Find for `sk-ant-`, `ANTHROPIC_API_KEY=`, `AIza` and `GEMINI_API_KEY=`, including in the results files; only a fake value, as in `.env.example`, is allowed), as in week 10 step 7. In the pull request's **Commits** tab, the hostile cases commit must come before the defence. **Merge with "Create a merge commit"**, as in week 12, so `main` keeps that order. Then pull.
 
 The deal screener's week 13 changes are on this page (it works once week 13 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-12...week-13>.
 
@@ -228,7 +228,7 @@ The deal screener's week 13 changes are on this page (it works once week 13 is p
 - Your 5 hostile cases and their answers were committed before your defence.
 - You have: the "before" score, the "after" score, and the normal dev score after the defence.
 - `REVIEW.md` has a triaged "## Week 13: security review" section.
-- Your tests pass with `.env` moved out of the folder (week 9 steps 5e and 5f).
+- Your tests pass with `.env` moved out of the folder (week 9 steps 5e and 5f), in a window with no key loaded: `[ ! -e ~/env-aside ] && mv .env ~/env-aside && echo moved` (if it doesn't print `moved`, stop), run your tests, then `[ ! -e .env ] && mv ~/env-aside .env && echo restored`.
 - You've written your four answers from step 6.
 
 ## Troubleshooting
