@@ -27,11 +27,22 @@ The class builds this project up week by week, alongside your own:
 | 9 | an optional "paste the listing" step: a model (Claude Haiku 5.5, through the Anthropic API) reads a pasted listing and offers its numbers, which you confirm or replace; tests use a fake model, so they need no key and cost nothing |
 | 10 | investor notes you can ask questions of: `python3 -m dealscreener.notes index` turns each note into an embedding (Google's `gemini-embedding-001`), and `ask` finds the notes closest in meaning to your question and has Claude Haiku answer from those notes only, naming its sources; tests use fake embeddings and a fake model, so they need no keys and cost nothing |
 | 11 | tools, an agent and MCP: the calculator becomes a tool (`screen_listing`) that Claude can call; `python3 -m dealscreener.agent "your question"` runs an agent loop (Claude asks for the tool, the program runs it and sends the result back, at most 5 calls to Claude), and `python -m dealscreener.mcp_server` offers the same tool to Claude Code as an MCP server; tests use a fake model, so they need no key and cost nothing |
-| 12 onward | more of the tool, step by step, following the plan |
+| 12 | an evaluation of the listing step: 20 made-up listings in [`evals/`](evals/) with the right answers written down first, and `python3 -m dealscreener.evaluate` to run the model on them and count the numbers it gets right (15 dev cases, 5 held out); tests use a fake model, so they need no key and cost nothing |
+| 13 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-09` exist now, the week 10 state will get the tag `week-10` once week 10 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-11` exist now; `week-12` is added when week 12 is published, and `week-13` after that. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 11)
+## What's here now (week 12)
+
+Everything from week 11 (listed below), plus:
+
+- `evals/`: the evaluation set. 20 fictional listings (`listings/case-01.txt` to `case-20.txt`), and `expected.json` with the five right numbers for each one (`null` when the listing doesn't say), its category and a note on why those are the right answers. The categories are 4 clean listings, 4 messy ones (monthly tax, monthly insurance, a "reduced from" price, "association dues" per quarter), 4 with numbers missing, 3 traps (a yearly rent, a price range, a list price next to an appraisal), 3 with extra numbers that aren't inputs, and 2 that say "no HOA" in words. Five are held out. [`evals/README.md`](evals/README.md) holds the scoring rule. The listings, the answers and the rule were committed before the first run, so the history shows the answers came first.
+- `dealscreener/evaluate.py`: `python3 -m dealscreener.evaluate` runs the model on the 15 dev cases, `--held-out` on the 5 held-out ones and `--all` on all 20. It prints one line per case (for example `case-14  4/5  purchase_price: expected null, got 187500`), then the score, the cost, and where it saved the results. A failed call is recorded as an error and the run carries on. Each run is saved in `evals/results/` (the date, the model, the score, the misses, the errors and the cost; never a key).
+- `evals/results/`: the course's own runs (see [How to evaluate the listing step](#how-to-evaluate-the-listing-step)).
+- `tests/test_evaluate.py` (38 tests): a fake model, so they run with plain `python3`, no key and no packages. They cover the $1.00 tolerance, a broken cases file (a missing listing, a repeated id, a misspelt field, 19 cases, 4 held out, a negative number), a perfect case, a wrong number, a guess where `null` was right, a `null` where a number was right, both kinds of error, the score and cost sums, the results file, a results folder that can't be written to, every case failing, and the command's flags.
+- `tests/test_evaluate_live.py`: the 15 dev cases against the real model, skipped unless you ask for it. It passes when at least 80% of the fields are right.
+
+## What week 11 added
 
 Everything from week 10 (listed below), plus:
 
@@ -240,6 +251,66 @@ What each real call cost, from the token counts the program prints and Haiku 5.5
 | `messy-listing.txt`, second run | 823 | 146 | about $0.00016 |
 
 These ran on 12 October 2026. The same listing can use a different number of output tokens each time.
+
+## How to evaluate the listing step
+
+From week 12 you can check how well the listing step reads listings, on 20 made-up listings whose right answers were written down before the model saw them. The scoring rule, the categories and the held-out cases are in [`evals/README.md`](evals/README.md). You need the same key, `.env` and package as [the listing step](#how-to-use-the-listing-step). Each run of the 15 dev cases cost about $0.002 in the course's runs.
+
+**1. Run the dev cases.** Look at these as often as you like.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing, in the `example-project` folder).
+
+```
+python3 -m dealscreener.evaluate
+```
+
+**2. Run the held-out cases once,** after any one change you make because of the dev results.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+python3 -m dealscreener.evaluate --held-out
+```
+
+`--all` runs all 20. Each run is saved in `evals/results/`, named after the date and the set; a second run on the same day gets `-2` on the end.
+
+**3. With Docker.** Build the image again (`docker build -t dealscreener .`). The container needs your key and somewhere to save the results: `-v` connects your `evals/results` folder to the one inside the container, and `--user` lets the container write there as you (checked on Windows (WSL) only; being tested on a Mac).
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD/evals/results":/app/evals/results dealscreener python -m dealscreener.evaluate
+```
+
+The live test runs the 15 dev cases and passes when at least 80% of the fields are right (the first real run scored 100%; the test stays at 80% to leave room for a run where the model answers differently):
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+set -a; . ./.env; set +a
+RUN_LIVE_TESTS=1 python -m unittest tests.test_evaluate_live -v
+```
+
+### The course's results
+
+Run on 13 October 2026 with Claude Haiku 5.5 and the week 9 `extract.py` unchanged. The results files are in [`evals/results/`](evals/results/).
+
+| Run | Score | Cases fully right | Errors | Input tokens | Output tokens | Cost |
+|---|---|---|---|---|---|---|
+| Dev, first run | 75 of 75 fields (100%) | 15 of 15 | 0 | 11,199 | 1,112 | about $0.0017 |
+| Dev, second run | 75 of 75 fields (100%) | 15 of 15 | 0 | 11,199 | 1,056 | about $0.0016 |
+| Held out, run on its own once | 24 of 25 fields (96%) | 4 of 5 | 0 | 3,729 | 303 | about $0.0005 |
+| All 20 | 100 of 100 fields (100%) | 20 of 20 | 0 | 14,928 | 1,556 | about $0.0023 |
+
+The `--all` run includes the 5 held-out cases, so they were run twice in total: once on their own, then once more inside all 20. In your own work, run `--held-out` once and skip `--all` until the report is written.
+
+The live test, run once more on the dev cases, also scored 75 of 75 (about $0.0017). All five runs together cost under one cent.
+
+**The one miss.** Case 14 says "The seller will consider offers between $180,000 and $195,000." There is no single asking price, so the written answer is `null`: picking either end, or the middle, would be a guess. In the held-out run the model gave 187500, the middle of the range. In the `--all` run, on the same listing, it gave `null`. So the same listing got two different answers in two runs: the model doesn't answer the same way every time, and one run of a case is not the last word. This miss is the model's (the instructions say "Never guess"), though a reader could fairly argue the answer should be the lower offer; the expected answer was not changed.
+
+**No change made.** The dev cases had no misses at all, so there was no pattern to fix, and `extract.py` stays as it was in week 9. The one miss was in a held-out case: changing the program because of it would turn that case into a dev case, and the held-out score would no longer tell us anything new.
+
+**What these 20 cases show, and what they don't.** They show no gross failure: monthly tax and insurance, a yearly rent, a quarterly and a yearly HOA, "no HOA" in words, missing numbers and extra numbers were all read right in every run. They don't show a precise accuracy rate: one case is 5 points out of 100%, and 19 of 20 against 20 of 20 is within the noise. A perfect dev score also says the set may be too easy for this model: harder listings (two rents, a weekly figure, a typo in a number) would tell us more.
 
 ## How to ask your notes
 

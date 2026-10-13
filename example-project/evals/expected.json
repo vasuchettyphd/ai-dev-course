@@ -1,0 +1,282 @@
+[
+  {
+    "id": "case-01",
+    "file": "listings/case-01.txt",
+    "held_out": false,
+    "category": "clean",
+    "expected": {
+      "purchase_price": 182000,
+      "monthly_rent": 1850,
+      "yearly_property_tax": 2900,
+      "yearly_insurance": 1350,
+      "monthly_hoa": 75
+    },
+    "note": "All five numbers are stated plainly, with their periods."
+  },
+  {
+    "id": "case-02",
+    "file": "listings/case-02.txt",
+    "held_out": false,
+    "category": "clean",
+    "expected": {
+      "purchase_price": 249500,
+      "monthly_rent": 2300,
+      "yearly_property_tax": 4100,
+      "yearly_insurance": 1600,
+      "monthly_hoa": 120
+    },
+    "note": "A fact sheet: each line names the number and its period."
+  },
+  {
+    "id": "case-03",
+    "file": "listings/case-03.txt",
+    "held_out": true,
+    "category": "clean",
+    "expected": {
+      "purchase_price": 129900,
+      "monthly_rent": 1400,
+      "yearly_property_tax": 1950,
+      "yearly_insurance": 980,
+      "monthly_hoa": 45
+    },
+    "note": "All five stated plainly in sentences."
+  },
+  {
+    "id": "case-04",
+    "file": "listings/case-04.txt",
+    "held_out": false,
+    "category": "clean",
+    "expected": {
+      "purchase_price": 315000,
+      "monthly_rent": 2650,
+      "yearly_property_tax": 5200,
+      "yearly_insurance": 2100,
+      "monthly_hoa": 210
+    },
+    "note": "All five stated plainly; the pool is part of the HOA, not an extra number."
+  },
+  {
+    "id": "case-05",
+    "file": "listings/case-05.txt",
+    "held_out": false,
+    "category": "messy",
+    "expected": {
+      "purchase_price": 167000,
+      "monthly_rent": 1600,
+      "yearly_property_tax": 2220,
+      "yearly_insurance": 1100,
+      "monthly_hoa": 60
+    },
+    "note": "Tax is given monthly: $185 x 12 = $2,220 a year."
+  },
+  {
+    "id": "case-06",
+    "file": "listings/case-06.txt",
+    "held_out": false,
+    "category": "messy",
+    "expected": {
+      "purchase_price": 205000,
+      "monthly_rent": 1900,
+      "yearly_property_tax": 3300,
+      "yearly_insurance": 1140,
+      "monthly_hoa": 40
+    },
+    "note": "Insurance is given monthly: $95 x 12 = $1,140 a year."
+  },
+  {
+    "id": "case-07",
+    "file": "listings/case-07.txt",
+    "held_out": true,
+    "category": "messy",
+    "expected": {
+      "purchase_price": 224500,
+      "monthly_rent": 2050,
+      "yearly_property_tax": 3600,
+      "yearly_insurance": 1500,
+      "monthly_hoa": 95
+    },
+    "note": "The price now is $224,500; $239,000 is the old price it was reduced from."
+  },
+  {
+    "id": "case-08",
+    "file": "listings/case-08.txt",
+    "held_out": false,
+    "category": "messy",
+    "expected": {
+      "purchase_price": 158000,
+      "monthly_rent": 1550,
+      "yearly_property_tax": 2250,
+      "yearly_insurance": 1020,
+      "monthly_hoa": 180
+    },
+    "note": "The HOA is called association dues and given per quarter: $540 / 3 = $180 a month."
+  },
+  {
+    "id": "case-09",
+    "file": "listings/case-09.txt",
+    "held_out": false,
+    "category": "missing",
+    "expected": {
+      "purchase_price": 142000,
+      "monthly_rent": 1500,
+      "yearly_property_tax": 2100,
+      "yearly_insurance": null,
+      "monthly_hoa": 25
+    },
+    "note": "No insurance figure: 'arrange their own coverage' states no number, so null."
+  },
+  {
+    "id": "case-10",
+    "file": "listings/case-10.txt",
+    "held_out": false,
+    "category": "missing",
+    "expected": {
+      "purchase_price": 198000,
+      "monthly_rent": 1750,
+      "yearly_property_tax": null,
+      "yearly_insurance": 1250,
+      "monthly_hoa": null
+    },
+    "note": "No property tax and no HOA are mentioned. Silence about an HOA is not 'no HOA', so null, not 0."
+  },
+  {
+    "id": "case-11",
+    "file": "listings/case-11.txt",
+    "held_out": true,
+    "category": "missing",
+    "expected": {
+      "purchase_price": 175000,
+      "monthly_rent": null,
+      "yearly_property_tax": 2600,
+      "yearly_insurance": 1150,
+      "monthly_hoa": 50
+    },
+    "note": "The house is vacant and no rent is stated, so rent is null."
+  },
+  {
+    "id": "case-12",
+    "file": "listings/case-12.txt",
+    "held_out": false,
+    "category": "missing",
+    "expected": {
+      "purchase_price": 99000,
+      "monthly_rent": 1100,
+      "yearly_property_tax": null,
+      "yearly_insurance": null,
+      "monthly_hoa": null
+    },
+    "note": "Only price and rent are given; tax, insurance and HOA are not stated, so null."
+  },
+  {
+    "id": "case-13",
+    "file": "listings/case-13.txt",
+    "held_out": false,
+    "category": "trap",
+    "expected": {
+      "purchase_price": 210000,
+      "monthly_rent": 1650,
+      "yearly_property_tax": 3150,
+      "yearly_insurance": 1400,
+      "monthly_hoa": 30
+    },
+    "note": "Rent is given yearly: $19,800 / 12 = $1,650 a month."
+  },
+  {
+    "id": "case-14",
+    "file": "listings/case-14.txt",
+    "held_out": true,
+    "category": "trap",
+    "expected": {
+      "purchase_price": null,
+      "monthly_rent": 1700,
+      "yearly_property_tax": 2800,
+      "yearly_insurance": 1200,
+      "monthly_hoa": 55
+    },
+    "note": "No single asking price: offers between $180,000 and $195,000 is a range, and picking either end or the middle would be a guess, so null."
+  },
+  {
+    "id": "case-15",
+    "file": "listings/case-15.txt",
+    "held_out": false,
+    "category": "trap",
+    "expected": {
+      "purchase_price": 210000,
+      "monthly_rent": 1950,
+      "yearly_property_tax": 3000,
+      "yearly_insurance": 1300,
+      "monthly_hoa": 85
+    },
+    "note": "Two prices: the list price $210,000 is the price; $225,000 is an appraisal, not the price."
+  },
+  {
+    "id": "case-16",
+    "file": "listings/case-16.txt",
+    "held_out": false,
+    "category": "extra_numbers",
+    "expected": {
+      "purchase_price": 238000,
+      "monthly_rent": 2200,
+      "yearly_property_tax": 3700,
+      "yearly_insurance": 1450,
+      "monthly_hoa": 65
+    },
+    "note": "Bedrooms, baths, square feet, year built, lot size, garage and a phone number are not inputs."
+  },
+  {
+    "id": "case-17",
+    "file": "listings/case-17.txt",
+    "held_out": true,
+    "category": "extra_numbers",
+    "expected": {
+      "purchase_price": 189000,
+      "monthly_rent": 1725,
+      "yearly_property_tax": 2750,
+      "yearly_insurance": 1180,
+      "monthly_hoa": 40
+    },
+    "note": "The $2,000 security deposit is not rent; MLS number, year built, bedrooms, square feet and showing hours are not inputs."
+  },
+  {
+    "id": "case-18",
+    "file": "listings/case-18.txt",
+    "held_out": false,
+    "category": "extra_numbers",
+    "expected": {
+      "purchase_price": 221000,
+      "monthly_rent": 2000,
+      "yearly_property_tax": 3400,
+      "yearly_insurance": 1320,
+      "monthly_hoa": 100
+    },
+    "note": "The $5,000 seller credit does not change the price; HOA is given yearly: $1,200 / 12 = $100 a month; size, year and phone are not inputs."
+  },
+  {
+    "id": "case-19",
+    "file": "listings/case-19.txt",
+    "held_out": false,
+    "category": "no_hoa_words",
+    "expected": {
+      "purchase_price": 156000,
+      "monthly_rent": 1625,
+      "yearly_property_tax": 2350,
+      "yearly_insurance": 1050,
+      "monthly_hoa": 0
+    },
+    "note": "'There is no homeowners association' means HOA 0."
+  },
+  {
+    "id": "case-20",
+    "file": "listings/case-20.txt",
+    "held_out": false,
+    "category": "no_hoa_words",
+    "expected": {
+      "purchase_price": 172500,
+      "monthly_rent": 1780,
+      "yearly_property_tax": 2500,
+      "yearly_insurance": 1210,
+      "monthly_hoa": 0
+    },
+    "note": "'Not part of any HOA or association, so there are no monthly dues' means HOA 0."
+  }
+]
