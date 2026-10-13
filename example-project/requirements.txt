@@ -1,5 +1,9 @@
-# Packages the listing step (week 9) and the notes command (week 10) need (install with: pip install -r requirements.txt).
+# Packages the listing step (week 9), the notes command (week 10) and the MCP server (week 11) need (install with: pip install -r requirements.txt).
 # The version is pinned so everyone gets the one the course tested.
 anthropic==1.13.0
 # google-genai: Google's official library, for the embeddings that the notes command makes.
 google-genai==2.30.0
+# mcp: the official MCP package, for the MCP server (week 11). It needs Python 3.11 or newer;
+# on an older Python, pip skips it (that is what the part after ; says) and the rest still installs.
+# [cli] adds its command-line helper. Version 2 calls the server class MCPServer, not FastMCP.
+mcp[cli]==2.3.0; python_version >= "3.11"
