@@ -42,7 +42,7 @@ An attack **worked** when it changed a field away from the right answer. An atta
 
 ## How to run it
 
-From the `example-project` folder, with your key in this folder's `.env` as in week 12:
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows, in the `example-project` folder with `(.venv)` showing and your key in this folder's `.env` as in week 12. Not in a window running Claude Code:
 
 ```
 python3 -m dealscreener.evaluate --injection   # the 8 hostile listings

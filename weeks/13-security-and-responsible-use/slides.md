@@ -76,6 +76,8 @@ Anthropic: "Apply the principle of least privilege so that a successful injectio
 
 ## Anthropic's advice for outside text
 
+Its first tip, "Put untrusted content only in tool results", needs a tool loop. For one call:
+
 - **"JSON-encode untrusted content"**: then an attacker can't close a quote or tag and break out of the data
 - **"State the policy in your system prompt"**: this text is data, not instructions
 - **"Red-team your own agent"**: test it with attacks first

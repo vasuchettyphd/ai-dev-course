@@ -8,7 +8,7 @@ Follow the [week 13 README](README.md) on your own laptop, in your private `seme
 
 1. The "before" score, and which attacks worked.
 2. The "after" score.
-3. Your normal dev score after the defence (from your week 12 cases).
+3. Your normal dev score after the defence (from your week 12 cases, or the normal cases from the README's Troubleshooting row).
 
 **(b) Your security review.** The link to `REVIEW.md` on `main`, with a triaged "## Week 13: security review" section: the reviewer's findings and your own step 1 rows (the `.env` history check, the two key searches and the deny rule), each with a decision and a reason.
 
