@@ -15,7 +15,7 @@ AI Development Course
 
 Search by meaning, and answers from your own documents
 
-<p class="small">Tested with google-genai 2.30.0 and gemini-embedding-001, anthropic 1.13.0 and claude-haiku-5-5, and the deal screener's offline tests, 13 October 2026. Real Google calls, AI Studio, school accounts, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with google-genai 2.30.0 and gemini-embedding-001, anthropic 1.13.0 and claude-haiku-5-5, the deal screener's offline tests and real calls, 13 October 2026. AI Studio, school accounts, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
 
 ---
 
@@ -35,7 +35,7 @@ Search by meaning, and answers from your own documents
 
 Your note:
 
-> The association dues on the Riverside condo are $185 a month.
+> The association dues on the Riverside condo are $240 a month.
 
 Your search: **"HOA fees"**
 
@@ -64,7 +64,7 @@ Google: cosine similarity "focuses on direction rather than magnitude"
 | Dues note vs contractor's phone note | lower |
 | HOA question vs contractor's phone note | lower |
 
-`embed.py` in `~/first-call` prints all three (being tested: the real scores).
+Our run of `embed.py`: **0.817**, 0.681, 0.653.
 
 ---
 
@@ -116,7 +116,7 @@ python3 -m dealscreener.notes index
 python3 -m dealscreener.notes ask "What are the HOA fees like in Riverside?"
 ```
 
-- `Indexed 9 chunks from 8 notes.` (being tested)
+- `Indexed 9 chunks from 8 notes.` (about a second)
 - `Notes that match best:` the Riverside dues note first
 - The answer, `Sources: ...`, and the Claude cost
 
@@ -145,7 +145,7 @@ python3 -m dealscreener.notes ask "What did I note about solar panels?"
 
 - Retrieval still returns 3 chunks: something is always "closest"
 - None of them mentions solar panels
-- Answer: `My notes don't say.` (being tested)
+- Answer: `My notes don't say.` (our run: the 3 "closest" scored only 0.62 to 0.64)
 
 ---
 

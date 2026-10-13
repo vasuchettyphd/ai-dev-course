@@ -7,8 +7,8 @@
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
 - Google's official Python package `google-genai` 2.30.0 (released 13 October 2026; it needs Python 3.10 or newer) and the embedding model `gemini-embedding-001`, plus `anthropic` 1.13.0 and `claude-haiku-5-5` from week 9, in a container with Python 3.12.
-- The deal screener example's new `notes` command and its offline tests.
-- **Being tested:** every real call to Google (no Google key had been used when this page was written), every step in Google AI Studio, whether your school Google account can use AI Studio, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Real calls on 13 October 2026, from a container: `embed.py` below, and the deal screener's `notes` command (index, three questions, its live test). The scores, answers and costs shown below are from those runs; yours will differ a little. Google's responses carried no token counts.
+- **Being tested:** every step in Google AI Studio, whether your school Google account can use AI Studio, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
 
 ## Before you start
 
@@ -51,7 +51,7 @@ The same as week 9: you ask Claude Code in plain English, and this page shows th
 
 ### 1. Search by meaning
 
-Say your notes say "the association dues are $185 a month", and you search for "HOA fees". A **keyword search** finds nothing: none of those words are in the note. A person sees at once that it's the same thing (an HOA, a homeowners association, charges dues).
+Say your notes say "the association dues are $240 a month", and you search for "HOA fees". A **keyword search** finds nothing: none of those words are in the note. A person sees at once that it's the same thing (an HOA, a homeowners association, charges dues).
 
 An **embedding** lets a program see that too. An embedding model turns a piece of text into a long list of numbers (`gemini-embedding-001` gives 3,072 of them by default; this course keeps 768). Texts that **mean** similar things get similar lists of numbers, even when they use different words. Then "find notes about HOA fees" becomes "find the notes whose numbers are closest to the question's numbers".
 
@@ -127,7 +127,7 @@ from google.genai import types
 client = genai.Client()  # reads GEMINI_API_KEY from the environment
 
 sentences = [
-    "The association dues on the Riverside condo are $185 a month.",
+    "The association dues on the Riverside condo are $240 a month.",
     "How much are the HOA fees?",
     "The contractor prefers a text message to a phone call.",
 ]
@@ -161,7 +161,16 @@ set -a; . ./.env; set +a
 python embed.py
 ```
 
-The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
+The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores. The course's run:
+
+```text
+Numbers in each embedding: 768
+Dues note vs HOA question:       0.817
+Dues note vs contractor note:    0.681
+HOA question vs contractor note: 0.653
+```
+
+The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
 
 If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, which Google supports until at least May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
 
@@ -190,7 +199,7 @@ set -a; . ./.env; set +a
 python3 -m dealscreener.notes index
 ```
 
-It splits each note into chunks of up to 800 characters (most notes are one chunk; the listing B write-up is two), turns every chunk into an embedding with Google, and saves them all in `notes-index.json`. It prints `Indexed 9 chunks from 8 notes.` (being tested). That file holds the full text of your notes, so git and Docker both ignore it. You only rebuild it when the notes change: if you edit a note and ask again, the program says `Your notes changed since the index was built. Run: python3 -m dealscreener.notes index`.
+It splits each note into chunks of up to 800 characters (most notes are one chunk; the listing B write-up is two), turns every chunk into an embedding with Google, and saves them all in `notes-index.json`. It prints `Indexed 9 chunks from 8 notes.` (about a second in the course's run). That file holds the full text of your notes, so git and Docker both ignore it. You only rebuild it when the notes change: if you edit a note and ask again, the program says `Your notes changed since the index was built. Run: python3 -m dealscreener.notes index`.
 
 **c. Retrieve and answer.** Ask:
 
@@ -198,7 +207,7 @@ It splits each note into chunks of up to 800 characters (most notes are one chun
 python3 -m dealscreener.notes ask "What are the HOA fees like in Riverside?"
 ```
 
-The program turns your question into an embedding, picks the 3 closest chunks, and prints them with their similarity scores, under `Notes that match best:`. The Riverside "association dues" note should be first (being tested). Then it sends **only those 3 chunks** to Claude Haiku with these instructions (the program's `SYSTEM_PROMPT`, word for word):
+The program turns your question into an embedding, picks the 3 closest chunks, and prints them with their similarity scores, under `Notes that match best:`. In the course's run the Riverside "association dues" note came first, with similarity 0.73; the next two scored 0.55. Then it sends **only those 3 chunks** to Claude Haiku with these instructions (the program's `SYSTEM_PROMPT`, word for word):
 
 ```text
 You answer questions about a property investor's own notes. Answer only from the notes below. Do not use anything else you know. After your answer, list the file names you used, after the word Sources:. If the notes do not answer the question, reply exactly: My notes don't say.
@@ -212,7 +221,7 @@ and prints the answer, its `Sources:` line, and what the Claude call cost.
 python3 -m dealscreener.notes ask "What did I note about solar panels?"
 ```
 
-Retrieval still finds the 3 "closest" chunks (something is always closest), but none of them mentions solar panels, so the answer should be `My notes don't say.` (being tested). That's **grounding**: without the rule, a model would happily answer from general knowledge, sounding just as sure, and you couldn't tell which answers came from your notes.
+Retrieval still finds the 3 "closest" chunks (something is always closest), but none of them mentions solar panels, so the answer should be `My notes don't say.`, and in the course's run it was (the three "closest" chunks scored only 0.62 to 0.64). That's **grounding**: without the rule, a model would happily answer from general knowledge, sounding just as sure, and you couldn't tell which answers came from your notes.
 
 **e. Without a Claude key.** If the Anthropic key is missing or the call fails, `ask` still prints the matching notes and says why there's no answer: retrieval alone is useful.
 

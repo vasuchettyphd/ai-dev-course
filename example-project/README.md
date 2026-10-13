@@ -280,7 +280,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 python3 -m dealscreener.notes index
 ```
 
-It should print `Indexed 9 chunks from 8 notes.` (8 notes, and the listing B write-up counts twice because it is split in two). How long it takes is being tested. This saves `notes-index.json` in this folder. **Don't commit it:** it holds the full text of every note, so it follows the same privacy rule as the notes themselves. The course's `.gitignore` already leaves it out; for your own project, add `notes-index.json` to your `.gitignore`.
+It should print `Indexed 9 chunks from 8 notes.` (8 notes, and the listing B write-up counts twice because it is split in two). In the course's run it took about a second. This saves `notes-index.json` in this folder. **Don't commit it:** it holds the full text of every note, so it follows the same privacy rule as the notes themselves. The course's `.gitignore` already leaves it out; for your own project, add `notes-index.json` to your `.gitignore`.
 
 **4. Ask a question.**
 
@@ -337,16 +337,16 @@ The course checked both commands in the container with a made-up key: the folder
 
 ### Notes cost record
 
-What the course's real runs cost. Being tested: the course hasn't run these with a real Google key yet.
+What the course's real runs cost, on 13 October 2026 (Claude at $0.10 / $0.50 per million input / output tokens).
 
 | Run | Google (embeddings) | Claude input tokens | Claude output tokens | Claude cost |
 |---|---|---|---|---|
-| `index` (9 chunks) | being tested | none | none | none |
-| Riverside association dues question | being tested | being tested | being tested | being tested |
-| listing B repairs reserve question | being tested | being tested | being tested | being tested |
-| solar panels question (expect `My notes don't say.`) | being tested | being tested | being tested | being tested |
+| `index` (9 chunks) | 9 embeddings, no token count returned | none | none | none |
+| Riverside association dues question | 1 embedding | 585 | 268 | about $0.00019 |
+| listing B repairs reserve question | 1 embedding | 739 | 276 | about $0.00021 |
+| solar panels question (answer: `My notes don't say.`) | 1 embedding | 620 | 151 | about $0.00014 |
 
-Whether Google reports how many tokens an embedding used is also being tested.
+Google's embedding responses reported no token counts, so the program prints only Claude's cost.
 
 ## What the numbers mean
 
