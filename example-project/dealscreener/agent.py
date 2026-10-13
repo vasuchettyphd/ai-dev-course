@@ -119,7 +119,7 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
     print_fn("")
     cost = extract.cost_usd(result.input_tokens, result.output_tokens)
     print_fn(f"Used {result.input_tokens} input and {result.output_tokens} output tokens "
-             f"on Claude in {result.turns} turns, about ${cost:.5f}.")
+             f"on Claude in {result.turns} {'turn' if result.turns == 1 else 'turns'}, about ${cost:.5f}.")
     return 1 if result.text is None else 0
 
 

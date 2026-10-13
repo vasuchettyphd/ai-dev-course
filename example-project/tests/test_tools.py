@@ -127,6 +127,11 @@ class ToolSchemaTest(unittest.TestCase):
     def test_description_says_how_percentages_are_written(self):
         self.assertIn("percentages are written as 25 for 25%", tools.TOOL_SCHEMA["description"])
 
+    def test_description_says_vacancy_and_repairs_are_already_allowed_for(self):
+        # Without this, a live run told the user the calculator leaves them out.
+        self.assertIn("5% of the rent for empty months (vacancy)", tools.TOOL_SCHEMA["description"])
+        self.assertIn("8% of the rent for repairs", tools.TOOL_SCHEMA["description"])
+
     def test_fields_match_the_listing(self):
         from dataclasses import fields
         from dealscreener.calculator import Listing

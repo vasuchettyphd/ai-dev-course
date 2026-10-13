@@ -194,6 +194,12 @@ class MainTest(unittest.TestCase):
         self.assertEqual(printed[-1], "Used 2500 input and 500 output tokens on Claude in 2 turns, about $0.00050.")
         self.assertEqual(client.calls[0]["messages"][0]["content"], "Screen listing B")
 
+    def test_one_turn_says_turn(self):
+        code, printed = self.main(["Screen a listing"], FakeClient(reply(text("Which numbers?"),
+                                                                         input_tokens=1000, output_tokens=200)))
+        self.assertEqual(code, 0)
+        self.assertEqual(printed[-1], "Used 1000 input and 200 output tokens on Claude in 1 turn, about $0.00020.")
+
     def test_cap_reached_says_so_and_returns_1(self):
         client = FakeClient(reply(tool_use(LISTING_B)), repeat_last=True)
         code, printed = self.main(["Screen listing B"], client)

@@ -15,7 +15,7 @@ import math
 
 from dealscreener.__main__ import parse_answer
 from dealscreener.buybox import check, passes
-from dealscreener.calculator import Listing, analyse
+from dealscreener.calculator import Assumptions, Listing, analyse
 
 TOOL_NAME = "screen_listing"
 
@@ -43,6 +43,8 @@ TOOL_SCHEMA = {
         "and percentages are written as 25 for 25%. "
         "It returns the monthly mortgage payment, the monthly cash flow, the cap rate and the "
         "cash-on-cash return, then checks the investor's buy box rules and says PASS or FAIL. "
+        f"It already sets aside {Assumptions().vacancy_pct:g}% of the rent for empty months (vacancy) "
+        f"and {Assumptions().repairs_reserve_pct:g}% of the rent for repairs. "
         "Use it for every number you report about a listing. Do not call it with a guessed "
         "number: if the user didn't give one of the nine numbers, ask them for it instead. "
         "If a number is wrong, it returns an error sentence naming the field."
