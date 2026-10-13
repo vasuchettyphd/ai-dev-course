@@ -105,7 +105,7 @@ The model can send anything. `screen_listing` checks every field:
 |---|---|
 | a missing field, words, a negative | refused, with the field named |
 | a 250% rate, 30.5 years | refused |
-| an interest rate of `0.07` | refused: "write 7 for 7%" |
+| an interest rate of `0.07` | refused: "percentages are written as 7 for 7%" |
 
 Refusals go back as `is_error: true`, so the model can fix it or ask you.
 

@@ -235,7 +235,15 @@ def screen_listing(...):
 
 Older tutorials call `MCPServer` by its old name, `FastMCP`; in version 2.3.0 that name no longer exists. To send a plain error sentence back to the client, the server raises `ToolError` (from `mcp.server.mcpserver.exceptions`).
 
-**c. Connect it to Claude Code.** Open a **new** terminal window with **no key loaded** (tool rule 6), `cd ~/ai-dev-course/example-project`, and check `.venv/bin/python --version` says 3.11 or newer. Then:
+**c. Connect it to Claude Code.** Open a **new** terminal window with **no key loaded** (tool rule 6), `cd ~/ai-dev-course/example-project`, and check three things:
+
+```bash
+[ -z "$ANTHROPIC_API_KEY" ] && echo clear
+grep -c 'Read(./.env)' .claude/settings.json
+.venv/bin/python --version
+```
+
+The first prints `clear` (no key loaded in this window). The second prints `1`: this folder holds your real `.env` from week 10, so the course repo comes with the week 9 deny rule in `example-project/.claude/settings.json`, which stops Claude Code reading it (being tested in a signed-in session). The third says 3.11 or newer. Then:
 
 ```bash
 claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
@@ -246,14 +254,14 @@ claude mcp list
 - `-e PYTHONPATH="$PWD"` tells Python where the `dealscreener` code is, wherever Claude Code starts the server from.
 - After `--` comes the command that starts the server. It uses the **full path** to the `.venv`'s Python, because Claude Code saves the command exactly as you typed it.
 
-`claude mcp list` should show `dealscreener: ... ⏸ Pending approval (run `claude` to approve)`. A project's servers wait until you approve them, as a safety check. `.mcp.json` holds no key; open it and check.
+`claude mcp list` should show ``dealscreener: ... ⏸ Pending approval (run `claude` to approve)``. A project's servers wait until you approve them, as a safety check. `.mcp.json` holds no key; open it and check.
 
-**d. Use it.** In that same key-free window, start `claude`. Approve the `dealscreener` server when Claude Code asks, then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: $150,000 price, $1,700 rent, ..." (all nine numbers). Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status. (All of this is being tested.) Take a screenshot of Claude Code calling your tool, with nothing secret on screen: you hand it in.
+**d. Use it.** In that same key-free window, start `claude`. Approve the `dealscreener` server when Claude Code asks, then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: price 150000, rent 1700 a month, property tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status. (All of this is being tested.) Take a screenshot of Claude Code calling your tool, with nothing secret on screen: you hand it in.
 
 **e. For your own project.** In Claude Code, on your `tool` branch:
 
 ```text
-Add a small MCP server for my <tool name> tool, using the official mcp Python package pinned to mcp[cli]==2.3.0 and MCPServer (not FastMCP). It must call the same function and the same input checks as my agent's tool, need no API key and never read .env. Add a test that starts the server and calls the tool through the mcp package's client, skipped when mcp isn't installed. Then tell me the exact claude mcp add command for it, with --scope project, -e PYTHONPATH and the full path to the .venv's Python, but don't run it.
+Add a small MCP server for my <tool name> tool, using the official mcp Python package pinned to mcp[cli]==2.3.0 and MCPServer (not FastMCP), or for a Node.js project the official @modelcontextprotocol/server package. It must call the same function and the same input checks as my agent's tool, raise a bad input as ToolError (from mcp.server.mcpserver.exceptions) so the model gets my own error sentence, need no API key and never read .env. Add a test that starts the server and calls the tool through the mcp package's client, once with good input and once with bad input, skipped when mcp isn't installed. Then tell me the exact claude mcp add command for it, with --scope project, -e PYTHONPATH and the full path to the .venv's Python, but don't run it.
 ```
 
 Run the `claude mcp add` command yourself after reading it, in a second terminal window with no key loaded, in your project folder, after checking `.venv/bin/python --version` says 3.11 or newer (if not, see Troubleshooting, "No module named 'mcp'"). For a Node.js project, the official TypeScript package is `@modelcontextprotocol/server` (being tested; <https://github.com/modelcontextprotocol/typescript-sdk>). To remove a server: `claude mcp remove <name> -s project`.
@@ -292,10 +300,10 @@ The deal screener's week 11 changes are on this page (it works once week 11 is p
 | "Stopped after 5 turns without a final answer." | The model kept calling the tool. Look at the printed calls: usually the tool's error sentence doesn't tell it what to change. |
 | Error 400 mentioning `tool_use_id` or `tool_result` | Each `tool_result` must carry the `id` of the `tool_use` it answers, and the results must come first in your reply. |
 | Error 400 about thinking blocks | Claude's turn must go back into the conversation unchanged (`response.content`), not rebuilt by hand. |
-| `claude mcp list` shows the server as failed, or `No module named 'dealscreener'` | The `-e PYTHONPATH="$PWD"` part is missing, or you ran `claude mcp add` from another folder. `claude mcp remove dealscreener -s project`, `cd` into the project folder, and add it again (step 5c). |
-| `No module named 'mcp'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`, in the project folder, nothing added to the command) and make it again with 3.11 or newer. |
+| `claude mcp list` shows the server as failed, or `No module named 'dealscreener'` | Test the server on its own first: `python3 -m unittest tests.test_mcp_server -v` in the project folder. Then: the `-e PYTHONPATH="$PWD"` part is missing, or you ran `claude mcp add` from another folder. `claude mcp remove dealscreener -s project`, `cd` into the project folder, and add it again (step 5c). |
+| `No module named 'mcp'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`, in the project folder, nothing added to the command) and make it again with 3.11 or newer: for example `python3.12 -m venv .venv` (if `python3.12 --version` works), then `source .venv/bin/activate` and `pip install -r requirements.txt`. |
 | `cannot import name 'FastMCP'` | Version 2.3.0 calls it `MCPServer`: `from mcp.server import MCPServer`. |
-| "Pending approval" | Start `claude` in the project folder and approve the server (step 5c). |
+| "Pending approval" | Start `claude` in the project folder and approve the server (step 5d). |
 | Claude Code asks permission to run your tool | Plain **Yes** for your own read-or-calculate tool. **No** for any tool you didn't write. |
 | Anthropic errors (401, 429, credit, workspace) | See [week 9's Troubleshooting](../09-calling-a-model/README.md#troubleshooting). |
 | Work was committed to `main` | Use [week 5's rescue](../05-building-with-ai/README.md#if-it-committed-to-main). |
