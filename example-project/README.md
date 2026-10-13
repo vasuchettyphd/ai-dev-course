@@ -244,7 +244,7 @@ From week 10 you can ask questions of your own investor notes in plain English. 
 
 > Do not submit sensitive, confidential, or personal information to the Unpaid Services.
 
-On the paid tier Google says it doesn't use your prompts or responses to improve its products. Treat your use as unpaid, and only index notes you'd be happy for a stranger to read: these fictional notes, public material or your own non-private writing. Never index real tenants' details, customer data or anything confidential. (A school Google account may count as a paid "Workspace" account under these terms; whether yours does is unknown, so check with your instructor and treat it as unpaid until then.)
+On the paid tier Google says it doesn't use your prompts or responses to improve its products. Treat your use as unpaid, and only index notes you'd be happy for a stranger to read: these fictional notes, public material or your own non-private writing. Never index real tenants' details, customer data or anything confidential. (Calls to the Gemini API count as paid only through a Google Cloud project with billing switched on, so without billing they are on the free tier.)
 
 You need two keys now: the Anthropic key from week 9 and a Google key. The [week 10 page](../weeks/10-embeddings-and-rag/README.md) (published with this week) walks through getting the Google key; in short:
 
@@ -290,7 +290,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 python3 -m dealscreener.notes ask "What are the association dues like in Riverside?"
 ```
 
-It prints `Notes that match best:` and the three best notes with their similarity scores then Claude's answer with a `Sources:` line, then what the Claude call cost. In the course's run of the live test with this question, the first match was `  riverside-association-dues.md part 1 (similarity 0.77)`, and the call used 725 input and 296 output tokens, about $0.00022. Then try:
+It prints `Notes that match best:` and the three best notes with their similarity scores, then Claude's answer with a `Sources:` line, then what the Claude call cost. In the course's run of the live test with this question, the first match was `  riverside-association-dues.md part 1 (similarity 0.77)`, and the call used 725 input and 296 output tokens, about $0.00022. Then try:
 
 - `"What repairs reserve did I use for listing B?"`: the answer should be 8% of the rent, from `listing-b-write-up.md`.
 - `"What did I note about solar panels?"`: no note mentions solar panels, so the answer should be exactly `My notes don't say.` The matches are still printed, but they are only the closest of a poor set.
