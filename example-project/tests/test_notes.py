@@ -243,6 +243,13 @@ class IndexTest(unittest.TestCase):
                 notes.load_index(os.path.join(folder, "notes-index.json"))
         self.assertEqual(str(caught.exception), "No index yet. Run: python3 -m dealscreener.notes index")
 
+    def test_index_that_cant_be_saved_says_so(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = os.path.join(folder, "no-such-folder", "notes-index.json")
+            with self.assertRaises(notes.NotesError) as caught:
+                notes.save_index({"chunks": []}, path)
+        self.assertEqual(str(caught.exception), f"Couldn't save the index file {path}.")
+
     def test_unreadable_index_says_run_index(self):
         with tempfile.TemporaryDirectory() as folder:
             path = write(folder, "notes-index.json", "{not json")

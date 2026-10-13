@@ -175,8 +175,11 @@ def build_index(folder, embed_client) -> dict:
 
 
 def save_index(index: dict, path: str = INDEX_FILE) -> None:
-    with open(path, "w", encoding="utf-8") as index_file:
-        json.dump(index, index_file)
+    try:
+        with open(path, "w", encoding="utf-8") as index_file:
+            json.dump(index, index_file)
+    except OSError:  # for example a folder you can't write to, such as /app in the container
+        raise NotesError(f"Couldn't save the index file {path}.") from None
 
 
 def load_index(path: str = INDEX_FILE) -> dict:
