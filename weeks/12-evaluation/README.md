@@ -2,7 +2,7 @@
 
 **Goal:** find out how well your AI feature really works, with evidence instead of impressions. You'll read how the course measured another model (Jev), watch the deal screener's listing step get scored on 20 test cases, build your own 20-case test set with the right answers written first, write a script that scores your feature, and report what the score does and doesn't tell you, merged through a pull request.
 
-**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 calls for your own runs (an estimate: three dev runs and one held-out run), plus about 20 for the deal screener in step 3, from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
+**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 calls for your own runs (an estimate: three dev runs and one held-out run), plus about 15 for the deal screener in step 3, from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
 
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
