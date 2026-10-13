@@ -25,11 +25,27 @@ The class builds this project up week by week, alongside your own:
 | 7 | a [`Dockerfile`](Dockerfile) and [`.dockerignore`](.dockerignore), so the program and its tests run the same way inside a Docker container |
 | 8 | a real bug fixed test first: a classmate's feedback form found it ([`FEEDBACK.md`](FEEDBACK.md) is the instructor's example), [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
 | 9 | an optional "paste the listing" step: a model (Claude Haiku 5.5, through the Anthropic API) reads a pasted listing and offers its numbers, which you confirm or replace; tests use a fake model, so they need no key and cost nothing |
-| 10 onward | more of the tool, step by step, following the plan |
+| 10 | investor notes you can ask questions of: `python3 -m dealscreener.notes index` turns each note into an embedding (Google's `gemini-embedding-001`), and `ask` finds the notes closest in meaning to your question and has Claude Haiku answer from those notes only, naming its sources; tests use fake embeddings and a fake model, so they need no keys and cost nothing |
+| 11 onward | more of the tool, step by step, following the plan |
 
 Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-08` exist now, the week 9 state will get the tag `week-09` once week 9 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 9)
+## What's here now (week 10)
+
+Everything from week 9 (listed below), plus:
+
+- `notes/`: eight short investor notes, each marked "Fictional notes written for this course example; no real people or addresses." They cover the Riverside association dues, the university district, a rule of thumb for the repairs reserve, the write-up of listing B, a lender's notes on down payments, property tax after a sale, an insurance quote, and one note with nothing about money (how a contractor likes to be called), which should never match a money question. The Riverside note says "association dues" and never "HOA", so asking about HOA fees shows that the search goes by meaning, not by the same words. `listing-b-write-up.md` is longer than one chunk (800 characters), so it is split into two parts.
+- `dealscreener/notes.py`: the notes command, `python3 -m dealscreener.notes`.
+  - `index` reads every `.md` and `.txt` file in `notes/`, cuts each into chunks of at most 800 characters (whole paragraphs where it can), and asks Google's embedding model for one embedding per chunk: a list of 768 numbers that stands for the chunk's meaning. It saves the chunks, their embeddings and a fingerprint of each file in `notes-index.json`.
+  - `ask "your question"` gets an embedding for the question, compares it with every chunk's embedding (cosine similarity), prints the three best matches with their scores, and sends just those three chunks and the question to Claude Haiku 5.5. The instructions tell Claude to answer only from those notes, to list the file names it used after the word `Sources:`, and to reply exactly `My notes don't say.` when the notes don't answer the question. It prints the answer and what the Claude call cost.
+  - If you add, change or delete a note after indexing, `ask` stops and tells you to run `index` again, so answers never come from old notes. If the Claude call fails (for example, no Anthropic key), `ask` still prints the matching notes themselves. Each kind of failed Google call (no key, a key that isn't accepted, too many requests, no internet) becomes one plain sentence, and neither key is ever printed.
+- `tests/test_notes.py`: 33 tests for `notes.py`. A fake embedder stands in for Google: it counts words for a few ideas, so "association dues" and "HOA" count as the same idea, and a fake client stands in for Claude. They run with plain `python3`, no keys, no internet and no packages. They cover chunking, reading the notes folder (including a file that isn't text), search by meaning, sending the notes in batches, spotting changed notes, the answer instructions, a cut-off answer and a refusal, every error sentence (with a key hidden in the error, which must never show), and the command itself.
+- `tests/test_notes_live.py`: one real run, skipped unless you ask for it (see [How to ask your notes](#how-to-ask-your-notes)).
+- `requirements.txt`: adds `google-genai`, Google's official library, pinned to the version the course tested (2.30.0).
+- `.env.example`: adds a `GEMINI_API_KEY` line.
+- `.dockerignore` and the course `.gitignore`: both leave out `notes-index.json`, because it holds the full text of your notes.
+
+## What week 9 added
 
 Everything from week 8 (listed below), plus:
 
@@ -74,7 +90,7 @@ Everything from week 8 (listed below), plus:
 
 ## How to run it
 
-You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library. (The optional listing step from week 9 needs more: see [How to use the listing step](#how-to-use-the-listing-step).)
+You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library. (The optional listing step from week 9 and the notes command from week 10 need more: see [How to use the listing step](#how-to-use-the-listing-step) and [How to ask your notes](#how-to-ask-your-notes).)
 
 Open the Terminal (Mac) or, on Windows, the Ubuntu window you set up in week 2, go to the folder where you cloned the course repo, and type:
 
@@ -124,7 +140,7 @@ docker run -it --rm dealscreener
 
 It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` lets you type into the program (`-i` keeps your typing connected to the program, `-t` makes it act like a terminal); `--rm` deletes the stopped container when the program ends, so they don't pile up. If you leave out `-it`, the program can't read what you type: it prints `Stopped before all the numbers were typed.` and stops.
 
-The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs`, `REVIEW.md`, `BUGS.md` and `FEEDBACK.md`: people read them, but the program doesn't need them.
+The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs, spreadsheet exports (`.csv`) and, from week 10, the notes index (`notes-index.json`). It also leaves out `docs`, `REVIEW.md`, `BUGS.md` and `FEEDBACK.md`: people read them, but the program doesn't need them.
 
 The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user. That line (`USER nobody`) is optional: if your own program writes files inside `/app` and gets "Permission denied", remove that line from your Dockerfile or ask Claude.
 
@@ -210,6 +226,116 @@ What each real call cost, from the token counts the program prints and Haiku 5.5
 | `messy-listing.txt`, second run | 823 | 146 | about $0.00016 |
 
 These ran on 12 October 2026. The same listing can use a different number of output tokens each time.
+
+## How to ask your notes
+
+From week 10 you can ask questions of your own investor notes in plain English. The notes are the files in `notes/`. You build an index once, then ask as many questions as you like.
+
+**How it finds the right notes.** An embedding is a list of numbers that stands for the meaning of a piece of text: two texts about the same idea get lists that point in nearly the same direction, even when they use different words. The program compares them with cosine similarity, a score from -1 to 1 where higher means closer in meaning. Google's [embeddings page](https://ai.google.dev/gemini-api/docs/embeddings) (read 2026-10-13) puts it this way: "Cosine similarity is a good distance metric because it focuses on direction rather than magnitude." The program uses `gemini-embedding-001`, which Google supports until 14 May 2028 ([deprecations page](https://ai.google.dev/gemini-api/docs/deprecations)). Google's newer model, `gemini-embedding-2`, also reads images, audio and PDFs, but it is called differently, so the course stays with 001 for now.
+
+**What it costs.**
+
+- Google: on the free tier, no charge for this course's use (being tested for `gemini-embedding-001`: Google's [pricing page](https://ai.google.dev/gemini-api/docs/pricing), read 2026-10-13, lists only the newer `gemini-embedding-2`, whose free tier says "Free of charge"). The notes are embedded once, when you run `index`. Each question is one more small embedding. Google doesn't publish its free-tier limits for embeddings; you can see yours in Google AI Studio.
+- Claude: each question is one Haiku 5.5 call, at the same price as the listing step (see the [cost record](#cost-record)). The program prints what each call cost.
+
+**What Google does with your text on the free tier.** From the [Gemini API terms](https://ai.google.dev/gemini-api/terms) (read 2026-10-13), for the free ("Unpaid") services:
+
+> To help with quality and improve our products, human reviewers may read, annotate, and process your API input and output.
+
+> Do not submit sensitive, confidential, or personal information to the Unpaid Services.
+
+On the paid tier Google says it doesn't use your prompts or responses to improve its products. Treat your use as unpaid, and only index notes you'd be happy for a stranger to read: these fictional notes, public material or your own non-private writing. Never index real tenants' details, customer data or anything confidential. (A school Google account may count as a paid "Workspace" account under these terms; whether yours does is unknown, so check with your instructor and treat it as unpaid until then.)
+
+You need two keys now: the Anthropic key from week 9 and a Google key. The [week 10 page](../weeks/10-embeddings-and-rag/README.md) (published with this week) walks through getting the Google key; in short:
+
+- **Google key:** sign in to Google AI Studio and create an API key, as Google's [API key page](https://ai.google.dev/gemini-api/docs/api-key) describes (read 2026-10-13). You must be 18 or older. A school Google account works only if your school hasn't turned AI Studio off (check with your instructor); a personal Google account is the fallback. Restrict the key to the Gemini API in AI Studio.
+- **Safety:** both keys go only in `.env`, typed with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a pull request. If a key is ever shared by mistake, delete it first (in AI Studio for the Google key, in the Anthropic Console for the other), then make a new one.
+
+**1. Add the Google key to `.env`, with a text editor.** If you made `.env` in week 9, open it in a text editor (not in Claude Code) and add a new line `GEMINI_API_KEY=` followed by your key, with no quote marks. If you don't have a `.env` yet, copy `.env.example` first (`cp .env.example .env`, in the Terminal on a Mac or the Ubuntu window on Windows), then replace each `put-your-key-here`. Use the name `GEMINI_API_KEY` only: don't also set `GOOGLE_API_KEY`, which Google's library would read in its place. Then check git still ignores `.env`.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+git check-ignore .env
+```
+
+It should print `.env`. If it prints nothing, stop and fix that first (see step 1 of [How to use the listing step](#how-to-use-the-listing-step)).
+
+**2. Install the new package.** `requirements.txt` now lists `google-genai` too, which needs Python 3.10 or newer like `anthropic`. Switch to the virtual environment from week 9 and install again.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+(No `.venv` yet? Make one first with `python3 -m venv .venv`, as in [How to use the listing step](#how-to-use-the-listing-step). On Python 3.9, use Docker instead: step 6.)
+
+**3. Build the index.**
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+python3 -m dealscreener.notes index
+```
+
+It should print `Indexed 9 chunks from 8 notes.` (8 notes, and the listing B write-up counts twice because it is split in two). How long it takes is being tested. This saves `notes-index.json` in this folder. **Don't commit it:** it holds the full text of every note, so it follows the same privacy rule as the notes themselves. The course's `.gitignore` already leaves it out; for your own project, add `notes-index.json` to your `.gitignore`.
+
+**4. Ask a question.**
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+python3 -m dealscreener.notes ask "What are the association dues like in Riverside?"
+```
+
+It prints `Notes that match best:` and the three best notes with their similarity scores (like `  riverside-association-dues.md part 1 (similarity 0.xx)`), then Claude's answer with a `Sources:` line, then a line like `Used ... input and ... output tokens on Claude, about $0.0000x.` The course's real output is being tested. Then try:
+
+- `"What repairs reserve did I use for listing B?"`: the answer should be 8% of the rent, from `listing-b-write-up.md`.
+- `"What did I note about solar panels?"`: no note mentions solar panels, so the answer should be exactly `My notes don't say.` The matches are still printed, but they are only the closest of a poor set.
+- `"What are the HOA fees like in Riverside?"`: the Riverside note never says "HOA", yet it should still match, because the search goes by meaning.
+
+If you add, change or delete a note, `ask` says `Your notes changed since the index was built. Run: python3 -m dealscreener.notes index`. Run `index` again, then ask again.
+
+If something goes wrong with Google (no key, a key that isn't accepted, too many requests, no internet), the program says so in one sentence and stops. If only the Claude call fails, it says why, adds "Here are the notes that match best instead.", and prints those notes. The tests never call Google or Claude: `python3 -m unittest` stays free and works without keys.
+
+**5. The live test (optional).** One real run: it builds the index into a temporary folder, asks the Riverside question, and checks that the Riverside note is among the matches and that the answer isn't `My notes don't say.`
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+set -a; . ./.env; set +a
+RUN_LIVE_TESTS=1 python -m unittest tests.test_notes_live -v
+```
+
+**6. With Docker.** Build the image again (`docker build -t dealscreener .`, as in [How to run with Docker](#how-to-run-with-docker)). The image never holds your keys or the index: `.dockerignore` leaves out `.env` and `notes-index.json`. So each command below hands the container this folder and your keys while it runs.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD:/app" dealscreener python -m dealscreener.notes index
+docker run --rm --env-file .env --user "$(id -u):$(id -g)" -v "$PWD:/app" dealscreener python -m dealscreener.notes ask "What are the association dues like in Riverside?"
+```
+
+- `--env-file .env` hands both keys to this one container while it runs.
+- `-v "$PWD:/app"` lets the container use this folder (`$PWD` means "the folder you're in") in place of the copy inside the image, so it reads your current notes and saves `notes-index.json` here, next to them. Without it, `index` can't save the file: the program runs as the `nobody` user, which can't write inside the image, and it says `Couldn't save the index file notes-index.json.`
+- `--user "$(id -u):$(id -g)"` runs the program as you, so the saved index belongs to you, not to another user.
+
+The course checked these commands in the container with a made-up key (the index was saved to the folder and belonged to the right user; the made-up key was refused with the plain sentence); the run with real keys is being tested.
+
+### Notes cost record
+
+What the course's real runs cost. Being tested: the course hasn't run these with a real Google key yet.
+
+| Run | Google (embeddings) | Claude input tokens | Claude output tokens | Claude cost |
+|---|---|---|---|---|
+| `index` (9 chunks) | being tested | none | none | none |
+| Riverside association dues question | being tested | being tested | being tested | being tested |
+| listing B repairs reserve question | being tested | being tested | being tested | being tested |
+| solar panels question (expect `My notes don't say.`) | being tested | being tested | being tested | being tested |
+
+Whether Google reports how many tokens an embedding used is also being tested.
 
 ## What the numbers mean
 
