@@ -90,11 +90,11 @@ Every reply tells you exactly how many tokens it used, so you never have to gues
 **d. Create a key and save it in `.env`.**
 
 1. In the Console, open **Settings > API keys** (<https://platform.claude.com/settings/keys>) and click **Create key**. Name it `semester-project`, and choose an expiration such as **30 days** (Anthropic: "Expiration limits the lifetime of a leaked credential"). Set **Linked account** to yourself.
-2. The Console "shows the full key, which starts with `sk-ant-`, only once". Click its copy button. Don't paste it anywhere except step 4 below.
+2. The Console "shows the full key, which starts with `sk-ant-`, only once". Click its copy button. Don't paste it anywhere except into the file, in item 4 below.
 3. In your terminal, make a scratch folder for step 3 and open a new `.env` file in a text editor:
 
    - **Mac:** `mkdir -p ~/first-call && cd ~/first-call && touch .env && open -e .env` opens it in TextEdit. If TextEdit shows a formatting bar, choose **Format > Make Plain Text** first.
-   - **Windows (Ubuntu window):** `mkdir -p ~/first-call && cd ~/first-call && nano .env` opens the `nano` editor in the window.
+   - **Windows (Ubuntu window):** `mkdir -p ~/first-call && cd ~/first-call && nano .env` opens the `nano` editor in the window. To paste into it, right-click, or press `Ctrl+Shift+V` (plain `Ctrl+V` often doesn't paste there).
 
 4. Type this one line, and paste your key after the `=`, with **no spaces and no quote marks**:
 
@@ -103,7 +103,7 @@ Every reply tells you exactly how many tokens it used, so you never have to gues
    ```
 
    Save and close: in TextEdit, **File > Save** then quit; in `nano`, press `Ctrl+O`, `Enter`, then `Ctrl+X`. (No quote marks, because Docker's `--env-file` in step 6 would keep them as part of the key, and Anthropic would then reject it.)
-5. Check the file has exactly one line, without showing the key: in your terminal, in `~/first-call`, `wc -l .env` should print `1 .env`. Don't `cat` the file in class: anyone behind you can read your screen.
+5. Check the file has exactly one line, without showing the key: in your terminal, in `~/first-call`, `grep -c '^ANTHROPIC_API_KEY=sk-ant-' .env` should print `1` (one line in the right form; `0` means the line is missing, misspelt or has a space or quote mark before the key). Don't `cat` the file in class: anyone behind you can read your screen. Close the editor before you share your screen, too: the key is visible while it's open.
 
 The key is like a password to your credit. If you lose it, you can't see it again: delete it and create a new one.
 
@@ -117,7 +117,7 @@ You'll do this in the scratch folder `~/first-call` from step 2d, not in your pr
 
 **a. Check your Python.** In your terminal, type `python3 --version`. The `anthropic` package needs **Python 3.10 or newer**.
 
-- **Mac:** if it prints `Python 3.9` (Apple's own Python, from week 3) or lower, install a newer one from python.org exactly as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools), then close and reopen Terminal and check again (being tested). On an Apple chip Mac, `brew install python` works too.
+- **Mac:** if it prints `Python 3.9` (Apple's own Python, from week 3) or lower, install a newer one from python.org exactly as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools), then close and reopen Terminal and check again (being tested). If you already use Homebrew, `brew install python` works too.
 - **Windows (Ubuntu window):** Ubuntu 24.04 comes with Python 3.12, which is fine.
 
 **b. Make a virtual environment and install the package.** A **virtual environment** (a `.venv` folder) is a private box of Python packages for one folder, so installing a package can't break anything else on your laptop. In your terminal:
@@ -200,7 +200,7 @@ Cost: about $0.000...
 
 `end_turn` means the model finished its answer. Check the cost by hand with step 1's arithmetic, and check it against the Console's **Usage** page (<https://platform.claude.com/usage>) later: the Console may take a while to update.
 
-If you see `TypeError: "Could not resolve authentication method...`, the key isn't loaded: run the `set -a` line again, in `~/first-call`. Other errors: see Troubleshooting.
+If you see `TypeError: Could not resolve authentication method...`, the key isn't loaded: run the `set -a` line again, in `~/first-call`. Other errors: see Troubleshooting.
 
 ### 4. The settings that matter
 
@@ -212,7 +212,7 @@ Each change below is a small edit to `first_call.py`. Make it in a text editor (
 for i in 1 2 3; do python first_call.py; done
 ```
 
-Compare the three answers. They'll probably be worded differently (being tested): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 also reject any other value (<https://platform.claude.com/docs/en/about-claude/models/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models. So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
+Compare the three answers. They'll probably be worded differently (being tested): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 reject any non-default value (<https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/opus-5-5/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models (the Opus 5.5 guide). So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
 
 **b. A system prompt.** The `system` setting holds instructions that apply to the whole conversation (Anthropic: "Use the top-level `system` field for instructions that apply from the start"). Add this line just below `max_tokens=1000,`:
 
@@ -262,7 +262,7 @@ EOF
 python structured.py
 ```
 
-You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested). The `output_config` part is Anthropic's **structured outputs** feature (<https://platform.claude.com/docs/en/build-with-claude/structured-outputs>). `null` lets the model say "the listing doesn't say" instead of guessing. Structured output fixes the **shape** of the answer, not whether it's **right**: a model can still misread a number, so your program checks the values, and a person confirms anything that matters.
+You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested). (This short example assumes the reply has a text block; the deal screener's code also handles one that doesn't.) The `output_config` part is Anthropic's **structured outputs** feature (<https://platform.claude.com/docs/en/build-with-claude/structured-outputs>). `null` lets the model say "the listing doesn't say" instead of guessing. Structured output fixes the **shape** of the answer, not whether it's **right**: a model can still misread a number, so your program checks the values, and a person confirms anything that matters.
 
 **e. Choosing a model.** Anthropic's three current families (<https://platform.claude.com/docs/en/about-claude/models/overview>, prices from <https://platform.claude.com/docs/en/about-claude/pricing>, both read 12 October 2026):
 
@@ -280,7 +280,7 @@ You may hear of **fine-tuning**: training a model further on your own examples. 
 
 > **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version of it was built and tested offline on 12 October 2026 (see "The deal screener's version" below).
 
-**a. Make the branch first.** In your terminal, `cd ~/semester-project`, then start `claude`. In Claude Code:
+**a. Make the branch first.** Open a **new** terminal window, `cd ~/semester-project`, then start `claude`. Always start Claude Code in a window where you have **not** loaded the key with `set -a`: a program started from that window, Claude Code included, would get your key. In Claude Code:
 
 ```text
 Switch to main, pull the latest changes from GitHub, then create a new branch called ai-feature and switch to it.
@@ -298,11 +298,11 @@ git check-ignore .env
 It should print `.env`. If it prints nothing, **stop**: in Claude Code, type "Add .env and .venv to .gitignore and commit only .gitignore on this branch.", plain **Yes**, and run `git check-ignore .env` again until it prints `.env`. Only then copy the key file from step 2, without opening it:
 
 ```bash
-cp ~/first-call/.env ~/semester-project/.env
+cp -n ~/first-call/.env ~/semester-project/.env
 git status
 ```
 
-`git status` must **not** list `.env`. (If it does, don't commit anything: ask your instructor.)
+(`-n` means: don't overwrite a `.env` that's already there.) `git status` must **not** list `.env`. (If it does, don't commit anything: ask your instructor.)
 
 **c. Pick one small feature.** One call to the model, one clear job, and the program still works without it. Ideas for business projects:
 
@@ -331,7 +331,7 @@ Answer as in the table at the top. Watch especially for:
 - **No** to a test that calls the real API whenever the tests run.
 - For a package install: Python's official package is `anthropic`; for a Node.js project it's `@anthropic-ai/sdk` (Anthropic's other official packages are listed at <https://platform.claude.com/docs/en/cli-sdks-libraries/overview>). Any other name: ask "Is this Anthropic's official package?" before answering Yes.
 
-**e. Try it.** When the build is done, in your terminal, in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, and run it again. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
+**e. Try it.** When the build is done, in your terminal, in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key. Your program may read `.env` by itself, so move the file out of the folder for a moment: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, `mv .env ~/semester-project-key.env`, run your program again, then put the file back with `mv ~/semester-project-key.env .env`. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
 
 **f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass with no key loaded. Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
 
@@ -341,7 +341,7 @@ Answer as in the table at the top. Watch especially for:
 Purchase price ($) [from the listing: 150000]:
 ```
 
-Press Enter to keep the number, or type the right one. Numbers the listing doesn't state are asked normally, the loan questions are always yours, and the maths is unchanged. With no key, it says `No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README). For now, type the numbers yourself.` and carries on. Its 90 tests never touch the network. See [`example-project/README.md`](../../example-project/README.md) and [`dealscreener/extract.py`](../../example-project/dealscreener/extract.py).
+Press Enter to keep the number, or type the right one. Numbers the listing doesn't state are asked normally, the loan questions are always yours, and the maths is unchanged. With no key (no `.env` in the folder, and none loaded), it says `No API key found. Put ANTHROPIC_API_KEY in a .env file (see the README). For now, type the numbers yourself.` and carries on. Its 90 tests never touch the network. See [`example-project/README.md`](../../example-project/README.md) and [`dealscreener/extract.py`](../../example-project/dealscreener/extract.py).
 
 ### 6. Review and run
 
@@ -396,7 +396,7 @@ The deal screener's week 9 changes are on this page (it works once week 9 is pub
 
 | What you see | What to do |
 |---|---|
-| `TypeError: "Could not resolve authentication method...` | The key isn't loaded. In the same terminal window, in the folder with `.env`, run `set -a; . ./.env; set +a`, then try again. |
+| `TypeError: Could not resolve authentication method...` | The key isn't loaded. In the same terminal window, in the folder with `.env`, run `set -a; . ./.env; set +a`, then try again. |
 | `No API key found` (the deal screener, or your own program's message) | Same as above: load the key in this window. In Docker, add `--env-file .env`. |
 | `ModuleNotFoundError: No module named 'anthropic'` | The `.venv` isn't active: `source .venv/bin/activate` (your prompt shows `(.venv)`), then try again. In a new folder, install it first (step 3b). |
 | `python3 -m venv .venv` fails with "ensurepip is not available" (Ubuntu) | Step 3b: `sudo apt install python3-venv`, delete only the broken `.venv` folder with `rm -r .venv`, try again. |

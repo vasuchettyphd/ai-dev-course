@@ -69,6 +69,7 @@ Every reply says exactly how many tokens it used.
 1. **You** put the key in `.env`, with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a PR.
 2. Before committing: `git check-ignore .env` must print `.env`.
 3. Your program reads the key from the environment and **never prints it**.
+   Start Claude Code in a window where the key is **not** loaded.
 4. Docker gets it at run time: `--env-file .env`. Never in the image.
 5. Set a monthly **spend limit** before your first call.
 6. A key leaked? **Delete it in the Console first**, then clean up.
@@ -143,7 +144,7 @@ for i in 1 2 3; do python first_call.py; done
 - The wording changes each time (being tested): a model picks words with some randomness
 - **Temperature** used to turn that down. Not any more:
   - Haiku 5.5: "If a request includes `temperature`, it must be `1`"
-  - Sonnet 5.5 and Opus 5.5 reject any other value
+  - Sonnet 5.5 and Opus 5.5 reject any non-default value
   - The package: `TypeError: ... unexpected keyword argument 'temperature'`
 - So: make answers **dependable**, then **check** them
 
