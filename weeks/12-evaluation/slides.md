@@ -135,7 +135,7 @@ One line per case, then the score, the misses and the cost. Saved in `evals/resu
 
 ---
 
-## What 20 perfect dev cases mean
+## What 15 perfect dev cases mean
 
 - No big failure: monthly tax, yearly rent, quarterly HOA, missing numbers
 - **Not** "100% accurate"
@@ -174,7 +174,7 @@ Course-safe data. Scoring rule written first.
 3. Dev cases twice, in a second window (never the Claude Code one); read every miss
 4. One change; dev again
 5. Held-out, once
-6. Review, pull request (no `.env`, no key in any file), merge, pull
+6. Review, pull request (no `.env`, no key in any file), **Create a merge commit**, pull
 
 ---
 

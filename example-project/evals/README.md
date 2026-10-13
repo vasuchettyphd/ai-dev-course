@@ -50,13 +50,15 @@ Twenty cases can show gross failures (a whole kind of listing the model gets wro
 
 ## How to run it
 
-From the `example-project` folder, with the key in your environment (see the main README):
+From the `example-project` folder, with your key in this folder's `.env` (the program reads it itself and never prints it; no `set -a` needed):
 
 ```
 python3 -m dealscreener.evaluate              # the 15 dev cases
 python3 -m dealscreener.evaluate --held-out   # the 5 held-out cases, once, after your change
 python3 -m dealscreener.evaluate --all        # all 20
 ```
+
+A case that ends in an error counts no tokens, so the `Cost:` line can be slightly low on a run with errors.
 
 ## Corrections
 

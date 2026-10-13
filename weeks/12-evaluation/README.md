@@ -2,7 +2,7 @@
 
 **Goal:** find out how well your AI feature really works, with evidence instead of impressions. You'll read how the course measured another model (Jev), watch the deal screener's listing step get scored on 20 test cases, build your own 20-case test set with the right answers written first, write a script that scores your feature, and report what the score does and doesn't tell you, merged through a pull request.
 
-**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 calls in all (an estimate: three dev runs and one held-out run), from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
+**Time:** plan for about 2 to 3 hours of your own time after class (an estimate); writing good test cases takes longer than people expect. **Cost:** one Claude call per case per run, so about 50 calls for your own runs (an estimate: three dev runs and one held-out run), plus about 20 for the deal screener in step 3, from your week 9 API credit: running the deal screener's 20 cases once cost under a cent (step 3).
 
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
@@ -87,7 +87,7 @@ git pull
 python3 -m dealscreener.evaluate
 ```
 
-It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`, or the fields it missed), then the score and the cost, and saves the results in `evals/results/`. `--held-out` runs the 5 held-out cases and first reminds you to run them only once; `--all` runs all 20. To run it in Docker instead, use the command in the [example README's evaluation section](../../example-project/README.md#how-to-evaluate-the-listing-step) (it needs the `--user` and `-v` parts to save results).
+It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`, or the fields it missed), then the score and the cost, and saves the results in `evals/results/`. `--held-out` runs the 5 held-out cases and first reminds you to run them only once; `--all` runs all 20. The results files it saves in your course folder are just for you: `git status` shows them, and you can delete them by name when you're done. To run it in Docker instead, use the command in the [example README's evaluation section](../../example-project/README.md#how-to-evaluate-the-listing-step) (it needs the `--user` and `-v` parts to save results).
 
 **b. The course's results** (13 October 2026, Claude Haiku 5.5):
 
@@ -98,7 +98,7 @@ It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`,
 | Held out, run on its own once | 24 of 25 fields (96%) | 4 of 5 | about $0.0005 |
 | All 20 | 100 of 100 fields (100%) | 20 of 20 | about $0.0023 |
 
-The `--all` run includes the 5 held-out cases, so the course ran them a second time to show you the flip below. In your own work, run `--held-out` once and leave `--all` until your report is written.
+The `--all` run includes the 5 held-out cases, so they ran a second time; that is how the flip below showed up. In your own work, run `--held-out` once and leave `--all` until your report is written.
 
 **c. Read the miss.** Case 14 says "The seller will consider offers between $180,000 and $195,000." There's no single asking price, so the written answer is `null`. In the held-out run the model answered 187500, the middle of the range: a guess. In the `--all` run, on the very same listing, it answered `null`. **The same input got two different answers in two runs.** That's why you run an evaluation more than once, and why one good run proves little.
 
@@ -170,6 +170,16 @@ Type in: a second terminal window, **never** the one running Claude Code, in `~/
 3. **Make one change** that should fix a pattern in the misses (a clearer prompt, a schema description, a check in your code). Run the dev cases again.
 4. **Run the held-out cases, once.** That score is your honest estimate, because those cases didn't shape your change.
 
+**Commit as you go.** After each run and after your change, in Claude Code:
+
+```text
+Commit the new results files, and my change if there is one, with a message saying which run or change this was. Don't change the test cases or the expected answers, except a correction I've recorded under "Corrections".
+```
+
+Plain **Yes**, after `git status` shows no `.env`.
+
+**Run your tests offline once:** with `.env` moved out of the folder, as in week 9 steps 5e and 5f (in a window with no key loaded); they must all pass.
+
 Write down: the two dev scores, three misses and why (if you have fewer than three, all of them, and the harder cases you'd add), any corrections with their reasons, your change, the new dev score, and the held-out score. You hand these in.
 
 When you read your scores, remember what 20 cases can show (step 1): a pattern of misses, yes; a precise rate, no. With 20 cases, 17 against 18 is one case.
@@ -184,7 +194,7 @@ Run the safe-and-private reviewer as a subagent on the files changed on this bra
 
 Triage, fix and commit as in week 6 steps 5 and 6.
 
-**b. Push, open a pull request, read Files changed** (the test cases and expected answers, the scoring rule, the script and its tests, the results files, `REVIEW.md`; no `.env`, no real key), **merge on GitHub, then pull.** In the pull request's Commits tab, the test set commit should come before the script.
+**b. Push, open a pull request, read Files changed** (the test cases and expected answers, the scoring rule, the script and its tests, the results files, `REVIEW.md`; no `.env` and no real key: use the browser's Find for `sk-ant-` and `ANTHROPIC_API_KEY=`, including in the results files), as in week 10 step 7. In the pull request's **Commits** tab, the test set commit must come before the script. **This week, merge with "Create a merge commit"**, not "Squash and merge": a squash would fold the test set and the script into one commit on `main`, and the order is what assignment part (a) checks. Then pull.
 
 The deal screener's week 12 changes are on this page (it works once week 12 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-11...week-12>.
 
