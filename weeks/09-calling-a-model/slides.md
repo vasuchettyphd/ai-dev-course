@@ -240,13 +240,18 @@ Each one, then: "For now, type the numbers yourself." Never the key, never a tra
 
 ---
 
+<style scoped>section { font-size: 25px; }</style>
+
 ## Your feature
 
 1. Branch `ai-feature` first
-2. `git check-ignore .env` prints `.env`, **then** block Claude Code from reading it (`.claude/settings.json`: `"deny": ["Read(./.env)"]`), **then** `cp -n ~/first-call/.env .`
-3. Pick one small job: pull fields out of text, sort into categories, or a one-sentence summary
-4. `/superpowers:writing-plans` with the guardrails in the prompt, then `/superpowers:subagent-driven-development`
-5. **No** to reading `.env`, keys in files, tests that call the real API
+2. `git check-ignore .env` prints `.env`
+3. Block Claude Code from reading it, in `.claude/settings.json`:
+   `"deny": ["Read(./.env)"]`, then restart `claude`
+4. `cp -n ~/first-call/.env .`
+5. Pick one small job: pull fields out of text, sort into categories, or a one-sentence summary
+6. `/superpowers:writing-plans` with the guardrails in the prompt, then `/superpowers:subagent-driven-development`
+7. **No** to printing `.env`, keys in files, tests that call the real API
 
 ---
 
