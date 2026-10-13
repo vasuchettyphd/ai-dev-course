@@ -24,11 +24,26 @@ The class builds this project up week by week, alongside your own:
 | 6 | a code review: three reviewer agents in [`.claude/agents/`](.claude/agents/), their findings and the decision on each in [`REVIEW.md`](REVIEW.md), and the fix commits, each named after its finding's number |
 | 7 | a [`Dockerfile`](Dockerfile) and [`.dockerignore`](.dockerignore), so the program and its tests run the same way inside a Docker container |
 | 8 | a real bug fixed test first: a classmate's feedback form found it ([`FEEDBACK.md`](FEEDBACK.md) is the instructor's example), [`BUGS.md`](BUGS.md) logs it, and one commit carries the failing test and the fix |
-| 9 onward | more of the tool, step by step, following the plan |
+| 9 | an optional "paste the listing" step: a model (Claude Haiku 5.5, through the Anthropic API) reads a pasted listing and offers its numbers, which you confirm or replace; tests use a fake model, so they need no key and cost nothing |
+| 10 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state is marked with a **git tag** named after the week: `week-04`, `week-05`, `week-06` and `week-07` exist now, the week 8 state will get the tag `week-08` once week 8 is published, and later weeks follow (`week-09`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-08` exist now, the week 9 state will get the tag `week-09` once week 9 is published, and later weeks follow (`week-10`, ... up to `week-13`). In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 8)
+## What's here now (week 9)
+
+Everything from week 8 (listed below), plus:
+
+- `dealscreener/extract.py`: the listing step's model call. It sends the pasted listing to Claude Haiku 5.5 (`claude-haiku-5-5`) in one call and asks for the five property numbers in a fixed JSON shape (Anthropic calls this "structured outputs"). Each number comes back, or `null` when the listing doesn't say. The code then checks every number itself: anything that isn't a number of 0 or more is dropped and asked for normally. It also turns each kind of failed call (no key, wrong key, no credit, no internet, too many requests) into one plain sentence, and works out what the call cost from its token counts and the published price. It never prints the key.
+- `dealscreener/__main__.py`: `python3 -m dealscreener --listing` turns the step on. Without `--listing` the program behaves exactly as in week 8.
+- `listings/`: two listings to paste. `listing-b.txt` is listing B written as a real listing (with extra numbers that aren't inputs, like bedrooms and the year built). `messy-listing.txt` is harder on purpose: a "price reduced from" figure, the property tax given per month instead of per year, the HOA fee per month, and no insurance figure at all.
+- `requirements.txt`: the one package the listing step needs, `anthropic`, pinned to the version the course tested (1.13.0).
+- `.env.example`: what your `.env` file should look like, with a made-up value. Your real key goes in `.env`, which git and Docker both ignore.
+- `tests/test_extract.py`: tests for `extract.py`. A fake client stands in for Anthropic, so they run with plain `python3`, no key, no internet and no `anthropic` package. They include a reply that was cut off, a refusal, an answer that isn't JSON, odd values (text, negative, missing) and every error sentence, and they check that the key never appears in a message.
+- `tests/test_main.py`: a new `ListingStepTest` class, with the same fake client: accepting a number with Enter, typing over it, a missing number asked normally, a listing number that fails the usual checks, skipping with `done`, a paste that is too long, and each kind of failure falling back to typing the numbers.
+- `tests/test_live.py`: one real call, skipped unless you ask for it (see [How to use the listing step](#how-to-use-the-listing-step)).
+- `Dockerfile`: now installs `requirements.txt` before copying the code.
+
+## What was here in week 8
 
 - `README.md`: this page.
 - `PLAN.md`: the plan from week 4. In week 5 the repairs reserve was decided while building: 8% of monthly rent. In week 6 the review led to one more line: the buy-box rules compare each number rounded to 2 decimals, as it is shown.
@@ -59,7 +74,7 @@ Each week's finished state is marked with a **git tag** named after the week: `w
 
 ## How to run it
 
-You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library.
+You need Python 3.9 or newer (type `python3 --version` to check). Nothing else needs installing: the code uses only Python's standard library. (The optional listing step from week 9 needs more: see [How to use the listing step](#how-to-use-the-listing-step).)
 
 Open the Terminal (Mac) or, on Windows, the Ubuntu window you set up in week 2, go to the folder where you cloned the course repo, and type:
 
@@ -112,6 +127,89 @@ It asks for each number in turn, the same as `python3 -m dealscreener`. `-it` le
 The image holds only what the program needs. `.dockerignore` leaves out git's history, the Claude Code and Superpowers settings, Python's saved bytecode (`__pycache__`), any `.env` file of secrets, key files (`.pem`, `.key`), logs and spreadsheet exports (`.csv`). It also leaves out `docs`, `REVIEW.md`, `BUGS.md` and `FEEDBACK.md`: people read them, but the program doesn't need them.
 
 The program runs inside the container as a user called `nobody`, which has no special powers, rather than as the all-powerful `root` user. That line (`USER nobody`) is optional: if your own program writes files inside `/app` and gets "Permission denied", remove that line from your Dockerfile or ask Claude.
+
+## How to use the listing step
+
+From week 9 the program can read a pasted listing for you. It sends the text to a model (Claude Haiku 5.5) through the Anthropic API, then shows each number it found at the usual question. Press Enter to keep a number, or type the right one. Questions the listing didn't answer, and the loan questions, are asked as usual. Every call costs a little API credit (see the [cost record](#cost-record)), and the program never calls the model unless you add `--listing`.
+
+You need three things: an API key with credit on it, a `.env` file holding the key, and the `anthropic` package. The [week 9 page](../weeks/09-calling-a-model/README.md) (published with this week) walks through each step; in short:
+
+- **Key:** in the Anthropic Console, go to Settings > API keys (https://platform.claude.com/settings/keys) and click **Create key**. Choose a **workspace** for it (a key not tied to a workspace was refused with "This API key is not scoped to a workspace"). The Console shows the key, which starts with `sk-ant-`, only once, so put it straight into `.env` (step 1 below).
+- **Spend limit, before your first call:** in Settings > Billing (https://platform.claude.com/settings/billing), set a monthly spend limit in the "Spend limits" section, so a mistake can't cost more than you chose.
+- **Safety:** the key goes only in `.env`, typed with a text editor. Never in Claude Code, a chat, a screenshot, a commit or a pull request.
+
+**1. Put your key in `.env`, with a text editor.** Never paste your key into Claude Code, a chat, a screenshot, a commit or a pull request. In the `example-project` folder, make a copy of `.env.example` called `.env`.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+cp .env.example .env
+```
+
+Open `.env` in a text editor (not in Claude Code), replace `put-your-key-here` with your key, and save. Write the key with no quote marks around it, like `ANTHROPIC_API_KEY=sk-ant-...`: `docker run --env-file` keeps quote marks as part of the key, and Anthropic then rejects it. Then check git ignores `.env`.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+git check-ignore .env
+```
+
+It should print `.env`. If it prints nothing, stop: don't commit anything until `.env` is in your `.gitignore`. If a key is ever shared by mistake, revoke it in the Anthropic Console first, then make a new one.
+
+**2. Install the package in a virtual environment.** A virtual environment (a `.venv` folder) keeps this project's packages separate from the rest of your computer. The `anthropic` package needs Python 3.10 or newer: type `python3 --version`, and if it shows 3.9, use Docker instead (step 4).
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+`source .venv/bin/activate` switches this window to the virtual environment: your prompt starts with `(.venv)`. In a new window, type it again before running the program. On Windows, if `python3 -m venv .venv` says `ensurepip is not available` and suggests `apt install python3.12-venv`, type `sudo apt install python3-venv`, delete the broken `.venv` folder it left behind (`rm -r .venv`), and run the three lines again. `rm -r .venv` deletes only that broken `.venv` folder you just made, by name, and nothing else: never add `-f` or any other folder or file to it.
+
+**3. Run it with `--listing`.**
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+python3 -m dealscreener --listing
+```
+
+Paste the listing, then type `done` on a line by itself and press Enter. (Type `done` straight away to skip the step.) Try `listings/listing-b.txt`: in the course's run every number matched listing B, so pressing Enter five times and typing the loan details (25, 7, 30, 6000) gave a cash flow of $430.53. Then try `listings/messy-listing.txt` and check what the model made of the monthly tax and the missing insurance before you press Enter. In the course's run it turned the $200 a month tax into 2400 a year, left the insurance out (so you're asked for it), ignored the old "reduced from" price, and found the $185 HOA. The model can be wrong: you are the one who confirms each number.
+
+If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence, adds "For now, type the numbers yourself.", and asks the questions as usual. The tests never call the model: `python3 -m unittest` stays free and works without a key. The one real-call test runs only on request.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
+
+```
+set -a; . ./.env; set +a
+RUN_LIVE_TESTS=1 python -m unittest tests.test_live -v
+```
+
+The first line loads the key from `.env` into this window without showing it.
+
+**4. With Docker.** The image installs `requirements.txt` itself, so you only need Docker Desktop. Build the image again (week 7's `docker build -t dealscreener .`), then give the container your key when it starts, never inside the image.
+
+Type in: the Terminal on a Mac, or the Ubuntu window on Windows.
+
+```
+docker run -it --rm --env-file .env dealscreener python -m dealscreener --listing
+```
+
+`--env-file .env` hands the key to this one container while it runs. `.dockerignore` keeps `.env` out of the image, so the image never holds your key.
+
+### Cost record
+
+What each real call cost, from the token counts the program prints and Haiku 5.5's published price: $0.10 per million input tokens and $0.50 per million output tokens (for prompts up to 100,000 tokens; [Anthropic's pricing page](https://platform.claude.com/docs/en/about-claude/pricing), read on 2026-10-12).
+
+| Call | Input tokens | Output tokens | Cost |
+|---|---|---|---|
+| `listing-b.txt` | 887 | 65 | 887 x $0.10 / 1,000,000 + 65 x $0.50 / 1,000,000 = about $0.00012 |
+| `messy-listing.txt`, first run | 823 | 174 | about $0.00017 |
+| `messy-listing.txt`, second run | 823 | 146 | about $0.00016 |
+
+These ran on 12 October 2026. The same listing can use a different number of output tokens each time.
 
 ## What the numbers mean
 

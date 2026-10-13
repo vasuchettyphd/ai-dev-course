@@ -35,3 +35,6 @@ docs
 REVIEW.md
 BUGS.md
 FEEDBACK.md
+
+# Kept in the image on purpose: listings/ (two small sample listings). The program doesn't
+# read them, but the live test (tests/test_live.py) does, so it can run inside the container.

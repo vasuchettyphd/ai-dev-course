@@ -1,0 +1,3 @@
+# Packages the listing step needs (install with: pip install -r requirements.txt).
+# The version is pinned so everyone gets the one the course tested.
+anthropic==1.13.0

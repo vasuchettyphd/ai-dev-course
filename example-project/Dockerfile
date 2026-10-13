@@ -6,10 +6,12 @@ FROM python:3.12-slim
 # Work in a folder called /app inside the container.
 WORKDIR /app
 
-# No package install step: the program uses only Python's standard library. A project that
-# needs packages first copies its list of packages (requirements.txt for Python,
-# package.json for Node.js) and installs them here (pip install -r requirements.txt, or
-# npm install), before the line below, so Docker can reuse that step when only your code changes.
+# Copy the list of packages first, on its own, and install them. Week 9's listing step
+# needs one package (anthropic, the official library for calling Claude). Doing this before
+# copying the code lets Docker reuse this slow step when only your code changes.
+# --no-cache-dir stops pip keeping its download files, so the image stays smaller.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy this folder into /app, leaving out everything listed in .dockerignore.
 COPY . .
@@ -19,5 +21,7 @@ COPY . .
 # remove this line or ask Claude).
 USER nobody
 
-# The command that runs when the container starts: the deal screener.
+# The command that runs when the container starts: the deal screener. To paste a listing
+# first, add the key at run time (never in the image) and the flag:
+#   docker run -it --rm --env-file .env dealscreener python -m dealscreener --listing
 CMD ["python", "-m", "dealscreener"]
