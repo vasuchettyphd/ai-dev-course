@@ -30,7 +30,6 @@ The class builds this project up week by week, alongside your own:
 | 12 | an evaluation of the listing step: 20 made-up listings in [`evals/`](evals/) with the right answers written down first, and `python3 -m dealscreener.evaluate` to run the model on them and count the numbers it gets right (15 dev cases, 5 held out); tests use a fake model, so they need no key and cost nothing |
 | 13 | a prompt injection test and a defence: 8 hostile made-up listings in [`evals/injection/`](evals/injection/) that try to give the model orders, `python3 -m dealscreener.evaluate --injection` to run them, and a listing step that sends the pasted text inside a JSON object and tells the model it is data, not instructions; scored before and after the change; tests use a fake model, so they need no key and cost nothing |
 | 14 | a model demo and write-up, with no code change: [`DEMO.md`](DEMO.md) is a timed 3-minute demo script with a fallback that needs no key and no network, and [`FINAL.md`](FINAL.md) is the final write-up under the seven headings, with every number linked to its file |
-| 15 onward | more of the tool, step by step, following the plan |
 
 Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-13` exist now; `week-14` is added when week 14 is published. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
