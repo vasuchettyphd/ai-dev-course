@@ -97,7 +97,7 @@ Do it in `~/first-call/.env` now, and later in `~/semester-project/.env` (step 5
 
 Use the name `GEMINI_API_KEY`, and **don't** also set `GOOGLE_API_KEY`: Google's library reads both, and "If both are set, `GOOGLE_API_KEY` takes precedence" (<https://ai.google.dev/gemini-api/docs/api-key>), which leads to confusing "wrong key" errors.
 
-**e. Restrict it, and if it leaks, delete it.** Google: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." (<https://ai.google.dev/gemini-api/docs/api-key>): if the key's settings in AI Studio let you limit it to the Gemini API, do (being tested). If a Google key leaks, on the same API keys page delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
+**e. Restrict it, and if it leaks, delete it.** Google: "Adding restrictions to your API keys minimizes the potential damage if a key is compromised." (<https://ai.google.dev/gemini-api/docs/api-key>): so if your key's settings in AI Studio offer a way to limit it to the Gemini API, use it (being tested). If a Google key leaks, on the same API keys page delete the key first, then create a new one and put it in `.env`. Google's own advice: "Never check API keys into source control systems like Git."
 
 **f. Limits.** On the free tier, Google limits how many requests you can make per minute and per day; Google says "View your active rate limits in AI Studio" (<https://ai.google.dev/gemini-api/docs/rate-limits>). If you hit one, you'll see error 429: wait and try again. The daily count resets at midnight Pacific time. The free tier needs no billing account, so it shouldn't be able to charge you (being tested): **don't add billing** for this course.
 
@@ -161,7 +161,7 @@ set -a; . ./.env; set +a
 python embed.py
 ```
 
-The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested: the course will add its real scores here). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
+The first line loads both keys from `.env` into this window, as in week 9. You should see `Numbers in each embedding: 768`, then three scores (being tested). The dues note and the HOA question should score **higher** than either does with the contractor note, although they share no important words. That's search by meaning.
 
 If you see `ValueError` mentioning an API key, the key isn't loaded: run the `set -a` line again in `~/first-call`. Google's newer model, `gemini-embedding-2`, works a little differently (it has no `task_type`); this course uses `gemini-embedding-001`, which Google supports until at least May 2028 (<https://ai.google.dev/gemini-api/docs/deprecations>).
 
@@ -318,7 +318,7 @@ The deal screener's week 10 changes are on this page (it works once week 10 is p
 | `API key not valid`, error 400, 401 or 403, or "The Google API key was not accepted" | The key is wrong, deleted, or has quote marks or spaces: check the `.env` line, or make a new key (step 2b). |
 | "Using GOOGLE_API_KEY" in a warning | You also set `GOOGLE_API_KEY`, which wins: remove it (step 2d). |
 | Error 429, or "Too many requests for the free tier" | You hit a free-tier limit. Wait a minute (or until the next day for a daily limit) and try again; see your limits in AI Studio. |
-| "Google couldn't read the request." (error 400) | Usually a changed package or model name: check `google-genai==2.30.0` and `gemini-embedding-001`, and that your notes aren't empty. |
+| "Google couldn't read the request." (error 400) | Google rejected the request. Check the package version (`google-genai==2.30.0`), the model name (`gemini-embedding-001`), and that your documents aren't empty; if it continues, ask your instructor. |
 | "Couldn't reach Google. Check your internet connection." | Check your internet connection, then try again. |
 | "Google's service is busy or having a problem. Try again later." | Wait a few minutes and try again. |
 | "Couldn't save the index file ..." | The program can't write in that folder (in Docker, check the `--user` part and that you ran `touch notes-index.json` first). |
