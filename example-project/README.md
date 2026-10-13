@@ -38,8 +38,8 @@ Everything from week 10 (listed below), plus:
 - `dealscreener/tools.py`: the `screen_listing` tool. `TOOL_SCHEMA` is what Claude is told about it: its name, a plain description (it says percentages are written as 25 for 25%, and that 5% vacancy and 8% repairs are already allowed for), and the nine numbers it needs, each with a type and a description, all required, nothing else allowed. `screen_listing` checks every number with the same rules as the program's questions, runs the calculator and the buy box, and returns the four results (rounded to cents), each rule's reason, and `PASS` or `FAIL`. A wrong number raises `ToolInputError` with one sentence naming the field, for example `interest_rate_pct is 250: it must be a percentage from 0 to 100.` A rate between 0 and 1 is refused with `interest_rate_pct is 0.07: percentages are written as 7 for 7%. Ask the user which they meant.` (the week 8 bug, now for the tool). The tool only calculates: it reads no files, writes nothing and sends nothing.
 - `dealscreener/agent.py`: the agent command, `python3 -m dealscreener.agent "your question"`. It sends the question and the tool's description to Claude Haiku 5.5. When Claude asks for the tool, the program prints `Calling screen_listing with` and the numbers, runs the tool, and sends the result back (or the error sentence, marked as an error, so Claude can fix it or ask you). It stops at Claude's final answer, or after 5 calls to Claude (the course's own limit, so a confused model can't run up a bill), and prints what all the calls cost together. The instructions tell Claude to use the tool for every number, to give the tool's numbers exactly, to ask for any of the nine numbers the question leaves out instead of guessing, and to explain the result for a beginner.
 - `dealscreener/mcp_server.py`: the same tool as an MCP server, for Claude Code (see [How to use the MCP server in Claude Code](#how-to-use-the-mcp-server-in-claude-code)). It needs no key and reads no `.env` file.
-- `tests/test_tools.py` (24 tests) and `tests/test_agent.py` (19 tests): a fake client plays Claude from a script of replies, so they run with plain `python3`, no key, no internet and no packages. They cover listing B (cash flow 430.53, `PASS`), listing A (`FAIL`), every kind of wrong input, a tool call and its result going back with the matching id, Claude's whole reply (including its thinking) going back unchanged, two tool calls in one reply, an unknown tool, the 5-call limit, a cut-off answer, a refusal, the cost line and the error sentences.
-- `tests/test_mcp_server.py` (4 tests): starts the real MCP server and talks to it the way Claude Code would, with the MCP package's own client. Skipped when the `mcp` package isn't installed.
+- `tests/test_tools.py` (25 tests) and `tests/test_agent.py` (20 tests): a fake client plays Claude from a script of replies, so they run with plain `python3`, no key, no internet and no packages. They cover listing B (cash flow 430.53, `PASS`), listing A (`FAIL`), every kind of wrong input, a tool call and its result going back with the matching id, Claude's whole reply (including its thinking) going back unchanged, two tool calls in one reply, an unknown tool, the 5-call limit, a cut-off answer, a refusal, the cost line and the error sentences.
+- `tests/test_mcp_server.py` (5 tests): starts the real MCP server and talks to it the way Claude Code would, with the MCP package's own client. Skipped when the `mcp` package isn't installed.
 - `tests/test_agent_live.py`: one real run, skipped unless you ask for it (see [How to ask the agent](#how-to-ask-the-agent)).
 - `requirements.txt`: adds `mcp[cli]`, the official MCP package, pinned to the version the course tested (2.3.0). It needs Python 3.11 or newer; on an older Python, pip skips it and installs the rest.
 
@@ -393,7 +393,7 @@ Two turns means two calls to Claude: one that asked for the tool, and one that a
 
 **3. Write the rate as a decimal.** Try the question from step 1 with `an interest rate of 0.07` in place of `7% interest`. In the course's run Claude sent 7 to the tool and said "I read your 0.07 interest rate as 7%." If Claude ever sends 0.07, the tool refuses it with `interest_rate_pct is 0.07: percentages are written as 7 for 7%. Ask the user which they meant.`, and Claude gets that sentence back as an error to act on. Either way, read the numbers in the `Calling screen_listing with` line: they are the ones the answer is based on.
 
-If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence and stops, the same sentences as the listing step. If Claude hasn't answered after 5 calls, it prints `Stopped after 5 turns without a final answer.` and what those calls cost. The tests never call Claude: `python3 -m unittest` stays free and works without a key.
+If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence and stops, the same sentences as the listing step. If Claude's answer is cut off or declined, it prints that sentence and what the calls so far cost. If Claude hasn't answered after 5 calls, it prints `Stopped after 5 turns without a final answer.` and what those calls cost. The tests never call Claude: `python3 -m unittest` stays free and works without a key.
 
 **4. The live test (optional).** One real run of the question from step 1: it checks that Claude called the tool at least once and that the answer contains 430.53.
 
@@ -431,7 +431,7 @@ MCP (Model Context Protocol) is a standard way to connect AI apps to tools: the 
 
 **An MCP server runs code on your computer.** Claude Code's [MCP page](https://code.claude.com/docs/en/mcp) (read 2026-10-13) says: "Verify you trust each server before connecting it. Servers that fetch external content can expose you to prompt injection risk." Add only servers you wrote yourself, like this one, or ones from a source you trust. Week 13 covers the risks in more depth.
 
-You need Python 3.11 or newer for the `mcp` package (type `python3 --version` to check) and Claude Code from week 2. On Windows, do every step in the Ubuntu window: Claude Code and the server both run in Ubuntu.
+You need Python 3.11 or newer for the `mcp` package (type `python3 --version` to check) and Claude Code from week 2. A virtual environment keeps the Python it was made with: if you made `.venv` with Python 3.10, `pip install -r requirements.txt` skips the MCP package and the steps below don't work. Then delete that `.venv` (`rm -r .venv`, which removes only that folder) and make it again with Python 3.11 or newer (for example `python3.12 -m venv .venv`, if `python3.12 --version` works), then activate it and install again. On Windows, do every step in the Ubuntu window: Claude Code and the server both run in Ubuntu.
 
 **1. Install the package and test the server on its own.** In the `example-project` folder, with the virtual environment from week 9:
 
@@ -443,7 +443,7 @@ pip install -r requirements.txt
 python3 -m unittest tests.test_mcp_server -v
 ```
 
-The tests start the server and talk to it with the MCP package's own client: they list its one tool, screen listing B (cash flow 430.53), and check that a wrong number comes back as an error. All four should say `ok`. If they say `skipped`, the `mcp` package isn't installed in this window: check that `(.venv)` is showing and that `python3 --version` is 3.11 or newer.
+The tests start the server and talk to it with the MCP package's own client: they list its one tool, screen listing B (cash flow 430.53), check that a wrong number comes back as an error, and start it from another folder the way Claude Code may. All five should say `ok`. If they say `skipped`, the `mcp` package isn't installed in this window: check that `(.venv)` is showing and that `python3 --version` is 3.11 or newer.
 
 You can also start the server by hand with `python -m dealscreener.mcp_server`, but it prints nothing: it waits silently for an app to connect. Press Ctrl+C to stop it.
 
@@ -452,11 +452,12 @@ You can also start the server by hand with `python -m dealscreener.mcp_server`, 
 Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` showing).
 
 ```
-claude mcp add --scope project dealscreener -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
+claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
 ```
 
 - `dealscreener` is the name Claude Code shows for the server.
 - `--scope project` saves it in a file called `.mcp.json` in this folder, for this project only.
+- `-e PYTHONPATH="$PWD"` tells Python where the `dealscreener` folder is. `-m dealscreener.mcp_server` only finds it from inside `example-project`, and Claude Code may start the server from another folder; in the course's check, starting it from another folder without this setting failed with `No module named 'dealscreener'`, and with it the server started and screened listing B. Put the name `dealscreener` before `-e`, as shown.
 - Everything after `--` is the command Claude Code runs to start the server. Claude Code stores it exactly as typed, so it uses the full path to the virtual environment's Python (`$PWD` means "the folder you're in"). With plain `python`, Claude Code would start a Python without the `mcp` package, and the server would fail.
 
 In the course's check (Claude Code 2.1.296, in a test container, not signed in) it printed:
@@ -478,13 +479,15 @@ and `.mcp.json` held this (your path will be your own folder):
         "-m",
         "dealscreener.mcp_server"
       ],
-      "env": {}
+      "env": {
+        "PYTHONPATH": "/home/student/example-project"
+      }
     }
   }
 }
 ```
 
-No key is in it, and none is needed. This example doesn't commit its `.mcp.json`, because the path belongs to one computer.
+No key is in it, and none is needed: the only setting is the folder. This example doesn't commit its `.mcp.json`, because the path belongs to one computer.
 
 **3. Check it.**
 
@@ -496,7 +499,9 @@ claude mcp list
 
 In the course's check it showed ``dealscreener: /home/student/example-project/.venv/bin/python -m dealscreener.mcp_server - ⏸ Pending approval (run `claude` to approve)``. For your safety, Claude Code asks you to approve a project's servers before it uses them. `claude mcp get dealscreener` shows the details.
 
-**4. Approve it and ask.** Start Claude Code in the `example-project` folder (type `claude`), approve the `dealscreener` server when it asks, and ask, for example: "Use the screen_listing tool to screen this listing: price 150000, rent 1700 a month, tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask your permission to run the tool, then answer with a cash flow of $430.53 and `PASS`. The approval screen, the permission prompt and the name Claude Code shows for the tool are being tested in a signed-in session; `/mcp` inside Claude Code shows the server's status.
+**4. Approve it and ask.** Start Claude Code in the `example-project` folder (type `claude`), approve the `dealscreener` server when it asks, and ask, for example: "Use the screen_listing tool to screen this listing: price 150000, rent 1700 a month, tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask your permission to run the tool (the permission prompt is being tested), then answer with a cash flow of $430.53 and `PASS`. The approval screen and the name Claude Code shows for the tool (perhaps `mcp__dealscreener__screen_listing`) are being tested in a signed-in session, and so is the `/mcp` screen inside Claude Code, which the docs say shows each server's status.
+
+**How the MCP tool differs from the agent's.** The MCP package builds the tool's input schema from the function's parameters, so it is a little stricter in places and looser in one: `loan_term_years` must be a whole number like `30`, not `30.0`, and an unknown extra field isn't turned away with `Unknown field:` the way the agent's tool does it. The numbers and the error sentences are the same. If you copy the pattern for your own server: a problem raised as `ToolError` (from `mcp.server.mcpserver.exceptions`) reaches Claude as your own sentence, while any other error reaches it only as `Error executing tool screen_listing`.
 
 **5. Remove it** when you no longer want it:
 

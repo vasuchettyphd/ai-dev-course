@@ -102,6 +102,12 @@ class CheckInputTest(unittest.TestCase):
         self.assertEqual(message, "interest_rate_pct is 0.07: percentages are written as 7 for 7%. "
                                   "Ask the user which they meant.")
 
+    def test_a_tiny_percentage_is_written_out_in_full(self):
+        message = self.assert_refused(listing_b(down_payment_pct=1e-07))
+        self.assertEqual(message, "down_payment_pct is 0.0000001: percentages are written as 0.00001 "
+                                  "for 0.00001%. Ask the user which they meant.")
+        self.assertNotIn("e-", message)
+
     def test_zero_percent_is_fine(self):
         self.assertEqual(tools.check_input(listing_b(interest_rate_pct=0)).interest_rate_pct, 0.0)
 

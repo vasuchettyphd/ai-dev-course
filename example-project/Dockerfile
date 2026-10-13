@@ -6,9 +6,10 @@ FROM python:3.12-slim
 # Work in a folder called /app inside the container.
 WORKDIR /app
 
-# Copy the list of packages first, on its own, and install them. The listing step (week 9)
-# and the notes command (week 10) need two packages: anthropic (for Claude) and google-genai
-# (for Google's embeddings). Doing this before
+# Copy the list of packages first, on its own, and install them. The listing step (week 9),
+# the notes command (week 10) and the agent and MCP server (week 11) need three packages:
+# anthropic (for Claude), google-genai (for Google's embeddings) and mcp (for the MCP
+# server). Doing this before
 # copying the code lets Docker reuse this slow step when only your code changes.
 # --no-cache-dir stops pip keeping its download files, so the image stays smaller.
 COPY requirements.txt .

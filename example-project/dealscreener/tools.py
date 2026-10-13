@@ -12,6 +12,7 @@ This file uses only Python's standard library. The agent (agent.py) and the MCP 
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 
 from dealscreener.__main__ import parse_answer
 from dealscreener.buybox import check, passes
@@ -106,12 +107,19 @@ def check_number(field: str, value):
         raise ToolInputError(f"{field} is {number:g}: {message[0].lower()}{message[1:]}") from None
     if kind == "percent" and 0 < checked < 1:
         # 0.07 might mean 7% written as a decimal: the tool refuses, and the model asks.
-        as_percent = round(checked * 100, 10)  # round away floating-point noise
+        shown, as_percent = plain_decimal(checked), plain_decimal(checked, times=100)
         raise ToolInputError(
-            f"{field} is {checked:g}: percentages are written as {as_percent:g} for {as_percent:g}%. "
+            f"{field} is {shown}: percentages are written as {as_percent} for {as_percent}%. "
             "Ask the user which they meant."
         )
     return checked
+
+
+def plain_decimal(value: float, times: int = 1) -> str:
+    """A small number written out in full, never as 1e-07: 0.07 -> "0.07", and with
+    times=100, 0.07 -> "7" (worked out exactly, so no 7.000000000000001)."""
+    exact = Decimal(repr(value)) * times
+    return format(exact.normalize(), "f")
 
 
 def screen_listing(raw: dict) -> dict:

@@ -6,6 +6,7 @@ import asyncio
 import json
 import pathlib
 import sys
+import tempfile
 import unittest
 
 try:
@@ -19,11 +20,11 @@ LISTING_B = {"purchase_price": 150000, "monthly_rent": 1700, "yearly_property_ta
              "interest_rate_pct": 7, "loan_term_years": 30, "closing_costs": 6000}
 
 
-def talk_to_server(action):
+def talk_to_server(action, cwd=PROJECT, env=None):
     """Start the server, run action(client) and return what it returns."""
     async def session():
         server = StdioServerParameters(command=sys.executable, args=["-m", "dealscreener.mcp_server"],
-                                       cwd=str(PROJECT))
+                                       cwd=str(cwd), env=env)
         async with Client(server) as client:
             return await action(client)
     return asyncio.run(session())
@@ -43,6 +44,14 @@ class McpServerTest(unittest.TestCase):
         schema = tool.input_schema if hasattr(tool, "input_schema") else tool.inputSchema
         self.assertEqual(sorted(schema["required"]), sorted(LISTING_B))
         self.assertIn("description", schema["properties"]["interest_rate_pct"])
+
+    def test_starts_from_another_folder_with_pythonpath(self):
+        # Claude Code may start the server in a different folder: the README's command sets
+        # PYTHONPATH to the project folder so Python still finds the dealscreener package.
+        with tempfile.TemporaryDirectory() as elsewhere:
+            listed = talk_to_server(lambda client: client.list_tools(), cwd=elsewhere,
+                                    env={"PYTHONPATH": str(PROJECT)})
+        self.assertEqual([tool.name for tool in listed.tools], ["screen_listing"])
 
     def test_listing_b_gives_its_cash_flow(self):
         result = talk_to_server(lambda client: client.call_tool("screen_listing", LISTING_B))

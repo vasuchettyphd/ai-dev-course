@@ -231,10 +231,22 @@ class MainTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(printed[-1], "Couldn't reach Anthropic. Check your internet connection.")
 
-    def test_cut_off_answer_gives_the_sentence(self):
-        code, printed = self.main(["Screen listing B"], FakeClient(reply(stop_reason="max_tokens")))
+    def test_cut_off_answer_gives_the_sentence_and_still_the_cost(self):
+        client = FakeClient(reply(tool_use(LISTING_B), input_tokens=1000, output_tokens=200),
+                            reply(text("The cash fl"), stop_reason="max_tokens",
+                                  input_tokens=1500, output_tokens=2000))
+        code, printed = self.main(["Screen listing B"], client)
         self.assertEqual(code, 1)
-        self.assertEqual(printed[-1], "The model's answer was cut off before it finished.")
+        self.assertEqual(printed[-2], "The model's answer was cut off before it finished.")
+        # 2500 x $0.10 / 1,000,000 + 2200 x $0.50 / 1,000,000 = $0.00135.
+        self.assertEqual(printed[-1], "Used 2500 input and 2200 output tokens on Claude in 2 turns, about $0.00135.")
+
+    def test_refusal_gives_the_sentence_and_still_the_cost(self):
+        client = FakeClient(reply(stop_reason="refusal", input_tokens=1000, output_tokens=20))
+        code, printed = self.main(["Screen listing B"], client)
+        self.assertEqual(code, 1)
+        self.assertEqual(printed, ["The model declined to answer.",
+                                   "Used 1000 input and 20 output tokens on Claude in 1 turn, about $0.00011."])
 
     def test_env_file_is_loaded_first(self):
         calls = []

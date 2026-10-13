@@ -37,6 +37,15 @@ SYSTEM_PROMPT = (
 )
 
 
+class AgentStopped(extract.ExtractionError):
+    """Claude's answer was cut off or declined. The message is one plain sentence; result
+    holds the turns and tokens used so far, so the cost can still be shown."""
+
+    def __init__(self, message: str, result: "AgentResult"):
+        super().__init__(message)
+        self.result = result
+
+
 @dataclass
 class AgentResult:
     text: str | None  # the final answer, or None if MAX_TURNS ran out first
@@ -61,10 +70,11 @@ def run_agent(question: str, client, print_fn=print) -> AgentResult:
         )
         input_tokens += response.usage.input_tokens
         output_tokens += response.usage.output_tokens
+        so_far = AgentResult(None, turn, input_tokens, output_tokens, tool_calls)
         if response.stop_reason == "max_tokens":
-            raise extract.ExtractionError("The model's answer was cut off before it finished.")
+            raise AgentStopped("The model's answer was cut off before it finished.", so_far)
         if response.stop_reason == "refusal":
-            raise extract.ExtractionError("The model declined to answer.")
+            raise AgentStopped("The model declined to answer.", so_far)
         # The whole reply goes back unchanged, thinking blocks included: the docs say they
         # must be passed back "complete and unmodified" when tools are used.
         history.append({"role": "assistant", "content": response.content})
@@ -74,7 +84,7 @@ def run_agent(question: str, client, print_fn=print) -> AgentResult:
             texts = [block.text for block in response.content if getattr(block, "type", None) == "text"]
             answer = "\n".join(texts).strip()
             if not answer:
-                raise extract.ExtractionError("The model's answer had no text in it.")
+                raise AgentStopped("The model's answer had no text in it.", so_far)
             return AgentResult(answer, turn, input_tokens, output_tokens, tool_calls)
         # One tool_result for every tool call, all in one user message, in the same order.
         results = []
@@ -107,7 +117,11 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
         return 2
     try:
         result = run_agent(question, client_factory(), print_fn)
-    except extract.ExtractionError as problem:  # no key, no package, cut off or declined
+    except AgentStopped as problem:  # cut off or declined: the calls so far still cost money
+        print_fn(str(problem))
+        print_cost(problem.result, print_fn)
+        return 1
+    except extract.ExtractionError as problem:  # no key or no package: nothing was spent
         print_fn(str(problem))
         return 1
     except Exception as error:  # any failed call: a plain sentence, never a traceback or the key
@@ -119,10 +133,15 @@ def main(argv, print_fn=print, client_factory=extract.make_client) -> int:
     else:
         print_fn(result.text)
     print_fn("")
+    print_cost(result, print_fn)
+    return 1 if result.text is None else 0
+
+
+def print_cost(result: AgentResult, print_fn) -> None:
+    """The tokens and cost of every call to Claude for this question, added together."""
     cost = extract.cost_usd(result.input_tokens, result.output_tokens)
     print_fn(f"Used {result.input_tokens} input and {result.output_tokens} output tokens "
              f"on Claude in {result.turns} {'turn' if result.turns == 1 else 'turns'}, about ${cost:.5f}.")
-    return 1 if result.text is None else 0
 
 
 if __name__ == "__main__":
