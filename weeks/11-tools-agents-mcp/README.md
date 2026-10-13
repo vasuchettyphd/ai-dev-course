@@ -15,8 +15,8 @@
 
 You need:
 
-- Weeks 9 and 10 done: your Anthropic key in `.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, and `~/first-call/.venv` (week 9 step 3).
-- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, the python.org installer from week 9 step 3a is newer than that.
+- Weeks 9 and 10 done: your Anthropic key in `.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, `~/first-call/.venv` (week 9 step 3), and the course repo's `example-project` set up as in week 10 step 4a (its own `.venv` and `.env`).
+- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, if `python3 --version` says 3.10 or lower, install a newer Python as in week 9 step 3a.
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows. Claude Code and your MCP server both run there; on Windows, nothing this week goes in PowerShell.
@@ -32,13 +32,14 @@ As in weeks 9 and 10: plain-English prompts, plain **Yes** for git, a branch fir
 3. **Errors go back to the model as text**, so it can fix its request or ask the user, instead of your program crashing.
 4. **The loop has a limit** (5 turns for the deal screener), so it can't run forever or run up costs.
 5. **Only add MCP servers you wrote or trust.** An MCP server is a program that runs on your laptop.
+6. **Start Claude Code in a window where no key is loaded** (week 9 step 5a): the MCP servers it starts would get the key too.
 
 | Claude asks to | Choose |
 |---|---|
 | Create or edit your code and tests on your `tool` branch | **Yes** |
 | A tool that reads or calculates | **Yes** |
 | A tool that deletes, sends, pays, posts or writes files | **No**. Type: "This week the tool may only read or calculate." |
-| `pip install` the official packages in your project's `.venv` (step 4) | **Yes** |
+| `pip install` the official packages, pinned, in your project's `.venv` (steps 4 and 5) | **Yes** |
 | `claude mcp add ...` for **your own** server (step 5) | **Yes** |
 | Add an MCP server you didn't write, or one from a website or a chat | **No** |
 | Read or print `.env`, or put a key in any file, including `.mcp.json` | **No** |
@@ -139,7 +140,7 @@ What happened:
 - **Call 2** stopped with `end_turn`: the answer, built on your number.
 - That's **two calls**, and you pay for both: (432 + 511) x $0.10 / 1,000,000 + (71 + 56) x $0.50 / 1,000,000 = about $0.00016.
 
-Two details matter. Claude's turn goes back into the conversation **unchanged** (`first.content`): Anthropic's docs say any thinking in it must be passed back "complete and unmodified". And in your reply, the `tool_result` comes first.
+Two details matter. Claude's turn goes back into the conversation **unchanged** (`first.content`): Anthropic's docs say any thinking in it must be passed back "complete and unmodified" (<https://platform.claude.com/docs/en/build-with-claude/thinking>, read 13 October 2026; the tool use docs are at <https://platform.claude.com/docs/en/agents-and-tools/tool-use/>). And in your reply, the `tool_result` comes first.
 
 ### 3. The agent loop, on the deal screener
 
@@ -159,12 +160,12 @@ cd ~/ai-dev-course
 git pull
 cd example-project
 source .venv/bin/activate
+python3 --version
 pip install -r requirements.txt
-set -a; . ./.env; set +a
 python3 -m dealscreener.agent "Should I buy this rental? The price is \$150,000 and the rent is \$1,700 a month. Property tax is \$2,400 a year, insurance is \$1,200 a year and there is no HOA fee. I'd put 25% down on a 30-year loan at 7% interest, with \$6,000 in closing costs."
 ```
 
-(The `\$` keeps your terminal from treating `$1` as something else.) The course's run printed the tool call, then the answer (shortened here):
+`python3 --version` must say 3.11 or newer for step 5 (if not, see Troubleshooting, "No module named 'mcp'"). The agent loads your key from this folder's `.env` by itself, so there's no `set -a` line. (The `\$` keeps your terminal from treating `$1` as something else.) The course's run printed the tool call, then the answer (shortened here):
 
 ```text
 Calling screen_listing with {"purchase_price":150000,"monthly_rent":1700,"yearly_property_tax":2400,"yearly_insurance":1200,"monthly_hoa":0,"down_payment_pct":25,"interest_rate_pct":7,"loan_term_years":30,"closing_costs":6000}
@@ -205,14 +206,14 @@ Switch to main, pull the latest changes from GitHub, then create a new branch ca
 **c. Plan and build it.** In Claude Code (replace the parts in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan to give my project one tool the model can call: <name>, which <what it reads or calculates>, using <the existing function, if there is one>. Use Anthropic's anthropic package with claude-haiku-5-5 and an agent loop: send the tool's name, description and input_schema; when stop_reason is tool_use, run the tool and send back a tool_result with the same tool_use_id (errors as text with is_error true), appending Claude's turn to the conversation unchanged; stop at end_turn; stop after 5 turns and say so; handle max_tokens and refusal with a plain sentence; omit tool_choice and temperature. Rules: the tool only reads or calculates; check every input the model sends, the same way the program checks a person's input; tell the model in the system prompt to use the tool for every number and to ask for missing inputs instead of guessing; print each tool call and the total tokens and cost; read the key only from the environment and never read or print .env; tests must use a fake model that asks for the tool, including a bad input, two tool calls in one reply, and hitting the 5-turn limit, and never call Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan to give my project one tool the model can call: <name>, which <what it reads or calculates>, using <the existing function, if there is one>. Use Anthropic's anthropic package pinned to 1.13.0 (or @anthropic-ai/sdk for a Node.js project) with claude-haiku-5-5 and an agent loop: send the tool's name, description and input_schema; when stop_reason is tool_use, run the tool and send back a tool_result with the same tool_use_id (errors as text with is_error true), appending Claude's turn to the conversation unchanged; stop at end_turn; stop after 5 turns and say so; handle max_tokens and refusal with a plain sentence; omit tool_choice and temperature. Rules: the tool only reads or calculates; check every input the model sends, the same way the program checks a person's input; tell the model in the system prompt to use the tool for every number and to ask for missing inputs instead of guessing; print each tool call and the total tokens and cost; read the key only from the environment and never read or print .env; tests must use a fake model that asks for the tool, including a bad input, two tool calls in one reply, and hitting the 5-turn limit, and never call Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1. I'm not a programmer, so keep each task small.
 ```
 
 Then `/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.` as in weeks 9 and 10. Answer as in the table at the top.
 
 **d. Try it.** In a second terminal window (not the Claude Code one): activate `.venv`, load the key, and ask your agent three questions: one it can answer with the tool, one with an input missing, and one with a bad input. Copy one run's printed output, with the tool calls and the cost line: you hand it in.
 
-**e. Run the tests** with `.env` moved out of the folder, as in week 9 step 5e: they must all pass.
+**e. Run the tests** with `.env` moved out of the folder, as in week 9 steps 5e and 5f: they must all pass.
 
 ### 5. Make your tool an MCP server
 
@@ -234,7 +235,7 @@ def screen_listing(...):
 
 Older tutorials call `MCPServer` by its old name, `FastMCP`; in version 2.3.0 that name no longer exists. To send a plain error sentence back to the client, the server raises `ToolError` (from `mcp.server.mcpserver.exceptions`).
 
-**c. Connect it to Claude Code.** In your terminal, in `~/ai-dev-course/example-project`, with the `.venv` from step 3 (made with Python 3.11 or newer):
+**c. Connect it to Claude Code.** Open a **new** terminal window with **no key loaded** (tool rule 6), `cd ~/ai-dev-course/example-project`, and check `.venv/bin/python --version` says 3.11 or newer. Then:
 
 ```bash
 claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
@@ -247,7 +248,7 @@ claude mcp list
 
 `claude mcp list` should show `dealscreener: ... ⏸ Pending approval (run `claude` to approve)`. A project's servers wait until you approve them, as a safety check. `.mcp.json` holds no key; open it and check.
 
-**d. Use it.** Start `claude` in the same folder. Approve the `dealscreener` server when Claude Code asks, then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: $150,000 price, $1,700 rent, ..." (all nine numbers). Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status. (All of this is being tested.) Take a screenshot of Claude Code calling your tool: you hand it in.
+**d. Use it.** In that same key-free window, start `claude`. Approve the `dealscreener` server when Claude Code asks, then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: $150,000 price, $1,700 rent, ..." (all nine numbers). Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status. (All of this is being tested.) Take a screenshot of Claude Code calling your tool, with nothing secret on screen: you hand it in.
 
 **e. For your own project.** In Claude Code, on your `tool` branch:
 
@@ -292,7 +293,7 @@ The deal screener's week 11 changes are on this page (it works once week 11 is p
 | Error 400 mentioning `tool_use_id` or `tool_result` | Each `tool_result` must carry the `id` of the `tool_use` it answers, and the results must come first in your reply. |
 | Error 400 about thinking blocks | Claude's turn must go back into the conversation unchanged (`response.content`), not rebuilt by hand. |
 | `claude mcp list` shows the server as failed, or `No module named 'dealscreener'` | The `-e PYTHONPATH="$PWD"` part is missing, or you ran `claude mcp add` from another folder. `claude mcp remove dealscreener -s project`, `cd` into the project folder, and add it again (step 5c). |
-| `No module named 'mcp'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`) and make it again with 3.11 or newer. |
+| `No module named 'mcp'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`, in the project folder, nothing added to the command) and make it again with 3.11 or newer. |
 | `cannot import name 'FastMCP'` | Version 2.3.0 calls it `MCPServer`: `from mcp.server import MCPServer`. |
 | "Pending approval" | Start `claude` in the project folder and approve the server (step 5c). |
 | Claude Code asks permission to run your tool | Plain **Yes** for your own read-or-calculate tool. **No** for any tool you didn't write. |
