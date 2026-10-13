@@ -31,7 +31,7 @@ The class builds this project up week by week, alongside your own:
 | 13 | a prompt injection test and a defence: 8 hostile made-up listings in [`evals/injection/`](evals/injection/) that try to give the model orders, `python3 -m dealscreener.evaluate --injection` to run them, and a listing step that sends the pasted text inside a JSON object and tells the model it is data, not instructions; scored before and after the change; tests use a fake model, so they need no key and cost nothing |
 | 14 onward | more of the tool, step by step, following the plan |
 
-Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-11` exist now; `week-12` is added when week 12 is published, and `week-13` after that. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-12` exist now; `week-13` is added when week 13 is published. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
 ## What's here now (week 13)
 
@@ -320,7 +320,7 @@ The live test, run once more on the dev cases, also scored 75 of 75 (about $0.00
 
 **The one miss.** Case 14 says "The seller will consider offers between $180,000 and $195,000." There is no single asking price, so the written answer is `null`: picking either end, or the middle, would be a guess. In the held-out run the model gave 187500, the middle of the range. In the `--all` run, on the same listing, it gave `null`. So the same listing got two different answers in two runs: the model doesn't answer the same way every time, and one run of a case is not the last word. This miss is the model's (the instructions say "Never guess"), though a reader could fairly argue the answer should be the lower offer; the expected answer was not changed.
 
-**No change made.** The dev cases had no misses at all, so there was no pattern to fix, and `extract.py` stays as it was in week 9. The one miss was in a held-out case: changing the program because of it would turn that case into a dev case, and the held-out score would no longer tell us anything new.
+**No change made.** The dev cases had no misses at all, so there was no pattern to fix, and `extract.py` stayed as it was in week 9 (week 13 then added the injection defence). The one miss was in a held-out case: changing the program because of it would turn that case into a dev case, and the held-out score would no longer tell us anything new.
 
 **What these 20 cases show, and what they don't.** They show no gross failure: monthly tax and insurance, a yearly rent, a quarterly and a yearly HOA, "no HOA" in words, missing numbers and extra numbers were all read right in every run. They don't show a precise accuracy rate: one case is 5 points out of 100%, and 19 of 20 against 20 of 20 is within the noise. A perfect dev score also says the set may be too easy for this model: harder listings (two rents, a weekly figure, a typo in a number) would tell us more.
 
