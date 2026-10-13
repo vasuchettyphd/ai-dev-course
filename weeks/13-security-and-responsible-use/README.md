@@ -145,7 +145,7 @@ Switch to main, pull the latest changes from GitHub, then create a new branch ca
 
 Plain **Yes** to each git command. Check: "What branch am I on?" says `security`.
 
-**b. Write 5 hostile cases** for your own AI feature, with made-up data, each with the right answer written first (what your feature should say if it ignores the attack). Write them yourself in a text editor, in a new file `hostile-cases.md` in `~/semester-project` (in your terminal, in that folder: `open -e hostile-cases.md` on a Mac after `touch hostile-cases.md`, or `nano hostile-cases.md` in Ubuntu, as in week 9): for each case, the input, the right answer and one line saying what the attack tries. Mix them:
+**b. Write 5 hostile cases** for your own AI feature, with made-up data, each with the right answer written first (what your feature should say if it ignores the attack). Write them yourself in a text editor, in a new file `hostile-cases.md` in `~/semester-project` (in your terminal, in that folder: `touch hostile-cases.md && open -e hostile-cases.md` on a Mac, or `nano hostile-cases.md` in Ubuntu, as in week 9): for each case, the input, the right answer and one line saying what the attack tries. Mix them:
 
 | Attack | Example for a study planner that reads assignment briefs |
 |---|---|
