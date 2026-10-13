@@ -69,3 +69,122 @@ The course's advanced tutorial [Jev](../../advanced/jev/README.md) measured a mo
 **Confidence isn't correctness.** When the prepared answers were kept only if Jev was at least 90% confident, 174 of 179 were right (97%): better, but 5 confident wrong answers remained.
 
 What that means for you: a feature that looks perfect on a few easy cases can be wrong exactly where it matters, while sounding just as sure. Only a test set with hard cases, scored by a rule you wrote first, shows that.
+
+### 3. The deal screener's evaluation
+
+The deal screener's listing step (week 9) reads a pasted listing and pulls out five numbers. Its evaluation is in [`example-project/evals/`](../../example-project/evals/):
+
+- 20 made-up listings: clean ones, messy ones (monthly tax, "association dues"), ones with numbers missing, traps (a yearly rent, a price range, two prices), ones full of extra numbers that aren't inputs, and ones saying "no HOA" in words;
+- `expected.json`: the right five numbers for each, with a note on why, and `null` where the listing doesn't say;
+- the scoring rule in [`evals/README.md`](../../example-project/evals/README.md): a number is right if it's within $1 of the expected one; `null` is right only if the model also says "not stated"; a guess where the listing gives nothing is a miss.
+
+All of that was committed **before** the first run (look at the commit history: it's the first week 12 commit). Five of the cases are held out.
+
+**a. Run it.** In your terminal, in `~/ai-dev-course/example-project`, with `(.venv)` showing (the evaluator reads your key from this folder's `.env` itself):
+
+```bash
+git pull
+python3 -m dealscreener.evaluate
+```
+
+It runs the 15 practice ("dev") cases, prints one line per case (`case-01  5/5`, or the fields it missed), then the score and the cost, and saves the results in `evals/results/`. `--held-out` runs the 5 held-out cases and first reminds you to run them only once; `--all` runs all 20.
+
+**b. The course's results** (13 October 2026, Claude Haiku 5.5):
+
+| Run | Score | Cases fully right | Cost |
+|---|---|---|---|
+| Dev, first run | 75 of 75 fields (100%) | 15 of 15 | about $0.0017 |
+| Dev, second run | 75 of 75 fields (100%) | 15 of 15 | about $0.0016 |
+| Held out, once | 24 of 25 fields (96%) | 4 of 5 | about $0.0005 |
+| All 20 | 100 of 100 fields (100%) | 20 of 20 | about $0.0023 |
+
+**c. Read the miss.** Case 14 says "The seller will consider offers between $180,000 and $195,000." There's no single asking price, so the written answer is `null`. In the held-out run the model answered 187500, the middle of the range: a guess. In the `--all` run, on the very same listing, it answered `null`. **The same input got two different answers in two runs.** That's why you run an evaluation more than once, and why one good run proves little.
+
+**d. What these 20 cases show, and what they don't.** They show no big failure: monthly tax, yearly rent, a quarterly HOA, "no HOA" in words, missing and extra numbers were all read right. They don't show a precise accuracy rate: 19 of 20 against 20 of 20 is one case. And a perfect dev score suggests the set may be **too easy** for this model: harder cases (two rents, a weekly figure, a typo in a number) would teach more. The example README explains why no change was made: the dev cases had no misses, and changing the program because of a held-out case would spoil the held-out set.
+
+### 4. Build your own test set
+
+> **Being tested:** steps 4 to 7 need a signed-in session and are being tested. The deal screener's version was built and run on 13 October 2026.
+
+**a. Make the branch first.** In a **new** terminal window (no key loaded), `cd ~/semester-project`, start `claude`, and in Claude Code:
+
+```text
+Switch to main, pull the latest changes from GitHub, then create a new branch called eval and switch to it.
+```
+
+**b. Pick what to evaluate:** your week 9 AI feature, your week 10 RAG, or your week 11 tool. It needs an answer you can check.
+
+**c. Write 20 cases.** Course-safe data only (week 10 step 5c). Mix them:
+
+| Kind | How many | Example |
+|---|---|---|
+| Clean, easy | 4 or 5 | the input your feature was built for |
+| Messy | 4 or 5 | typos, odd wording, extra detail |
+| Missing or impossible | 3 or 4 | the right answer is "not stated", "I don't know" or "ask the user" |
+| Traps | 3 or 4 | the thing that would fool a careless reader (two dates, a yearly figure, a negation) |
+| Edge cases | 2 or 3 | right at a limit, very long, or empty |
+
+**d. Write the right answers first,** for every case, with one line saying why. Mark 5 cases as **held out**, mixed across the kinds.
+
+**e. Write your scoring rule** in one short paragraph, before any run:
+
+- **numbers:** right if within a tolerance you choose (say why);
+- **categories or labels:** right if exactly equal;
+- **free text** (a RAG answer, a summary): a short checklist per case ("names the right document", "says the price", "doesn't invent a number"), graded by you. Anthropic's guide lists three ways to grade: code ("Fastest and most reliable"), a person ("Avoid if possible", because it's slow), or another model ("Test to ensure reliability first then scale"). For 20 cases, code or you is fine.
+
+**f. Commit them alone, first.** In Claude Code:
+
+```text
+Commit only the test cases, the expected answers and the scoring rule, with the message "Week 12 test set and scoring rule, written before any run". Don't write any other code yet.
+```
+
+### 5. Write the evaluation script
+
+In Claude Code (replace the parts in angle brackets):
+
+```text
+/superpowers:writing-plans Write an implementation plan for an evaluation script for <my feature>: read the test cases and expected answers I just committed, run my feature on each case, score each answer with my scoring rule in <file>, and print one line per case, the score, the misses and the cost. Rules: never change the test cases or the expected answers; run the 15 dev cases by default and the 5 held-out cases only with --held-out (print a reminder to run them once); if a call fails, record that case as an error with a plain sentence and carry on; stop before the first case if there's no API key; save each run's results (date, model, score, misses, cost) to a file, never a key; read the key only from the environment and never read or print .env; include offline tests with a fake model, including a miss, an error and the held-out flag, and never call the real API in the tests. I'm not a programmer, so keep each task small.
+```
+
+Then build it with `/superpowers:subagent-driven-development` as in weeks 9 to 11. Answer as in the table at the top.
+
+### 6. Run it, read the misses, make one change, test the held-out cases
+
+In a second terminal window (not the Claude Code one), with your project's `.venv` active and your key available the way your project loads it:
+
+1. **Run the dev cases twice.** Write down both scores. If they differ, look at the cases that changed: that's the model answering differently, not your code.
+2. **Read every miss.** For each one, decide: is it the model's mistake, or was **your expected answer** wrong? If yours was wrong, fix it and write the reason in your scoring rule file under "Corrections" (never quietly).
+3. **Make one change** that should fix a pattern in the misses (a clearer prompt, a schema description, a check in your code). Run the dev cases again.
+4. **Run the held-out cases, once.** That score is your honest estimate, because those cases didn't shape your change.
+
+Write down: the first dev score, three misses and why, your change, the new dev score, and the held-out score. You hand these in.
+
+### 7. Review and finish
+
+**a. Review it** with `safe-and-private`, as in weeks 9 to 11, focused on: keys in any file or results file (search tracked files with `git grep` only), test data that isn't course-safe, and tests that call the real API by default. Add a "## Week 12: evaluation review" section to `REVIEW.md` and triage it.
+
+**b. Push, open a pull request, read Files changed** (the test cases and expected answers, the scoring rule, the script and its tests, the results files, `REVIEW.md`; no `.env`, no real key), **merge on GitHub, then pull.** In the pull request's Commits tab, the test set commit should come before the script.
+
+The deal screener's week 12 changes are on this page (it works once week 12 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-11...week-12>.
+
+## Check it worked
+
+- Your test set (20 cases, 5 held out) and scoring rule were committed before your first run.
+- Your script runs the dev cases, prints the score, the misses and the cost, and saves a results file without any key in it.
+- Your tests pass with `.env` moved out of the folder.
+- You have: two dev scores, three misses explained, one change, and one held-out score.
+
+## Troubleshooting
+
+| What you see | What to do |
+|---|---|
+| The dev score changes between runs | Normal: the model doesn't answer the same way every time. Look at the cases that changed, and report both scores. |
+| An expected answer turns out to be wrong | Fix it, and record the reason under "Corrections" in your scoring rule file. Never change answers just to raise the score. |
+| Every case says ERROR | Usually the key: the first line says so. Check the key is in the project's `.env`, as in week 9. |
+| ERROR on some cases partway through (429) | Too many calls too quickly: wait a minute and run again. The run carries on past errors, and the score counts only the cases that ran. |
+| A score of 100% | Your test set may be too easy: add harder cases (keep the 20 by swapping, and write the new answers first). |
+| Free-text answers are hard to score | Use a short checklist per case and grade by hand; write the checklist before you run. |
+| Numbers that should match are scored as misses | Check your tolerance: rounding (1699.99 vs 1700) needs a small tolerance, written into your rule. |
+| The results file wasn't saved | The folder may not be writable (in Docker, use the `--user` and `-v` parts from the deal screener's README); the score printed on screen is still right. |
+| Anthropic errors (401, 429, credit, workspace) | See [week 9's Troubleshooting](../09-calling-a-model/README.md#troubleshooting). |
+| Work was committed to `main` | Use [week 5's rescue](../05-building-with-ai/README.md#if-it-committed-to-main). |
