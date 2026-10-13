@@ -8,7 +8,7 @@
 
 - `anthropic` 1.13.0 and `claude-haiku-5-5`, with real calls from a container (the outputs below are from those runs).
 - The official MCP Python package `mcp` 2.3.0, in a container with Python 3.12, and Claude Code 2.1.296's `claude mcp add`, `list`, `get` and `remove` commands (not signed in).
-- The deal screener's new tool, agent and MCP server, with 181 tests.
+- The deal screener's new tool, agent and MCP server, with 184 tests.
 - **Being tested:** everything inside a signed-in Claude Code session (approving your MCP server, the `/mcp` screen, the permission prompt and Claude Code actually calling your tool), everything on GitHub, and every step on a Mac or in Windows (WSL).
 
 ## Before you start
@@ -220,7 +220,7 @@ Then `/superpowers:subagent-driven-development Execute the plan docs/superpowers
 
 **a. Trust first.** An MCP server is a program on your laptop that Claude Code will start and talk to. Claude Code's security page: "We encourage either writing your own MCP servers or using MCP servers from providers that you trust." Anthropic "does not security-audit or manage any MCP server" (<https://code.claude.com/docs/en/security#mcp-security>). And its MCP page: "Verify you trust each server before connecting it. Servers that fetch external content can expose you to prompt injection risk." (<https://code.claude.com/docs/en/mcp>). This week you connect only the one you write.
 
-**b. The deal screener's server.** It's 30-odd lines: [`dealscreener/mcp_server.py`](../../example-project/dealscreener/mcp_server.py). It uses the official MCP Python package, `mcp` (<https://github.com/modelcontextprotocol/python-sdk>), pinned to `mcp[cli]==2.3.0`, which needs **Python 3.11 or newer**. The core is:
+**b. The deal screener's server.** It is about 60 lines: [`dealscreener/mcp_server.py`](../../example-project/dealscreener/mcp_server.py). It uses the official MCP Python package, `mcp` (<https://github.com/modelcontextprotocol/python-sdk>), pinned to `mcp[cli]==2.3.0`, which needs **Python 3.11 or newer**. The core is:
 
 ```python
 from mcp.server import MCPServer
