@@ -176,7 +176,7 @@ Type in: the Terminal on a Mac, or the Ubuntu window on Windows (with `(.venv)` 
 python3 -m dealscreener --listing
 ```
 
-Paste the listing, then type `done` on a line by itself and press Enter. (Type `done` straight away to skip the step.) Try `listings/listing-b.txt`: every number should match listing B (being tested), so pressing Enter five times and typing the loan details (25, 7, 30, 6000) should give a cash flow of $430.53 (being tested). Then try `listings/messy-listing.txt` and check what the model made of the monthly tax and the missing insurance before you press Enter. The model can be wrong: you are the one who confirms each number.
+Paste the listing, then type `done` on a line by itself and press Enter. (Type `done` straight away to skip the step.) Try `listings/listing-b.txt`: in the course's run every number matched listing B, so pressing Enter five times and typing the loan details (25, 7, 30, 6000) gave a cash flow of $430.53. Then try `listings/messy-listing.txt` and check what the model made of the monthly tax and the missing insurance before you press Enter. In the course's run it turned the $200 a month tax into 2400 a year, left the insurance out (so you're asked for it), ignored the old "reduced from" price, and found the $185 HOA. The model can be wrong: you are the one who confirms each number.
 
 If something goes wrong (no key, a key that isn't accepted, no credit, no internet), the program says so in one sentence, adds "For now, type the numbers yourself.", and asks the questions as usual. The tests never call the model: `python3 -m unittest` stays free and works without a key. The one real-call test runs only on request.
 
@@ -205,8 +205,11 @@ What each real call cost, from the token counts the program prints and Haiku 5.5
 
 | Call | Input tokens | Output tokens | Cost |
 |---|---|---|---|
-| `listing-b.txt` | being tested | being tested | being tested |
-| `messy-listing.txt` | being tested | being tested | being tested |
+| `listing-b.txt` | 887 | 65 | 887 x $0.10 / 1,000,000 + 65 x $0.50 / 1,000,000 = about $0.00012 |
+| `messy-listing.txt`, first run | 823 | 174 | about $0.00017 |
+| `messy-listing.txt`, second run | 823 | 146 | about $0.00016 |
+
+These ran on 12 October 2026. The same listing can use a different number of output tokens each time.
 
 ## What the numbers mean
 

@@ -9,7 +9,7 @@
 - The official Python package `anthropic` 1.13.0 (released 9 October 2026; it needs Python 3.10 or newer), installed in a virtual environment with Python 3.12.3 on Ubuntu 24.04 Linux (in a container).
 - The model `claude-haiku-5-5` (Claude Haiku 5.5), at $0.10 per million input tokens and $0.50 per million output tokens (<https://platform.claude.com/docs/en/about-claude/pricing>, read 12 October 2026). Model names and prices change: check that page on the day you start.
 - The deal screener example's new "paste the listing" step and its 90 offline tests, with Python 3.14.4 and, in a container, Python 3.12.
-- **Being tested:** every real call to the model. No call had been made when this page was written, so the replies, token counts and costs you'll see below are marked "being tested" (the cost arithmetic itself is exact). Also being tested: every step in the Claude Console, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Real calls to `claude-haiku-5-5`, made on 12 October 2026 with a workspace key (step 2d), from Python 3.12 in a container: the first-call and structured-output programs below, and the deal screener's listing step. The replies, token counts and costs shown below are from those runs; yours will differ a little. **Being tested:** every step in the Claude Console, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
 
 ## Before you start
 
@@ -89,7 +89,7 @@ Every reply tells you exactly how many tokens it used, so you never have to gues
 
 **d. Create a key and save it in `.env`.**
 
-1. In the Console, open **Settings > API keys** (<https://platform.claude.com/settings/keys>) and click **Create key**. Name it `semester-project`, and choose an expiration such as **30 days** (Anthropic: "Expiration limits the lifetime of a leaked credential"). Set **Linked account** to yourself.
+1. In the Console, open **Settings > API keys** (<https://platform.claude.com/settings/keys>) and click **Create key**. Name it `semester-project`, and choose an expiration such as **30 days** (Anthropic: "Expiration limits the lifetime of a leaked credential"). Set **Linked account** to yourself. If the form lets you choose a **workspace**, choose one (the default workspace is fine): a key that isn't tied to a workspace was refused in the course's test with "This API key is not scoped to a workspace" (see Troubleshooting).
 2. The Console "shows the full key, which starts with `sk-ant-`, only once". Click its copy button. Don't paste it anywhere except into the file, in item 4 below.
 3. In your terminal, make a scratch folder for step 3 and open a new `.env` file in a text editor:
 
@@ -189,13 +189,15 @@ set -a; . ./.env; set +a
 python first_call.py
 ```
 
-The first line loads the key from `.env` into this terminal window, without showing it. It lasts until you close the window; in a new window, run it again. You should see a one-sentence answer, then lines like these (being tested; your numbers will differ):
+The first line loads the key from `.env` into this terminal window, without showing it. It lasts until you close the window; in a new window, run it again. You should see a one-sentence answer, then the numbers. The course's run (yours will differ a little):
 
 ```text
+A cap rate (capitalization rate) is the ratio of a property's annual net operating income to its current market value or purchase price, used to estimate the return on a real estate investment.
+
 Stopped because: end_turn
-Input tokens: ...
-Output tokens: ...
-Cost: about $0.000...
+Input tokens: 26
+Output tokens: 56
+Cost: about $0.000031
 ```
 
 `end_turn` means the model finished its answer. Check the cost by hand with step 1's arithmetic, and check it against the Console's **Usage** page (<https://platform.claude.com/usage>) later: the Console may take a while to update.
@@ -212,7 +214,7 @@ Each change below is a small edit to `first_call.py`. Make it in a text editor (
 for i in 1 2 3; do python first_call.py; done
 ```
 
-Compare the three answers. They'll probably be worded differently (being tested): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 reject any non-default value (<https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/opus-5-5/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models (the Opus 5.5 guide). So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
+Compare the three answers. In the course's run, two of the three were almost the same and one was longer and worded differently (56, 75 and 58 output tokens): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 reject any non-default value (<https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/opus-5-5/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models (the Opus 5.5 guide). So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
 
 **b. A system prompt.** The `system` setting holds instructions that apply to the whole conversation (Anthropic: "Use the top-level `system` field for instructions that apply from the start"). Add this line just below `max_tokens=1000,`:
 
@@ -222,7 +224,7 @@ Compare the three answers. They'll probably be worded differently (being tested)
 
 Run it a few times. The answers keep their wording differences, but they all follow the rules. A specific prompt (exactly what to do, how long, in what form) is your strongest control.
 
-**c. `max_tokens`.** This caps how many output tokens the model may write, so it caps the cost of one call. Change `max_tokens=1000` to `max_tokens=20` and run it. The answer is probably cut off, and `Stopped because:` shows `max_tokens` (being tested). Thinking counts toward this cap too ("Thinking tokens count toward `max_tokens`"), so a very small number can stop the model before it writes any text at all. Your program must check `stop_reason` and not trust a cut-off answer. Put it back to `1000`.
+**c. `max_tokens`.** This caps how many output tokens the model may write, so it caps the cost of one call. Change `max_tokens=1000` to `max_tokens=20` and run it. In the course's run the answer stopped mid-sentence, at `A cap rate (capitalization rate) is the ratio of a`, with `Stopped because: max_tokens` and exactly 20 output tokens. Thinking counts toward this cap too ("Thinking tokens count toward `max_tokens`"), so a very small number can stop the model before it writes any text at all. Your program must check `stop_reason` and not trust a cut-off answer. Put it back to `1000`.
 
 **d. Structured output: answers your program can read.** A sentence is fine for a person, but a program needs the answer in a fixed shape. **Structured output** makes the model answer in JSON (a standard text format for data, like `{"price": 150000}`) that follows a **schema**: a description of exactly which fields you want. Paste this into your terminal, in `~/first-call`, to create `structured.py`:
 
@@ -262,7 +264,7 @@ EOF
 python structured.py
 ```
 
-You should see something like `{'price': 189000, 'bedrooms': 3}` (being tested). (This short example assumes the reply has a text block; the deal screener's code also handles one that doesn't.) The `output_config` part is Anthropic's **structured outputs** feature (<https://platform.claude.com/docs/en/build-with-claude/structured-outputs>). `null` lets the model say "the listing doesn't say" instead of guessing. Structured output fixes the **shape** of the answer, not whether it's **right**: a model can still misread a number, so your program checks the values, and a person confirms anything that matters.
+The course's run printed `{'price': 189000, 'bedrooms': 3}`, with 330 input and 20 output tokens (the schema counts as input). (This short example assumes the reply has a text block; the deal screener's code also handles one that doesn't.) The `output_config` part is Anthropic's **structured outputs** feature (<https://platform.claude.com/docs/en/build-with-claude/structured-outputs>). `null` lets the model say "the listing doesn't say" instead of guessing. Structured output fixes the **shape** of the answer, not whether it's **right**: a model can still misread a number, so your program checks the values, and a person confirms anything that matters.
 
 **e. Choosing a model.** Anthropic's three current families (<https://platform.claude.com/docs/en/about-claude/models/overview>, prices from <https://platform.claude.com/docs/en/about-claude/pricing>, both read 12 October 2026):
 
@@ -335,7 +337,7 @@ Answer as in the table at the top. Watch especially for:
 
 **f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass with no key loaded. Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
 
-**The deal screener's version** (being tested live; built and tested offline). It got an optional "paste the listing" step: `python3 -m dealscreener --listing` asks you to paste a listing's text, sends it to `claude-haiku-5-5` with a schema for the five property numbers, then shows each number for you to confirm:
+**The deal screener's version** (run live on 12 October 2026). It got an optional "paste the listing" step: `python3 -m dealscreener --listing` asks you to paste a listing's text, sends it to `claude-haiku-5-5` with a schema for the five property numbers, then shows each number for you to confirm:
 
 ```text
 Purchase price ($) [from the listing: 150000]:
@@ -366,7 +368,7 @@ The list must **not** include `.env` (your week 7 `.dockerignore` keeps it out).
 docker run -it --rm --env-file .env semester-project
 ```
 
-`--env-file .env` hands the key to this one container while it runs; it never goes into the image. For the deal screener the command is `docker run -it --rm --env-file .env dealscreener python -m dealscreener --listing` (being tested). Run your tests in the container as in week 7 step 4c, without `--env-file`: they must pass with no key.
+`--env-file .env` hands the key to this one container while it runs; it never goes into the image. For the deal screener the command is `docker run -it --rm --env-file .env dealscreener python -m dealscreener --listing`. Run your tests in the container as in week 7 step 4c, without `--env-file`: they must pass with no key.
 
 ### 7. Finish
 
@@ -402,9 +404,10 @@ The deal screener's week 9 changes are on this page (it works once week 9 is pub
 | `python3 -m venv .venv` fails with "ensurepip is not available" (Ubuntu) | Step 3b: `sudo apt install python3-venv`, delete only the broken `.venv` folder with `rm -r .venv`, try again. |
 | `pip install anthropic==1.13.0` says no matching version, or it needs Python 3.10 | Your Python is too old: step 3a. |
 | `TypeError: ... unexpected keyword argument 'temperature'` | Current models and the package don't take `temperature`: remove that line (step 4a). |
-| Error 401, or "The API key was not accepted" | The key is wrong, expired, deleted, or has quote marks or spaces around it. Check `.env` is exactly `ANTHROPIC_API_KEY=sk-ant-...` on one line, or make a new key (step 2d). |
+| `This API key is not scoped to a workspace` (error 400) | Your key belongs to the whole organization, not a workspace. Make a new key and choose a workspace when you create it (step 2d), put it in `.env`, and delete the old key. |
+| Error 401 (`invalid x-api-key`), or "The API key was not accepted" | The key is wrong, expired, deleted, or has quote marks or spaces around it. Check `.env` is exactly `ANTHROPIC_API_KEY=sk-ant-...` on one line, or make a new key (step 2d). |
 | Error 403 | This key isn't allowed to do that. Make a new key linked to yourself (step 2d). |
-| Error 404, or "The model name wasn't found" | Check the model name exactly: `claude-haiku-5-5`. Names change: check the models page. |
+| Error 404 (`model: ...`), or "The model name wasn't found" | Check the model name exactly: `claude-haiku-5-5`. Names change: check the models page. |
 | Error 429, or "Too many requests" | You (or your whole class, on one network) sent too many calls too fast, or hit your plan's cap. Wait a minute and try again. If it continues, check the Console's **Rate limits** page. |
 | "You have reached your specified API usage limits", or "Your monthly spend limit has been reached" | Your spend limit worked. Raise it a little in **Settings > Billing**, or wait until it resets. |
 | Calls stop working and your credit balance is $0, or "Your API credit has run out" | Buy a little more credit (step 2b). |
