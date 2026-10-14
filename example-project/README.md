@@ -29,11 +29,18 @@ The class builds this project up week by week, alongside your own:
 | 11 | tools, an agent and MCP: the calculator becomes a tool (`screen_listing`) that Claude can call; `python3 -m dealscreener.agent "your question"` runs an agent loop (Claude asks for the tool, the program runs it and sends the result back, at most 5 calls to Claude), and `python -m dealscreener.mcp_server` offers the same tool to Claude Code as an MCP server; tests use a fake model, so they need no key and cost nothing |
 | 12 | an evaluation of the listing step: 20 made-up listings in [`evals/`](evals/) with the right answers written down first, and `python3 -m dealscreener.evaluate` to run the model on them and count the numbers it gets right (15 dev cases, 5 held out); tests use a fake model, so they need no key and cost nothing |
 | 13 | a prompt injection test and a defence: 8 hostile made-up listings in [`evals/injection/`](evals/injection/) that try to give the model orders, `python3 -m dealscreener.evaluate --injection` to run them, and a listing step that sends the pasted text inside a JSON object and tells the model it is data, not instructions; scored before and after the change; tests use a fake model, so they need no key and cost nothing |
-| 14 onward | more of the tool, step by step, following the plan |
+| 14 | a model demo and write-up, with no code change: [`DEMO.md`](DEMO.md) is a timed 3-minute demo script with a fallback that needs no key and no network, and [`FINAL.md`](FINAL.md) is the final write-up under the seven headings, with every number linked to its file |
 
-Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-12` exist now; `week-13` is added when week 13 is published. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
+Each week's finished state is marked with a **git tag** named after the week: `week-04` to `week-13` exist now; `week-14` is added when week 14 is published. In-class demos start from the previous week's tag. If you fall behind, open the course repo on GitHub, click the branch menu, choose the **Tags** tab and pick a week to see what "done" looked like then (the exact menu is being tested).
 
-## What's here now (week 13)
+## What's here now (week 14)
+
+Everything from week 13 (listed below), plus two files to copy the shape of. There is no code change: the 236 tests are the same as in week 13.
+
+- [`DEMO.md`](DEMO.md): the instructor's 3-minute demo script. One table row per step, each with its time, what to show, the exact command and where to type it, what to say, and what to do if it fails. It covers the listing step on `listings/listing-b.txt`, one agent question, the committed week 12 and week 13 results files (not run live in the demo), and one honest limit, case 14. It also has "Before you start" (a window with no key loaded, notifications off), "If it fails" (`python3 -m unittest` and the results files, which need no key and no network), "What to cut first if you're over time", and the real output and cost of the rehearsal run.
+- [`FINAL.md`](FINAL.md): the final write-up, about two pages, under the course's seven headings, from "What it does and who it's for" to "What I'd do next". Every number links to the file it comes from (the results files, `BUGS.md`, `REVIEW.md`, `PLAN.md` or this README), and "What AI did and what I decided" says plainly which parts Claude Code wrote.
+
+## What week 13 added
 
 Everything from week 12 (listed below), plus:
 

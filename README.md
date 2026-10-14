@@ -14,7 +14,7 @@ Each week lives in its own folder. Follow that week's README from inside the fol
 ## Costs
 
 - **Claude Pro, about $20/month**, for Claude Code. Week 2 walks you through signing up.
-- **About $5 of one-time API credit**, used in weeks 9-11 when your own code calls a model. Claude Pro doesn't cover this.
+- **About $5 of one-time API credit**, used in weeks 9-14 when your own code calls a model (each call costs a fraction of a cent). Claude Pro doesn't cover this.
 
 Some advanced topics need their own API key and credit, beyond the costs above; the table under Advanced topics says which. Keep API keys in a `.env` file: the course's `.gitignore` keeps `.env` files out of commits.
 
@@ -43,7 +43,7 @@ A laptop running macOS 15 (Sequoia) or later, or Windows 10 (version 2004 or lat
 
 ## Your project
 
-In week 4 you choose a small tool to build, something useful for your work, studies or a business idea. Every week after that you apply what you learned to it, and in week 14 you demo it. The class examples use a shared project, a rental property deal screener. From week 4 it will live in `example-project/`, with a git tag (`week-04` to `week-13`) marking its finished state at the end of each week.
+In week 4 you choose a small tool to build, something useful for your work, studies or a business idea. Every week after that you apply what you learned to it, and in week 14 you demo it. The class examples use a shared project, a rental property deal screener. From week 4 it will live in `example-project/`, with a git tag (`week-04` to `week-14`) marking its finished state at the end of each week.
 
 ## Grading
 
