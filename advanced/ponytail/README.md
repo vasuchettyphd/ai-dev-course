@@ -46,7 +46,7 @@ Restart Claude Code afterwards. You need Node.js on your PATH, because the plugi
 - **Small files outside the project:** a mode flag in `~/.claude/.ponytail-active` and `~/.claude/ponytail-modes/`, and, if you have no status line yet, a copy of its status-line script in `~/.claude/` plus a hint that makes Claude *offer* to add a status line to your `~/.claude/settings.json`. You can say no.
 - **"The band"** (new in 5.3): a panel above the prompt showing cost, tokens and tests for the current task. It also writes a per-project CSV and a local `board.html` in `~/.config/ponytail/band/`. Nothing leaves your machine unless you fill in the optional webhook URL in the plugin settings, which is empty by default.
 
-Nothing in the hooks looked suspicious: no downloads, no network calls unless you set the webhook, and the only files written are the ones listed above. Upstream also offers `npx skills add DietrichGebert/ponytail` (the skills CLI), which copies the skills into your project without the hooks. We did not test that route.
+Nothing in the hooks looked suspicious: no downloads, no network calls unless you set the webhook, and the only files written are the ones listed above. Upstream also offers the skills CLI, `npx skills@1.7.4 add DietrichGebert/ponytail` (needs Node 22.20 or later), which copies the skills into your project without the hooks. We did not test that route.
 
 **For this demo we skip the plugin** and copy only the main skill file, `SKILL.md`, into one project folder. That keeps the experiment clean (only one copy has ponytail) and leaves your global Claude Code setup untouched. The trade-off: without the hooks it is not always on, so we type `/ponytail` in front of the request to switch it on.
 
@@ -68,7 +68,7 @@ Ready:
   /home/you/ai-dev-course/advanced/ponytail/demo/practice/ponytail   (ponytail v5.3.2 in .claude/skills/ponytail/SKILL.md)
 ```
 
-`setup.sh` made two identical copies of the starter project in `practice/` (which git ignores), turned each into its own git repo so we can measure changes with `git diff`, and downloaded ponytail's `SKILL.md` (pinned to v5.3.2) into `practice/ponytail/.claude/skills/ponytail/`. A skill in a project's `.claude/skills/` folder is only visible to Claude Code sessions started in that folder.
+`setup.sh` made two identical copies of the starter project in `practice/` (which git ignores), turned each into its own git repo so we can measure changes with `git diff`, and downloaded ponytail's `SKILL.md` (pinned to the exact commit behind v5.3.2, and checked against a SHA-256 fingerprint so a changed file is refused) into `practice/ponytail/.claude/skills/ponytail/`. A skill in a project's `.claude/skills/` folder is only visible to Claude Code sessions started in that folder.
 
 ### The starter project
 
@@ -102,6 +102,8 @@ Run it against both copies. The script runs Claude Code headless (`claude -p`) i
 ```bash
 ./run-both.sh
 ```
+
+**Safety note:** `run-both.sh` lets the agent edit files and run any `python3` command without asking you first. Python can do anything your user account can (delete files, reach the internet), so in effect the agent can run any code it likes. Only run the script against the practice copies `setup.sh` made, never inside a real project.
 
 Expected output, after about a minute (your numbers will vary a little):
 
@@ -242,7 +244,9 @@ Read the end of each reply (`python3 -c 'import json;print(json.load(open("pract
 
 **`./setup.sh` says the folder already has baseline/ or ponytail/.** Run `rm -rf practice` and try again.
 
-**`curl: (22) The requested URL returned error: 404`.** GitHub could not find the pinned file. Check you can open https://github.com/DietrichGebert/ponytail/blob/v5.3.2/skills/ponytail/SKILL.md in a browser.
+**`curl: (22) The requested URL returned error: 404`.** GitHub could not find the pinned file. Check you can open https://github.com/DietrichGebert/ponytail/blob/16352ac229eb08a9598dcae48fe9f2b342567d86/skills/ponytail/SKILL.md in a browser.
+
+**`SKILL.md checksum did not match. Not installing it.`** The downloaded file is not the one this lesson was written against (a proxy page or a changed upstream file). Do not work around it; tell your instructor.
 
 **`run-both.sh` stops with an error from `claude`.** Make sure `claude -p "say hi"` works on its own first (you need to be logged in).
 
@@ -277,15 +281,17 @@ Then, inside Claude Code:
 
 The band's task history in `~/.config/ponytail/band/` is not removed by the script. Delete that folder by hand if you used the band.
 
-## Files in this folder
+## Files
 
 | Path | What it is |
 |---|---|
-| `demo/starter/` | The 57-line expense tracker, its CSV and 3 tests |
+| `README.md` | This lesson |
+| `.gitignore` | Keeps `demo/practice/`, run results and Python caches out of git |
+| `demo/starter/tracker.py`, `test_tracker.py`, `expenses.csv` | The 57-line expense tracker, its 3 tests and its CSV of 12 expenses |
 | `demo/setup.sh` | Makes the two practice copies and downloads the skill into one |
 | `demo/run-both.sh` | Sends one request to both copies with `claude -p` |
 | `demo/compare.sh` | Line counts, test results and a sample command for both copies |
-| `demo/requests/` | The two feature requests |
+| `demo/requests/1-by-category.txt`, `demo/requests/2-budgets.txt` | The two feature requests |
 | `sample-output/` | Real diffs, replies and `compare.sh` output from our runs |
 
 ## Where to read more

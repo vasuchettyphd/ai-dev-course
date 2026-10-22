@@ -43,6 +43,22 @@ uv --version           # uv 0.13.4 (or newer)
 claude --version       # 2.1.309 (Claude Code) (or newer)
 ```
 
+### Before you start: Google keys
+
+If `GEMINI_API_KEY` or `GOOGLE_API_KEY` is set in your terminal, the `/graphify` skill is written to send your **documents** to Google Gemini for the document-reading step instead of using Claude. In our run a Gemini key was set, but the needed package wasn't installed, so Claude fell back to its own helper and said so. Check before you run anything:
+
+```bash
+env | grep -E '^(GEMINI|GOOGLE)_API_KEY='    # prints nothing if neither is set
+```
+
+If it prints a line and you don't want your documents sent to Google, run this in the same terminal before setup and before starting Claude:
+
+```bash
+unset GEMINI_API_KEY GOOGLE_API_KEY
+```
+
+`demo/setup.sh` also prints a warning with that line if either key is set. Your code is never sent to Google either way: graphify parses code on your machine. But like any Claude Code session, whatever Claude reads (code or documents) is sent to Anthropic as usual.
+
 ### The normal install (what upstream recommends)
 
 On your own projects, upstream's two commands are:
@@ -72,7 +88,9 @@ It does three things:
 2. Copies the deal screener from `example-project/` into `demo/practice/deal-screener` and makes it its own git repository.
 3. Runs `graphify install --project` there, so the skill exists in that one copy only.
 
-Expected output (trimmed):
+It skips any `.env` files in the example project (secrets), keeping only the `.env.example` template. If you rerun it, it reuses `demo/.venv`, so you only need to delete the practice folder (see [Troubleshooting](#troubleshooting)).
+
+Expected output (trimmed; if a Google key is set, a `WARNING` comes first):
 
 ```
 ==> Installing graphify 0.9.94 into .../advanced/graphify/demo/.venv
@@ -382,7 +400,7 @@ It took under a second. `graphify explain "verdict_word()"` now shows the new fu
 
 ## Limits and caveats
 
-- **Documents can be sent to Google.** If `GEMINI_API_KEY` or `GOOGLE_API_KEY` is set in your terminal, the skill is written to send your documents to Gemini for the document-reading step instead of using Claude. In our run a Gemini key was set, but the needed package wasn't installed, so Claude fell back to its own helper and said so. If you don't want that, run `unset GEMINI_API_KEY GOOGLE_API_KEY` before starting Claude. Code never leaves your machine either way.
+- **Documents can be sent to Google.** See [Before you start: Google keys](#before-you-start-google-keys) in Setup. Unset those keys before you build a graph if you don't want that.
 - **The skill may use a newer graphify than you installed.** Its first step runs `uv tool run --from graphifyy python`, which fetches the latest `graphifyy` from PyPI into uv's cache and uses that for the build. On 2026-10-22 the latest was 0.9.94, the same as our pinned version. Later, the build steps may run a newer release than the `graphify` command in `demo/.venv`.
 - **If uv can't find graphify at all, the skill installs it globally.** Step 1 of the skill falls back to `uv tool install --upgrade graphifyy` (or `pip install`). The demo avoids this because `uv tool run` succeeds first, but be aware of it on other machines.
 - **Results vary.** Node counts, community names and the ideas pulled from documents change a little between runs, because a model does that part.
@@ -434,7 +452,14 @@ uv tool uninstall graphifyy    # removes the graphify command
 | Path | What it is |
 |---|---|
 | `README.md` | This lesson |
+| `.gitignore` | Keeps `demo/.venv/`, `demo/practice/` and other generated files out of git |
 | `demo/setup.sh` | Installs graphify into `demo/.venv`, copies the deal screener, installs the skill project-only |
 | `demo/graphifyignore` | Copied into the practice project as `.graphifyignore` to keep the build small |
 | `sample-output/GRAPH_REPORT.md` | The report from our run |
 | `sample-output/graph.html` | The interactive map from our run (about 650 KB; open it in a browser) |
+
+## Where to read more
+
+- [graphify on GitHub](https://github.com/Graphify-Labs/graphify): the README, the skill file and the changelog
+- [graphifyy on PyPI](https://pypi.org/project/graphifyy/): release history, so you can see what changed since 0.9.94
+- [uv documentation](https://docs.astral.sh/uv/): how `uv venv` and `uv tool run` work

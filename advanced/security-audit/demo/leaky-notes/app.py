@@ -14,7 +14,7 @@ UPLOAD_DIR = os.path.join(BASE, "uploads")
 AVATAR_DIR = os.path.join(BASE, "avatars")
 
 app = Flask(__name__)
-app.secret_key = "leaky-notes-dev-key-2026"
+app.secret_key = "leaky-notes-dev-key-2026"  # PLANTED BUG 4: fake key, hard-coded on purpose
 
 SORT_COLUMNS = {"newest": "created_at DESC", "oldest": "created_at ASC", "title": "title ASC"}
 

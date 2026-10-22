@@ -8,7 +8,6 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRACTICE="$HERE/practice"
 TARGET="$PRACTICE/leaky-notes"
-SKILLS_CLI_VERSION="1.7.4"
 
 if [ -e "$TARGET" ]; then
   echo "practice/leaky-notes already exists. Run ./reset.sh first to start over." >&2
@@ -23,13 +22,21 @@ git add .
 git -c user.name="Demo Student" -c user.email="student@example.com" commit -q -m "Leaky Notes demo app (deliberately vulnerable)"
 echo "Created git repo at $TARGET"
 
-# Skip the CLI's anonymous usage telemetry.
-export DO_NOT_TRACK=1 DISABLE_TELEMETRY=1
-npx -y "skills@$SKILLS_CLI_VERSION" add cloudflare/security-audit-skill \
-  --skill security-audit -a claude-code -y --copy
+# Fetch the skill at the exact commit this lesson was tested with, then copy
+# it into the project. A shallow fetch of one commit keeps the download small.
+SKILL_REPO="https://github.com/cloudflare/security-audit-skill.git"
+SKILL_COMMIT="c1c8a8c1471069fb0e188eeaff69b8e8db6564a8"
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+git -C "$TMP" init -q
+git -C "$TMP" fetch -q --depth 1 "$SKILL_REPO" "$SKILL_COMMIT"
+git -C "$TMP" checkout -q FETCH_HEAD
+mkdir -p .claude/skills
+cp -R "$TMP/skills/security-audit" .claude/skills/security-audit
+echo "Installed security-audit skill at commit ${SKILL_COMMIT:0:7}"
 
-# Keep the installed skill and lock file out of the audited commit.
-printf '.claude/\n.agents/\nskills-lock.json\n.venv/\nnotes.db\n__pycache__/\nuploads/\navatars/\n' > .git/info/exclude
+# Keep the installed skill and runtime files out of the audited commit.
+printf '.claude/\n.venv/\nnotes.db\n__pycache__/\nuploads/\navatars/\n' > .git/info/exclude
 
 echo
 echo "Installed skill files:"

@@ -36,10 +36,10 @@ You need git, Node.js 22, and [Claude Code](https://claude.com/claude-code). On 
 ### The normal install (what upstream recommends)
 
 ```bash
-npx skills add wheresryan22/anatomy -g -a claude-code
+npx skills@1.7.4 add wheresryan22/anatomy -g -a claude-code
 ```
 
-This copies the whole repository (about 27 MB at the tested commit, examples included) into `~/.claude/skills/anatomy`, so it works in every project. `-g` means global. Leave it out to install into the current project only. The installer sends anonymous usage counts to its makers; set `DISABLE_TELEMETRY=1` first if you would rather it didn't.
+This copies the whole repository (about 27 MB at the tested commit, examples included) into `~/.claude/skills/anatomy`, so it works in every project. The installer needs Node 22.20 or later. `-g` means global. Leave it out to install into the current project only. The installer sends anonymous usage counts to its makers; set `DISABLE_TELEMETRY=1` first if you would rather it didn't.
 
 ### The install for this lesson (one project only, pinned)
 
@@ -56,15 +56,15 @@ Expected output (the `...` stands for wherever you cloned the course):
 ```
 anatomy at 1482e84
 
-Ready: .../advanced/anatomy/practice/skill-figure
-Skill installed at: .../advanced/anatomy/practice/skill-figure/.claude/skills/anatomy/SKILL.md
-Next: cd ".../advanced/anatomy/practice/skill-figure" && claude
+Ready: .../advanced/anatomy/demo/practice/skill-figure
+Skill installed at: .../advanced/anatomy/demo/practice/skill-figure/.claude/skills/anatomy/SKILL.md
+Next: cd ".../advanced/anatomy/demo/practice/skill-figure" && claude
 ```
 
-`practice/` is ignored by git. Check the skill is there:
+`demo/practice/` is ignored by git. Check the skill is there:
 
 ```bash
-cd practice/skill-figure
+cd demo/practice/skill-figure
 ls .claude/skills/anatomy
 ```
 
@@ -163,7 +163,7 @@ Our follow-up took **45 seconds, 9 turns and $0.71** (more per turn than the fir
 >
 > When you pick a folder mid-run, any lifted folder or sheet drops instantly instead of easing down.
 
-Notice it told you plainly what it did *not* check. That is your cue to check it yourself. We did, with the skill's own screenshot tool, sampling the readout every second. This needs Chrome or Chromium (see Troubleshooting) and costs nothing, because no model is involved. Run it in `practice/skill-figure`:
+Notice it told you plainly what it did *not* check. That is your cue to check it yourself. We did, with the skill's own screenshot tool, sampling the readout every second. This needs Chrome or Chromium (see Troubleshooting) and costs nothing, because no model is involved. Run it in `demo/practice/skill-figure`:
 
 ```bash
 node .claude/skills/anatomy/scripts/capture.mjs figure/skill-use.html --out shots/t.png --wait 100 --times 1000,2000,3000,4000,5000,6000,8000,9000
@@ -217,25 +217,40 @@ Reload the page in your browser and try it.
 Remove the practice project (the skill was only ever installed inside it):
 
 ```bash
-cd ../..            # back to advanced/anatomy
-rm -rf practice
+cd ../../..         # back to advanced/anatomy
+rm -rf demo/practice
 ```
 
 If you used the normal global install instead:
 
 ```bash
-npx skills remove anatomy -g      # or: rm -rf ~/.claude/skills/anatomy
+npx skills@1.7.4 remove anatomy -g      # or: rm -rf ~/.claude/skills/anatomy
 ```
 
-## Sample output
+## Files
 
-[`sample-output/`](sample-output) has the result of our run, so you can see it without spending anything:
+| File | What it is |
+|---|---|
+| [`demo/setup.sh`](demo/setup.sh) | Makes the practice project in `demo/practice/skill-figure` and clones Anatomy at the tested commit into its `.claude/skills/`. Pass a folder name to put it somewhere else. |
+| [`demo/brief.md`](demo/brief.md) | The facts the figure must show. `setup.sh` copies it into the practice project. |
+| [`sample-output/skill-use.html`](sample-output/skill-use.html) | The final figure from our run, after the follow-up prompt. Open it in a browser. |
+| [`sample-output/build.mjs`](sample-output/build.mjs) | The script that built it, with its paths changed to relative ones. |
+| [`sample-output/v1-lifted.png`](sample-output/v1-lifted.png) | Screenshot of the first version at about 6 seconds. |
+| [`sample-output/v2-at-8s.png`](sample-output/v2-at-8s.png) | Screenshot of the second version at about 8 seconds. |
+| `.gitignore` | Keeps `demo/practice/`, screenshots and other generated files out of git. |
 
-- `skill-use.html` - the final figure after the follow-up prompt. Open it in a browser.
-- `build.mjs` - the script that built it, with its paths changed to relative ones. To rebuild it yourself after `demo/setup.sh`: copy it to `practice/skill-figure/figure-src/build.mjs`, then in `practice/skill-figure` run `mkdir -p figure && node figure-src/build.mjs`. It writes a page byte for byte the same as `skill-use.html`.
-- `v1-lifted.png`, `v2-at-8s.png` - screenshots of the first and second versions.
+The sample output lets you see the result without spending anything. To rebuild the page yourself after `demo/setup.sh`, run this from `advanced/anatomy`:
 
-## Read more
+```bash
+cd demo/practice/skill-figure
+mkdir -p figure figure-src
+cp ../../../sample-output/build.mjs figure-src/build.mjs
+node figure-src/build.mjs
+```
+
+It writes `figure/skill-use.html`, byte for byte the same as `sample-output/skill-use.html`.
+
+## Where to read more
 
 - Anatomy: https://github.com/wheresryan22/anatomy (README, gallery and the examples)
 - Claude Code skills: https://code.claude.com/docs/en/skills

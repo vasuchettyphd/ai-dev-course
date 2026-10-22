@@ -2,6 +2,8 @@
 import pathlib, subprocess, tempfile, unittest
 from check_course import check, WEEKS, ADVANCED
 
+REPO = pathlib.Path(__file__).resolve().parent.parent
+
 STUB = "# Week\n\nStatus: coming soon\n"
 RUBRIC10 = "## Rubric\n\n| Criterion | Points |\n|---|---|\n| Works | 6 |\n| Explained | 4 |\n"
 RUBRIC30 = "## Rubric\n\n| Criterion | Points |\n|---|---|\n| Demo | 20 |\n| Write-up | 10 |\n"
@@ -169,6 +171,13 @@ class CheckCourse(unittest.TestCase):
     def test_missing_rubric_heading_reported(self):
         self._finished_week("| Criterion | Points |\n|---|---|\n| A | 10 |\n")
         self.assertTrue(any("no ## Rubric table" in p for p in check(self.root)))
+
+
+
+class RealRepo(unittest.TestCase):
+    def test_advanced_list_matches_folders(self):
+        folders = sorted(p.name for p in (REPO / "advanced").iterdir() if p.is_dir())
+        self.assertEqual(folders, sorted(ADVANCED))
 
 
 if __name__ == "__main__":

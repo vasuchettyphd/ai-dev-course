@@ -6,7 +6,7 @@
     "output": ".archify/architecture-deal-screener-20261022-120000/deal-screener.html",
     "quality_profile": "showcase",
     "repository": {
-      "url": "https://github.com/example/deal-screener.git",
+      "url": "https://example.com/deal-screener.git",
       "revision": "8661edcb52803533a8d6b3353bade8cf5085e2c3",
       "link_mode": "local-only"
     }

@@ -1,0 +1,9 @@
+# practice copies and run results made by demo/setup.sh / demo/run-both.sh
+demo/practice/
+*.result.json
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.env

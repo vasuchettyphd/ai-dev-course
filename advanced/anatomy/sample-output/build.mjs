@@ -1,5 +1,5 @@
 // Built by Claude Code (Sonnet) with the Anatomy skill on 2026-10-22, after the follow-up prompt.
-// Paths changed to relative so it runs from practice/skill-figure/figure-src/: node figure-src/build.mjs
+// Paths changed to relative so it runs from demo/practice/skill-figure/figure-src/: node figure-src/build.mjs
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import * as k from "../.claude/skills/anatomy/kit/iso-kit.mjs";

@@ -24,15 +24,25 @@ if [ -e "$DEST" ]; then
   exit 1
 fi
 
+if [ -n "${GEMINI_API_KEY:-}" ] || [ -n "${GOOGLE_API_KEY:-}" ]; then
+  echo "WARNING: GEMINI_API_KEY or GOOGLE_API_KEY is set in this terminal." >&2
+  echo "  The /graphify skill may send your documents to Google Gemini instead of Claude." >&2
+  echo "  To keep them off Google, run this before starting Claude:" >&2
+  echo "    unset GEMINI_API_KEY GOOGLE_API_KEY" >&2
+  echo >&2
+fi
+
 echo "==> Installing graphify $GRAPHIFY_VERSION into $HERE/.venv"
-uv venv -q "$HERE/.venv"
+uv venv -q --clear "$HERE/.venv"
 VIRTUAL_ENV="$HERE/.venv" uv pip install -q "graphifyy==$GRAPHIFY_VERSION"
 "$HERE/.venv/bin/graphify" --version
 
 echo "==> Copying the deal screener into $DEST"
 mkdir -p "$HERE/practice"
 cp -R "$EXAMPLE" "$DEST"
-rm -rf "$DEST/.venv" "$DEST/.env" "$DEST/notes-index.json" "$DEST/.mcp.json"
+rm -rf "$DEST/.venv" "$DEST/notes-index.json" "$DEST/.mcp.json"
+# Never copy secrets: drop every .env* file but keep the .env.example template
+find "$DEST" -name '.env*' ! -name '.env.example' -prune -exec rm -rf {} +
 find "$DEST" -name __pycache__ -type d -prune -exec rm -rf {} +
 cp "$HERE/graphifyignore" "$DEST/.graphifyignore"
 

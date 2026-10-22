@@ -1,9 +1,0 @@
-# practice copies and run results made by setup.sh / run-both.sh
-practice/
-*.result.json
-__pycache__/
-*.pyc
-.venv/
-venv/
-node_modules/
-.env

@@ -9,6 +9,8 @@ PORT="${XERJ_DEMO_PORT:-19273}"
 URL="http://127.0.0.1:$PORT"
 CORPUS="$(cd "${1:-$DEMO/../../../weeks}" && pwd)"
 PREFIX="course"
+# One state folder per indexed folder, so pointing start.sh at a new folder works.
+STATE="$DEMO/.xerj-state/$(printf '%s' "$CORPUS" | cksum | awk '{print $1}')"
 
 # Never let xerj or an agent send field reports from this demo.
 export XERJ_DISABLE_FEEDBACK=true
@@ -38,7 +40,7 @@ fi
 
 echo "Indexing $CORPUS as prefix '$PREFIX' ..."
 "$XERJ" autoindex "$CORPUS" --url "$URL" --prefix "$PREFIX" \
-  --state-dir "$DEMO/.xerj-state" --replace-prefix
+  --state-dir "$STATE" --replace-prefix
 
 mkdir -p "$DEMO/playground"
 cat > "$DEMO/playground/.mcp.json" <<EOF

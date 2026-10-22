@@ -13,12 +13,12 @@ Everything here was run for real on **2026-10-22** with:
 | Tool | Version |
 |---|---|
 | Archify skill | 3.2.0 (upstream commit `25cf370`) |
-| `skills` installer | 1.7.0 (run with `npx`, nothing installed) |
+| `skills` installer | 1.7.4 (run with `npx`, nothing installed) |
 | Claude Code | 2.1.309, model Sonnet |
-| Node.js | 22.23.3 (Archify needs 18 or newer) |
+| Node.js | 22.23.3 (the `skills` installer needs 22.20 or later) |
 | Browser for the automated check | Chromium (Playwright build 1248) |
 
-`demo/setup.sh` installs the newest Archify release, so you may get a version newer than 3.2.0. The replies quoted below are the real ones from those runs. Your diagram will not be identical: Claude decides the layout and the wording each time.
+`demo/setup.sh` installs exactly that tested commit, `25cf370`, so you get the same Archify we used. The upstream install command under [The normal way](#the-normal-way-for-your-own-projects) installs the newest version instead, which may be newer than 3.2.0. The replies quoted below are the real ones from those runs. Your diagram will not be identical: Claude decides the layout and the wording each time.
 
 **Time:** about 30-40 minutes. **Cost:** the three diagrams cost $0.90 of Sonnet usage in our runs ($0.44, $0.26 and $0.20). Redoing one costs about the same again. See [What it cost](#what-it-cost).
 
@@ -49,7 +49,7 @@ It can also make a one-page "explainer" (an answer laid out as a page), which th
 You need:
 
 - Claude Code, working.
-- **Node.js 18 or newer.** Check with `node --version`. If it's missing, install the LTS version from [nodejs.org](https://nodejs.org).
+- **Node.js 22.20 or later.** Check with `node --version`. The `skills` installer refuses older versions. If it's missing, install the LTS version from [nodejs.org](https://nodejs.org).
 - **git.** Check with `git --version`.
 - **Google Chrome, Chromium or Microsoft Edge.** Archify's last check opens your diagram in a hidden browser window. Without one the diagram is still made, but the check fails (see [Troubleshooting](#troubleshooting)). On WSL, a Windows browser does not count: Chrome must be installed inside Linux.
 
@@ -62,7 +62,7 @@ On Windows, use WSL.
 Upstream's install command puts Archify into your user-wide skills folder, so it works in every project:
 
 ```bash
-npx -y skills add tt-a1i/archify --skill archify -g
+npx -y skills@1.7.4 add tt-a1i/archify --skill archify -g
 ```
 
 Drop the `-g` to install it into the current project only (`.claude/skills/archify/`). Then start a new Claude Code session so it picks up the skill.
@@ -80,25 +80,34 @@ demo/setup.sh
 Expected output (about 15 seconds; `/...` stands for wherever you cloned the course):
 
 ```
-1/3 Copying the deal screener to /.../advanced/archify/demo/practice/deal-screener
-2/3 Making it a git repo (Archify cites code by commit)
-3/3 Installing the archify skill into this project only
+1/4 Copying the deal screener to /.../advanced/archify/demo/practice/deal-screener
+2/4 Making it a git repo (Archify cites code by commit)
+3/4 Downloading the tested Archify version (only its skill folder, about 18 MB)
+4/4 Installing the archify skill into this project only
 Archify is ready.
 
 Done. Next:
   cd "/.../advanced/archify/demo/practice/deal-screener"
+  export ARCHIFY_UPDATE_CHECK_DISABLED=1   # optional: skip Archify's daily update check
   claude
 ```
 
 What the script did:
 
-- copied `example-project/` (the deal screener the course builds week by week) into `demo/practice/deal-screener`, leaving out any `.env` file,
+- copied `example-project/` (the deal screener the course builds week by week) into `demo/practice/deal-screener`, leaving out `.env` files with secrets but keeping the `.env.example` template,
 - made it a git repo with one commit, because Archify pins every citation to a commit,
-- gave it a **placeholder** remote address, `https://github.com/example/deal-screener.git`. Archify only attaches source citations when a repo has a remote. Nothing is ever pushed there.
-- ran `npx skills add tt-a1i/archify --skill archify` without `-g`, so the skill landed in `demo/practice/deal-screener/.claude/skills/archify/`,
+- gave it a **placeholder** remote address, `https://example.com/deal-screener.git` (`example.com` is reserved for examples). Archify only attaches source citations when a repo has a remote. Nothing is ever pushed there.
+- downloaded only the `archify/` skill folder from upstream commit `25cf370`, the one we tested (not the whole 900 MB repo),
+- ran `npx skills@1.7.4 add` on that folder without `-g`, so the skill landed in `demo/practice/deal-screener/.claude/skills/archify/`,
 - ran Archify's own health check, `doctor`, whose last line is `Archify is ready.`
 
 `demo/practice/` is ignored by git, so you can't commit it by mistake.
+
+**Optional: turn off the update check.** Once a day Archify fetches a small file from `tt-a1i.github.io` to see if a newer version exists (see [Limits and caveats](#limits-and-caveats)). We turned it off for our runs. To do the same, run this in the terminal where you will start `claude`:
+
+```bash
+export ARCHIFY_UPDATE_CHECK_DISABLED=1
+```
 
 Want to see the full health check? From the practice folder:
 
@@ -254,7 +263,15 @@ Created ShelfSwap workflow
 Automated checks passed; I haven't looked at the diagram visually.
 ```
 
-The diagram ([`sample-output/3-workflow-shelfswap.html`](sample-output/3-workflow-shelfswap.html)) puts each step in a lane for who does it: Seller, Buyer, the ShelfSwap app, and a separate dashed "Held money" lane where the money waits until the hand-off scan, then goes either to "Pay seller, minus 10% fee" or to "Full refund" and back to "Listing live".
+Our diagram puts each step in a lane for who does it: Seller, Buyer, the ShelfSwap app, and a separate dashed "Held money" lane where the money waits until the hand-off scan, then goes either to "Pay seller, minus 10% fee" or to "Full refund" and back to "Listing live".
+
+We kept only the JSON for this one, [`sample-output/3-workflow-shelfswap.json`](sample-output/3-workflow-shelfswap.json), because each HTML file is about 0.8 MB and mostly the same viewer code. To turn it into the diagram on your own computer, with no Claude and no cost, run this from `demo/practice/deal-screener`:
+
+```bash
+node .claude/skills/archify/bin/archify.mjs render workflow ../../../sample-output/3-workflow-shelfswap.json ../3-workflow-shelfswap.html
+```
+
+It prints the path of the new file, `demo/practice/3-workflow-shelfswap.html`. Open it in your browser. (This works for Step 3 because that diagram cites no code. Steps 1 and 2 cite our exact commit, which your copy doesn't have, so their HTML files are kept in `sample-output/`.)
 
 Now do it for **your** idea. Edit `demo/startup-idea.md` (or write your own steps in the prompt) and ask for whichever type fits: a workflow for "how it works", a sequence for "what happens when a customer pays", a lifecycle for "the states an order goes through". This is a quick way to get a picture for a pitch slide, and to spot steps you haven't decided yet: if Claude asks you a question, that is a gap in your plan.
 
@@ -282,12 +299,12 @@ While writing this tutorial we also ran Step 1 twice more while working out the 
 - **Citations need a git repo with a commit and a remote.** Our first try had no remote, and Claude said: "Archify only attaches per-part source links when the repo has a git remote. This one has none, so every part shows its file path in its label." That is why `setup.sh` adds a placeholder remote. On your own project, once it's on GitHub, Archify can link each box to the real file on GitHub.
 - **Uncommitted changes are not evidence.** Archify checks citations against the committed files. Commit first, then diagram.
 - **Each diagram file is about 0.8 MB**, because the whole viewer is built into it. That is what makes it work offline as a single file.
-- **It checks for updates.** Once a day, `finalize` fetches a small file from `tt-a1i.github.io` to see if a newer Archify exists, and Claude may mention it. It never updates itself. Turn this off with `export ARCHIFY_UPDATE_CHECK_DISABLED=1`. We turned it off for our runs.
+- **It checks for updates.** Once a day, `finalize` fetches a small file from `tt-a1i.github.io` to see if a newer Archify exists, and Claude may mention it. It never updates itself. Turn this off with `export ARCHIFY_UPDATE_CHECK_DISABLED=1` before starting `claude` (see [Setup](#setup)).
 - **The "explainer" offer edits a global file if you say yes.** After making an explainer page, the skill may offer to make pages proactively from now on. If you accept, it adds a line to `~/.claude/CLAUDE.md`, which affects every project. Delete that line to undo it.
 - **The installer reports installs.** The `skills` installer sends an anonymous install event unless `DO_NOT_TRACK=1` is set. `setup.sh` sets it. The installer also showed a third-party safety summary: "Gen: Safe, Socket: 1 alert, Snyk: Low Risk" ([details](https://skills.sh/tt-a1i/archify)).
 - **We read the code before running it.** The skill's programs start a hidden browser for the check and run read-only `git` commands to verify citations. Apart from the update check, they only go online if you ask for a company logo and give a web address for it, and the optional live preview runs a small web server on your own computer only (`127.0.0.1`). We found nothing that sends your code anywhere. The skill runs with Claude Code's permissions, though, so treat it like any other software you install.
-- **Don't clone the upstream repo to look at it.** It is about 900 MB (videos, a website, galleries). Read it on GitHub instead. The installer took about 10 seconds for us and copied only the `archify/` skill folder (18 MB).
-- **The sample HTML files were edited once.** Archify's built-in viewer code contains the long dash character in its code comments, which this course's checker forbids. We replaced those characters with a hyphen in `sample-output/*.html`. The diagrams render the same.
+- **Don't clone the upstream repo to look at it.** It is about 900 MB (videos, a website, galleries). Read it on GitHub instead. `setup.sh` downloads only the `archify/` skill folder (18 MB) from the tested commit, which took a few seconds for us.
+- **The sample HTML files were edited once.** Archify's built-in viewer code contains the long dash character in its code comments, which this course's checker forbids. We replaced those characters with a hyphen in `sample-output/*.html`. We also set the placeholder remote in `sample-output/` to `example.com/deal-screener.git` to match `setup.sh`. The diagrams render the same, and Archify's `check` command still passes on them.
 
 ## Troubleshooting
 
@@ -302,7 +319,7 @@ Then ask Claude to "run Archify's finalize again on that diagram".
 
 **`demo/setup.sh` says the folder already exists.** You ran it before. Delete the old copy with `rm -rf demo/practice` and run it again.
 
-**`npx: command not found` or `Node.js 18 or newer is needed`.** Install Node.js LTS from [nodejs.org](https://nodejs.org), open a new terminal and check `node --version`.
+**`npx: command not found` or `Node.js 22.20 or later is needed`.** Install Node.js 22 LTS or newer from [nodejs.org](https://nodejs.org), open a new terminal and check `node --version`.
 
 **Claude left a `.archify` folder somewhere odd**, such as `dealscreener/.archify/` in our Step 1. It's a failed attempt. Delete it.
 
@@ -310,7 +327,7 @@ Then ask Claude to "run Archify's finalize again on that diagram".
 
 ## Clean up
 
-Delete the practice copy, which also removes the skill installed inside it:
+Delete the practice copy, which also removes the skill installed inside it. From the `advanced/archify` folder (if you are still in `demo/practice/deal-screener`, run `cd ../../..` first):
 
 ```bash
 rm -rf demo/practice
@@ -319,7 +336,7 @@ rm -rf demo/practice
 If you installed Archify for your whole account with `-g`, remove it with:
 
 ```bash
-npx -y skills remove archify -g
+npx -y skills@1.7.4 remove archify -g
 ```
 
 Without `-g`, run the same command inside the project to remove a project-only install. If you had turned on the explainer mode, also delete its `[archify explainer: ...]` line from `~/.claude/CLAUDE.md`.
@@ -328,11 +345,12 @@ Without `-g`, run the same command inside the project to remove a project-only i
 
 | Path | What it is |
 |---|---|
-| `demo/setup.sh` | Copies the deal screener to `demo/practice/deal-screener`, makes it a git repo, installs Archify into it only |
+| `.gitignore` | Keeps `demo/practice/` and Archify's working files out of git |
+| `demo/setup.sh` | Copies the deal screener to `demo/practice/deal-screener`, makes it a git repo, installs the tested Archify commit into it only |
 | `demo/startup-idea.md` | ShelfSwap, the made-up startup for Step 3 |
 | `sample-output/1-architecture-deal-screener.html` and `.json` | Step 1's diagram, and the JSON Claude wrote for it |
 | `sample-output/2-sequence-listing-verdict.html` and `.json` | Step 2's diagram and JSON |
-| `sample-output/3-workflow-shelfswap.html` and `.json` | Step 3's diagram and JSON |
+| `sample-output/3-workflow-shelfswap.json` | Step 3's JSON (render it to HTML with the command in Step 3) |
 
 ## Where to read more
 

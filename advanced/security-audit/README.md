@@ -6,10 +6,10 @@ Everything below was run for real on 2026-10-22 with:
 
 | Tool | Version |
 |---|---|
-| security-audit skill | upstream `main` at commit `c1c8a8c` (2026-09-14) |
-| Skills CLI (`npx skills`) | 1.7.4 |
+| security-audit skill | commit `c1c8a8c` (2026-09-14), pinned by `setup.sh` |
+| Skills CLI (`npx skills`, optional, for your own projects) | 1.7.4 |
 | Claude Code | 2.1.309, model Sonnet |
-| Node.js | 22.23.3 (the skill's validators need it) |
+| Node.js | 22.23.3 (the skill's validators need it; the skills CLI needs 22.20 or later) |
 | Python / Flask (demo app only) | Python 3.14, Flask 3.1.3, uv 0.13.4 |
 
 **Time:** 20-45 minutes. The audit itself took about 10 minutes. **Cost:** our run cost **$2.04** of Sonnet usage. It launches 11 helper agents, so it is the most expensive demo in this unit. Set a budget (Step 3 shows how).
@@ -45,7 +45,7 @@ The skill itself tells the agent not to run the target's code unless an OS-level
 
 ## Setup
 
-You need git, Node.js 18+ (for `npx`), Claude Code, and either [uv](https://docs.astral.sh/uv/) or Python 3.10+ with `venv` (only for the answer-key checker). On Windows, use WSL.
+You need git, Node.js 22.20 or later (for the skill's checker scripts and the `npx skills` installer), Claude Code, and either [uv](https://docs.astral.sh/uv/) or Python 3.10+ with `venv` (only for the answer-key checker). On Windows, use WSL.
 
 ```bash
 git clone https://github.com/vasuchettyphd/ai-dev-course.git
@@ -53,17 +53,11 @@ cd ai-dev-course/advanced/security-audit/demo
 ./setup.sh
 ```
 
-`setup.sh` copies the demo app into `practice/leaky-notes/` (git ignores `practice/`), makes it a git repo with one commit, and installs the skill **into that folder only**. Expected output (spinner lines trimmed):
+`setup.sh` copies the demo app into `demo/practice/leaky-notes/` (git ignores `practice/`), makes it a git repo with one commit, and installs the skill **into that folder only**. It downloads the skill at commit `c1c8a8c`, the exact version this lesson was tested with, and copies it to `.claude/skills/security-audit/`. Expected output:
 
 ```
 Created git repo at .../demo/practice/leaky-notes
-◇  Source: https://github.com/cloudflare/security-audit-skill.git
-◇  Repository cloned
-●  Selected 1 skill: security-audit
-◇  Installed 1 skill
-│  ✓ security-audit (copied)
-│    → ./.claude/skills/security-audit
-└  Done!  Review skills before use; they run with full agent permissions.
+Installed security-audit skill at commit c1c8a8c
 
 Installed skill files:
 AI-AND-LLM.md
@@ -77,21 +71,15 @@ validate-findings.test.cjs
 Next: cd .../demo/practice/leaky-notes && claude
 ```
 
-Under the hood that is upstream's own install command, run without `-g` so it stays in this one project:
+Why not the usual `npx skills add` installer? It can only pin a branch or tag, not a single commit, so `setup.sh` fetches the commit with git instead. The result is the same folder of files.
+
+**For your own projects later**, upstream's install command works from your project folder (it will ask which agent you use). It needs Node 22.20 or later:
 
 ```bash
-npx skills add cloudflare/security-audit-skill --skill security-audit -a claude-code -y --copy
+DO_NOT_TRACK=1 npx -y skills@1.7.4 add https://github.com/cloudflare/security-audit-skill --skill security-audit
 ```
 
-**For your own projects later**, upstream recommends the same command from your project folder (it will ask which agent you use):
-
-```bash
-npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit
-```
-
-`setup.sh` pins the skills CLI to 1.7.4, but the skill itself comes from upstream `main`. If Cloudflare has changed it since commit `c1c8a8c`, your run may word things differently or produce different files.
-
-Add `--global` only if you want it in every project. The skills CLI sends anonymous usage stats; `setup.sh` sets `DO_NOT_TRACK=1` to switch that off.
+That installs the latest upstream version, not `c1c8a8c`. If Cloudflare has changed the skill since, your run may word things differently or produce different files. Add `--global` only if you want it in every project. `DO_NOT_TRACK=1` switches off the CLI's anonymous usage stats.
 
 ## The demo app: Leaky Notes
 
@@ -274,7 +262,7 @@ Make your guess before opening this.
 - **Confirming bugs needs a real sandbox**: no network, read-only code, a clean environment and resource limits (for example `bwrap` on Linux). We did not test a run with a sandbox, so we cannot show what "confirmed" output looks like. Upstream says that without one, every lead stays `needs_validation`.
 - **It is not a guarantee.** No findings does not mean secure, and the report says so. Treat it as a very thorough reviewer, not a certificate.
 - **The demo app is labelled "deliberately vulnerable"** in its docstring, and the agent read that. It still traced each bug from the code, but on your own projects there is no such hint.
-- **It wanders a little.** In our run one verifier read Flask's source from the local uv cache in the home folder (read-only), and the main agent wrote two small helper scripts (`ledger-update-1.cjs`, `ledger-update-2.cjs`) into `demo/`, outside the output folder. `demo/.gitignore` ignores them. Neither is harmful, but it shows why you review what an agent touches.
+- **It wanders a little.** In our run one verifier read Flask's source from the local uv cache in the home folder (read-only), and the main agent wrote two small helper scripts (`ledger-update-1.cjs`, `ledger-update-2.cjs`) into `demo/`, outside the output folder. The lesson's `.gitignore` ignores them. Neither is harmful, but it shows why you review what an agent touches.
 - **Only audit code you own or have permission to test.** The skill never probes live servers, and neither should you.
 
 ## Troubleshooting
@@ -303,17 +291,19 @@ If you ran an audit without naming an output folder, also delete `~/security-aud
 If you installed the skill in another project, remove it from there with:
 
 ```bash
-npx skills remove security-audit
+DO_NOT_TRACK=1 npx -y skills@1.7.4 remove security-audit
 ```
 
 (add `--global` if you installed it globally), or simply delete that project's `.claude/skills/security-audit/` folder.
 
-## Files in this lesson
+## Files
 
 | Path | What it is |
 |---|---|
 | `demo/leaky-notes/` | The deliberately vulnerable app (`app.py`, `seed.py`, `requirements.txt`). Do not deploy |
-| `demo/setup.sh` | Copies the app to `practice/`, makes it a git repo, installs the skill there |
+| `demo/setup.sh` | Copies the app to `demo/practice/`, makes it a git repo, installs the skill (pinned to `c1c8a8c`) there |
 | `demo/prove-bugs.sh`, `demo/prove_bugs.py` | Answer-key checker using Flask's test client |
 | `demo/reset.sh` | Deletes `practice/` and `audit-output/` |
-| `sample-output/` | The report files from our run, so you can read them without paying for a run |
+| `sample-output/` | The report files from our run (`REPORT.md`, `NEEDS-VALIDATION.md`, `FINDINGS-DETAIL.md`, `architecture.md`, `findings.json`), so you can read them without paying for a run |
+| `.gitignore` | Keeps `demo/practice/`, `demo/audit-output/`, runtime files and stray agent scripts out of git |
+| `README.md` | This lesson |

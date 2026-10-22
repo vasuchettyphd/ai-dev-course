@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Make a practice project with the Anatomy skill installed for that project only.
-# Usage: demo/setup.sh [folder]   (default: advanced/anatomy/practice/skill-figure)
+# Usage: demo/setup.sh [folder]   (default: advanced/anatomy/demo/practice/skill-figure)
 # Set ANATOMY_REF=main to try the newest upstream version instead of the tested one.
 set -euo pipefail
 
@@ -8,8 +8,7 @@ TESTED_COMMIT="1482e8469b0a9e0d8cc18ea2740a01423d29ae80"
 REF="${ANATOMY_REF:-$TESTED_COMMIT}"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LESSON="$(dirname "$HERE")"
-TARGET="${1:-$LESSON/practice/skill-figure}"
+TARGET="${1:-$HERE/practice/skill-figure}"
 
 need() { command -v "$1" >/dev/null 2>&1 || { echo "Missing: $1. $2" >&2; exit 1; }; }
 need node "Install Node.js 22 LTS from https://nodejs.org"

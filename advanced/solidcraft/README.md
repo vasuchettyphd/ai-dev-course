@@ -46,7 +46,11 @@ SolidCraft was started by GitHub user `bherbruck` and now lives under the `tange
 
 ## Setup
 
-You need git, curl and [Claude Code](https://claude.com/claude-code). Linux and macOS work directly. On Windows, use WSL.
+You need:
+
+- **git** and **curl** (the script checks for both and stops if either is missing),
+- [Claude Code](https://claude.com/claude-code),
+- **Linux** (tested, on WSL) or **macOS (untested: the script has a macOS branch, but we never ran it on a Mac)**. On Windows, use WSL.
 
 ```bash
 git clone https://github.com/vasuchettyphd/ai-dev-course.git
@@ -58,7 +62,7 @@ Expected output (`...` stands for wherever you cloned the course):
 
 ```text
 Downloading solidcraft-0.19.0-linux-x86_64.tar.gz (about 60 MB) ...
-Checking the download against SHA256SUMS.txt ...
+Checking the download's SHA-256 checksum ...
 Checksum OK.
 solidcraft-cli 0.19.0
 Making a fresh practice folder in .../advanced/solidcraft/demo/practice ...
@@ -76,8 +80,8 @@ Ready. Next:
 
 What the script did (read it first, it is short: [`demo/setup.sh`](demo/setup.sh)):
 
-1. Downloaded the SolidCraft 0.19.0 release into `demo/bin/` and checked its SHA-256 checksum against the release's `SHA256SUMS.txt`. Nothing is installed system-wide, and there is no `curl | sh`.
-2. Made `demo/practice/` with the four skills in `.claude/skills/` (project-scoped: they exist only in this folder).
+1. Downloaded the SolidCraft 0.19.0 release into `demo/bin/` and checked its SHA-256 checksum. The expected value is written into the script itself, and the release's own `SHA256SUMS.txt` must agree with it. Nothing is installed system-wide, and there is no `curl | sh`.
+2. Made `demo/practice/` with the four skills in `.claude/skills/` (project-scoped: they exist only in this folder), plus a small marker file, `.solidcraft-practice`, that says the script made this folder.
 3. Wrote `demo/practice/.mcp.json`, which tells Claude Code how to start the SolidCraft MCP server:
 
 ```json
@@ -93,7 +97,7 @@ What the script did (read it first, it is short: [`demo/setup.sh`](demo/setup.sh
 
 `--allow-path` matters: by default the server can only read and write files in the open design's folder, its own scratch folder and its recovery folder. That is a good safety rule. We add `out/` so Claude can save and export there.
 
-Run `demo/setup.sh` again any time to get a fresh practice folder (the download is skipped if it's already there).
+Run `demo/setup.sh` again any time to get a fresh practice folder (the download is skipped if it's already there). The script only deletes a practice folder that has its marker file. If the folder exists without it (for example, you made it yourself), the script stops and changes nothing; delete the folder yourself or choose another one with `SOLIDCRAFT_PRACTICE=/some/new/folder demo/setup.sh`.
 
 ### The normal install (outside this course)
 
@@ -272,7 +276,7 @@ This is how you would keep a design in git and rebuild it in CI, and it is also 
 
 - **Early software.** SolidCraft calls itself "early but usable for simple parts". Upstream reports 75 of 76 reference parts matching their expected volume and shape. Keep parts simple, and always look before you print.
 - **Very new release.** We tested 0.19.0 on the day it came out. The skills say they were written for 0.8 and later, and they worked, but a future version may rename commands. Stay on the pinned version for this lesson.
-- **Unsigned downloads.** The SolidCraft downloads aren't code-signed yet. Our script checks the published SHA-256 checksum, which proves the file is the one on the release page, not who built it. On macOS the script clears the quarantine flag so the CLI runs.
+- **Unsigned downloads.** The SolidCraft downloads aren't code-signed yet. Our script checks the SHA-256 checksum against a value we pinned in the script on the day we tested, and against the release's `SHA256SUMS.txt`. That proves the file is the one we tested, not who built it. On macOS the script clears the quarantine flag so the CLI runs.
 - **We tested Linux (WSL) only.** The macOS branch of `setup.sh` uses the `solidcraft-cli-0.19.0-macos-universal.zip` release asset, whose layout we checked, but we did not run it on a Mac.
 - **The desktop app was not tested.** We ran everything headless (no window), because the test machine has no display. Upstream also supports a "bridged" mode, where you watch Claude model live in the app: start the app with `solidcraft --control 7878` and the server with `solidcraft-cli mcp --connect 127.0.0.1:7878` (see [docs/mcp.md](https://github.com/tangency-labs/solidcraft/blob/main/docs/mcp.md)). We describe it but did not run it.
 - **How we drove Claude.** For repeatable results we ran both prompts with `claude -p` (no chat window) instead of an interactive session:
@@ -291,6 +295,8 @@ This is how you would keep a design in git and rebuild it in CI, and it is also 
 | Problem | Fix |
 |---|---|
 | `Checksum mismatch ... - not installing.` | The download was cut short or changed. Run `demo/setup.sh` again. If it keeps failing, don't run the file: report it. |
+| `... already exists, and this script did not make it, so it will not touch it.` | The practice folder exists but has no `.solidcraft-practice` marker (it was made by hand or by an older copy of the script). Look inside, delete it yourself if you don't need it, and rerun `demo/setup.sh`. Or set `SOLIDCRAFT_PRACTICE` to a new folder. |
+| `fatal: ...` from git | The skills download failed (no network, or GitHub is down). Your old practice folder is left as it was. Try again later. |
 | `/mcp` doesn't list `solidcraft` | You started `claude` outside `demo/practice`, or you declined the approval. Run `claude mcp reset-project-choices` in `demo/practice` and start `claude` again. |
 | `solidcraft` shows as failed in `/mcp` | Run `demo/bin/solidcraft-cli --version`. If it doesn't print `solidcraft-cli 0.19.0`, rerun `demo/setup.sh`. If you moved the course folder, rerun it too: `.mcp.json` holds absolute paths. |
 | Claude says a path is refused | The server only writes to allowed folders. Ask it to save under `out/`, or add another `--allow-path` in `.mcp.json`. Folders whose names start with `.` are never allowed by default. |
@@ -316,7 +322,8 @@ If you did the normal install instead: `claude mcp remove solidcraft` and `rm -r
 
 | Path | What it is |
 |---|---|
-| `demo/setup.sh` | Downloads pinned SolidCraft 0.19.0 into `demo/bin`, checks the checksum, makes `demo/practice` with the skills and `.mcp.json` |
+| `.gitignore` | Keeps `demo/bin`, `demo/practice` and generated models out of git |
+| `demo/setup.sh` | Downloads pinned SolidCraft 0.19.0 into `demo/bin`, checks the pinned checksum, makes `demo/practice` with the skills and `.mcp.json` |
 | `demo/prompts/1-build.md` | The build prompt (Step 2) |
 | `demo/prompts/2-change.md` | The change prompt (Step 3) |
 | `demo/phone-stand.json` | The finished design as a plain command script (Step 5) |
