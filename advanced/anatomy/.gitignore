@@ -1,0 +1,13 @@
+practice/
+node_modules/
+.venv/
+venv/
+__pycache__/
+.env
+.env.*
+shots/
+*.png
+!sample-output/*.png
+*.pdf
+bin/
+.DS_Store

@@ -1,0 +1,109 @@
+diff --git a/budgets.csv b/budgets.csv
+new file mode 100644
+index 0000000..fd27340
+--- /dev/null
++++ b/budgets.csv
+@@ -0,0 +1,4 @@
++category,monthly_limit
++groceries,200
++eating out,40
++transport,50
+diff --git a/test_tracker.py b/test_tracker.py
+index 115a33d..fadd1fd 100644
+--- a/test_tracker.py
++++ b/test_tracker.py
+@@ -21,6 +21,20 @@ class TrackerTests(unittest.TestCase):
+             tracker.main(["total"])
+         self.assertEqual(out.getvalue().strip(), "Total: $2,235.05")
+ 
++    def test_over_budget_flags_only_exceeded_months(self):
++        expenses = tracker.load_expenses("expenses.csv")
++        budgets = {"eating out": Decimal("40"), "groceries": Decimal("170")}
++        self.assertEqual(
++            tracker.over_budget(expenses, budgets),
++            [("2026-09", "eating out", Decimal("50.50"), Decimal("40"))],
++        )
++
++    def test_budget_command_warns(self):
++        out = io.StringIO()
++        with redirect_stdout(out):
++            tracker.main(["budget"])
++        self.assertIn("WARNING 2026-09 eating out", out.getvalue())
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/tracker.py b/tracker.py
+index b884d06..392290f 100644
+--- a/tracker.py
++++ b/tracker.py
+@@ -3,6 +3,10 @@
+ Usage:
+     python3 tracker.py list  [--file expenses.csv]
+     python3 tracker.py total [--file expenses.csv]
++    python3 tracker.py budget [--file expenses.csv] [--budgets budgets.csv]
++
++budgets.csv has the columns category,monthly_limit. Each limit applies to
++every calendar month; categories without a row are unbudgeted.
+ """
+ import argparse
+ import csv
+@@ -24,6 +28,12 @@ def load_expenses(path):
+         ]
+ 
+ 
++def load_budgets(path):
++    """Read category,monthly_limit rows into {category: Decimal}."""
++    with open(path, newline="") as f:
++        return {row["category"]: Decimal(row["monthly_limit"]) for row in csv.DictReader(f)}
++
++
+ def format_money(amount):
+     """Format a Decimal as dollars, e.g. Decimal('1234.5') -> '$1,234.50'."""
+     return f"${amount:,.2f}"
+@@ -38,12 +48,36 @@ def cmd_total(expenses):
+     print(f"Total: {format_money(sum(e['amount'] for e in expenses))}")
+ 
+ 
++def over_budget(expenses, budgets):
++    """Return [(month, category, spent, limit)] for each month a limit was exceeded."""
++    spent = {}
++    for e in expenses:
++        key = (e["date"].strftime("%Y-%m"), e["category"])
++        spent[key] = spent.get(key, Decimal(0)) + e["amount"]
++    return [
++        (month, cat, amount, budgets[cat])
++        for (month, cat), amount in sorted(spent.items())
++        if cat in budgets and amount > budgets[cat]
++    ]
++
++
++def cmd_budget(expenses, budgets):
++    overs = over_budget(expenses, budgets)
++    for month, cat, amount, limit in overs:
++        print(f"WARNING {month} {cat}: {format_money(amount)} spent, "
++              f"{format_money(amount - limit)} over the {format_money(limit)} budget")
++    if not overs:
++        print("All categories are within budget.")
++
++
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description="A tiny expense tracker.")
+     parser.add_argument("--file", default="expenses.csv")
+     sub = parser.add_subparsers(dest="command", required=True)
+     sub.add_parser("list", help="show every expense")
+     sub.add_parser("total", help="show the total spent")
++    sub.add_parser("budget", help="warn about categories over their monthly budget")
++    parser.add_argument("--budgets", default="budgets.csv")
+     args = parser.parse_args(argv)
+ 
+     expenses = load_expenses(args.file)
+@@ -51,6 +85,8 @@ def main(argv=None):
+         cmd_list(expenses)
+     elif args.command == "total":
+         cmd_total(expenses)
++    elif args.command == "budget":
++        cmd_budget(expenses, load_budgets(args.budgets))
+ 
+ 
+ if __name__ == "__main__":

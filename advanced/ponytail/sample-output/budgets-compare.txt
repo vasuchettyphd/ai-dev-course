@@ -1,0 +1,36 @@
+=================== baseline ===================
+--- lines changed (git diff --stat) ---
+ budgets.csv     |  4 ++++
+ test_tracker.py | 14 ++++++++++++++
+ tracker.py      | 36 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+)
+--- file sizes now (starter: tracker.py 57, test_tracker.py 26) ---
+  40 ./test_tracker.py
+  93 ./tracker.py
+ 133 total
+--- tests ---
+Ran 5 tests in 0.001s
+
+OK
+--- python3 tracker.py budget ---
+WARNING 2026-09 eating out: $50.50 spent, $10.50 over the $40.00 budget
+
+=================== ponytail ===================
+--- lines changed (git diff --stat) ---
+ budgets.csv     |  5 +++++
+ test_tracker.py |  9 +++++++++
+ tracker.py      | 21 +++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+--- file sizes now (starter: tracker.py 57, test_tracker.py 26) ---
+  35 ./test_tracker.py
+  78 ./tracker.py
+ 113 total
+--- tests ---
+Ran 4 tests in 0.001s
+
+OK
+--- python3 tracker.py budget ---
+OVER BUDGET 2026-09 eating out: $50.50 of $40.00 (+$10.50)
+OVER BUDGET 2026-09 groceries: $164.15 of $150.00 (+$14.15)
+OVER BUDGET 2026-10 transport: $45.00 of $40.00 (+$5.00)
+

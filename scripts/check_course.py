@@ -8,7 +8,10 @@ WEEKS = [
     "09-calling-a-model", "10-embeddings-and-rag", "11-tools-agents-mcp", "12-evaluation",
     "13-security-and-responsible-use", "14-final-demos",
 ]
-ADVANCED = ["dbt", "local-llm-docker", "jev", "wordle-agent", "grill-me-superpowers", "beads"]
+ADVANCED = [
+    "dbt", "local-llm-docker", "jev", "wordle-agent", "grill-me-superpowers", "beads",
+    "security-audit", "ponytail", "solidcraft", "anatomy", "xerj", "graphify", "archify",
+]
 SKIP = {".git", "node_modules", "__pycache__", ".venv", "venv"}
 LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 FENCE = re.compile(r"```.*?```", re.S)

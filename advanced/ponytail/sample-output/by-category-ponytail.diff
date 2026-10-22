@@ -1,0 +1,96 @@
+diff --git a/test_tracker.py b/test_tracker.py
+index 115a33d..7edee41 100644
+--- a/test_tracker.py
++++ b/test_tracker.py
+@@ -1,6 +1,6 @@
+ import io
+ import unittest
+-from contextlib import redirect_stdout
++from contextlib import redirect_stderr, redirect_stdout
+ from decimal import Decimal
+ 
+ import tracker
+@@ -21,6 +21,27 @@ class TrackerTests(unittest.TestCase):
+             tracker.main(["total"])
+         self.assertEqual(out.getvalue().strip(), "Total: $2,235.05")
+ 
++    def cli(self, *argv):
++        out = io.StringIO()
++        with redirect_stdout(out):
++            tracker.main(list(argv))
++        return out.getvalue().splitlines()
++
++    def test_by_category_all_months_biggest_first(self):
++        lines = self.cli("by-category")
++        self.assertEqual([l.split()[0] for l in lines], ["rent", "groceries", "eating", "transport"])
++        self.assertEqual(lines[0].split()[-1], "$1,900.00")
++
++    def test_by_category_one_month(self):
++        lines = self.cli("by-category", "--month", "2026-10")
++        self.assertEqual([l.split()[0] for l in lines], ["rent", "groceries", "transport", "eating"])
++        self.assertEqual(lines[1].split()[-1], "$57.30")
++
++    def test_by_category_empty_month_and_bad_month(self):
++        self.assertEqual(self.cli("by-category", "--month", "2020-01"), [])
++        with self.assertRaises(SystemExit), redirect_stderr(io.StringIO()):
++            tracker.main(["by-category", "--month", "oct"])
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/tracker.py b/tracker.py
+index b884d06..f734a00 100644
+--- a/tracker.py
++++ b/tracker.py
+@@ -3,10 +3,12 @@
+ Usage:
+     python3 tracker.py list  [--file expenses.csv]
+     python3 tracker.py total [--file expenses.csv]
++    python3 tracker.py by-category [--month YYYY-MM] [--file expenses.csv]
+ """
+ import argparse
+ import csv
+-from datetime import date
++from collections import defaultdict
++from datetime import date, datetime
+ from decimal import Decimal
+ 
+ 
+@@ -38,12 +40,28 @@ def cmd_total(expenses):
+     print(f"Total: {format_money(sum(e['amount'] for e in expenses))}")
+ 
+ 
++def cmd_by_category(expenses, month=None):
++    totals = defaultdict(Decimal)
++    for e in expenses:
++        if month is None or e["date"].strftime("%Y-%m") == month:
++            totals[e["category"]] += e["amount"]
++    for category, amount in sorted(totals.items(), key=lambda kv: kv[1], reverse=True):
++        print(f"{category:<12} {format_money(amount):>10}")
++
++
++def month_arg(text):
++    datetime.strptime(text, "%Y-%m")  # raises ValueError -> argparse error
++    return text
++
++
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description="A tiny expense tracker.")
+     parser.add_argument("--file", default="expenses.csv")
+     sub = parser.add_subparsers(dest="command", required=True)
+     sub.add_parser("list", help="show every expense")
+     sub.add_parser("total", help="show the total spent")
++    by_cat = sub.add_parser("by-category", help="show spending per category, biggest first")
++    by_cat.add_argument("--month", type=month_arg, metavar="YYYY-MM")
+     args = parser.parse_args(argv)
+ 
+     expenses = load_expenses(args.file)
+@@ -51,6 +69,8 @@ def main(argv=None):
+         cmd_list(expenses)
+     elif args.command == "total":
+         cmd_total(expenses)
++    elif args.command == "by-category":
++        cmd_by_category(expenses, args.month)
+ 
+ 
+ if __name__ == "__main__":

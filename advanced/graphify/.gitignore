@@ -1,0 +1,11 @@
+# Everything the demo generates stays out of git
+demo/.venv/
+demo/practice/
+graphify-out/
+__pycache__/
+*.pyc
+node_modules/
+.env
+.env.*
+*.so
+*.bin

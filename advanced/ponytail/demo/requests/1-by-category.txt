@@ -1,0 +1,1 @@
+Add a `by-category` command to tracker.py. It prints how much was spent in each category, biggest first. It takes an optional --month YYYY-MM so I can see just one month. Add tests to test_tracker.py and run them when you are done.
