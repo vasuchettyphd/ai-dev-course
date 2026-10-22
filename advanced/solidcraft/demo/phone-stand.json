@@ -1,0 +1,663 @@
+{
+ "about": {
+  "design": "phone-stand",
+  "format": "solidcraft/30",
+  "replay": "solidcraft-cli eval script.json (timeline.add steps need a build that reads this design format)",
+  "version": "0.19.0"
+ },
+ "commands": [
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "70 mm",
+    "name": "width",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "80 mm",
+    "name": "base_depth",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "4 mm",
+    "name": "thickness",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "90 mm",
+    "name": "back_height",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "20 deg",
+    "name": "angle",
+    "unit": "deg"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "12 mm",
+    "name": "lip_height",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "parameters.add",
+   "params": {
+    "expression": "12 mm",
+    "name": "slot",
+    "unit": "mm"
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "id": 1,
+     "name": "BaseSketch",
+     "plane": {
+      "name": "YZ",
+      "type": "origin"
+     },
+     "sketch": {
+      "constraints": [
+       {
+        "id": "k1",
+        "l": 0,
+        "type": "horizontal"
+       },
+       {
+        "id": "k2",
+        "l": 2,
+        "type": "horizontal"
+       },
+       {
+        "id": "k3",
+        "l": 1,
+        "type": "vertical"
+       },
+       {
+        "id": "k4",
+        "l": 3,
+        "type": "vertical"
+       },
+       {
+        "id": "k5",
+        "p": 0,
+        "q": 1,
+        "type": "coincident"
+       },
+       {
+        "id": "k6",
+        "l": 1,
+        "param": "d1",
+        "type": "length",
+        "value": 4.0
+       },
+       {
+        "id": "k7",
+        "l": 0,
+        "param": "d2",
+        "type": "length",
+        "value": 80.0
+       }
+      ],
+      "counters": {
+       "k": 7,
+       "l": 4,
+       "p": 4
+      },
+      "curves": [
+       {
+        "a": 1,
+        "b": 2,
+        "construction": false,
+        "id": "l1",
+        "type": "line"
+       },
+       {
+        "a": 2,
+        "b": 3,
+        "construction": false,
+        "id": "l2",
+        "type": "line"
+       },
+       {
+        "a": 3,
+        "b": 4,
+        "construction": false,
+        "id": "l3",
+        "type": "line"
+       },
+       {
+        "a": 4,
+        "b": 1,
+        "construction": false,
+        "id": "l4",
+        "type": "line"
+       }
+      ],
+      "points": [
+       {
+        "fixed": true,
+        "id": "origin",
+        "pos": [
+         0.0,
+         0.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p1",
+        "pos": [
+         0.0,
+         0.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p2",
+        "pos": [
+         80.0,
+         0.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p3",
+        "pos": [
+         80.0,
+         4.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p4",
+        "pos": [
+         0.0,
+         4.0
+        ]
+       }
+      ]
+     },
+     "suppressed": false,
+     "type": "sketch"
+    },
+    "params": [
+     {
+      "expression": "thickness",
+      "name": "d1",
+      "unit": "mm"
+     },
+     {
+      "expression": "base_depth",
+      "name": "d2",
+      "unit": "mm"
+     }
+    ]
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "extent": {
+      "convention": "total_distance",
+      "direction": "symmetric",
+      "distance": "width"
+     },
+     "id": 2,
+     "name": "Base",
+     "operation": "new_body",
+     "param_names": [
+      "d3"
+     ],
+     "profiles": {
+      "type": "all"
+     },
+     "sketch": 1,
+     "suppressed": false,
+     "type": "extrude"
+    }
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "id": 3,
+     "name": "LipSketch",
+     "plane": {
+      "name": "YZ",
+      "type": "origin"
+     },
+     "sketch": {
+      "constraints": [
+       {
+        "id": "k1",
+        "l": 0,
+        "type": "horizontal"
+       },
+       {
+        "id": "k2",
+        "l": 2,
+        "type": "horizontal"
+       },
+       {
+        "id": "k3",
+        "l": 1,
+        "type": "vertical"
+       },
+       {
+        "id": "k4",
+        "l": 3,
+        "type": "vertical"
+       },
+       {
+        "id": "k5",
+        "l": 0,
+        "param": "d4",
+        "type": "length",
+        "value": 4.0
+       },
+       {
+        "id": "k6",
+        "l": 1,
+        "param": "d5",
+        "type": "length",
+        "value": 12.0
+       },
+       {
+        "c": 4,
+        "id": "k7",
+        "p": 1,
+        "type": "point_on_curve"
+       },
+       {
+        "id": "k8",
+        "p": 0,
+        "param": "d6",
+        "q": 1,
+        "type": "distance_y",
+        "value": 4.0
+       }
+      ],
+      "counters": {
+       "j": 1,
+       "k": 8,
+       "l": 5,
+       "p": 6
+      },
+      "curves": [
+       {
+        "a": 1,
+        "b": 2,
+        "construction": false,
+        "id": "l1",
+        "type": "line"
+       },
+       {
+        "a": 2,
+        "b": 3,
+        "construction": false,
+        "id": "l2",
+        "type": "line"
+       },
+       {
+        "a": 3,
+        "b": 4,
+        "construction": false,
+        "id": "l3",
+        "type": "line"
+       },
+       {
+        "a": 4,
+        "b": 1,
+        "construction": false,
+        "id": "l4",
+        "type": "line"
+       },
+       {
+        "a": 5,
+        "b": 6,
+        "construction": true,
+        "id": "l5",
+        "link": "j1",
+        "type": "line"
+       }
+      ],
+      "links": [
+       {
+        "id": "j1",
+        "kind": "project",
+        "source": {
+         "name": "y",
+         "type": "sketch_axis"
+        }
+       }
+      ],
+      "points": [
+       {
+        "fixed": true,
+        "id": "origin",
+        "pos": [
+         0.0,
+         0.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p1",
+        "pos": [
+         0.0,
+         4.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p2",
+        "pos": [
+         4.0,
+         4.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p3",
+        "pos": [
+         4.0,
+         16.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p4",
+        "pos": [
+         0.0,
+         16.0
+        ]
+       },
+       {
+        "fixed": true,
+        "id": "p5",
+        "link": "j1",
+        "pos": [
+         0.0,
+         -100.0
+        ]
+       },
+       {
+        "fixed": true,
+        "id": "p6",
+        "link": "j1",
+        "pos": [
+         0.0,
+         100.0
+        ]
+       }
+      ]
+     },
+     "suppressed": false,
+     "type": "sketch"
+    },
+    "params": [
+     {
+      "expression": "thickness",
+      "name": "d4",
+      "unit": "mm"
+     },
+     {
+      "expression": "lip_height",
+      "name": "d5",
+      "unit": "mm"
+     },
+     {
+      "expression": "thickness",
+      "name": "d6",
+      "unit": "mm"
+     }
+    ]
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "extent": {
+      "convention": "total_distance",
+      "direction": "symmetric",
+      "distance": "width"
+     },
+     "id": 4,
+     "name": "Lip",
+     "operation": "join",
+     "param_names": [
+      "d7"
+     ],
+     "profiles": {
+      "type": "all"
+     },
+     "sketch": 3,
+     "suppressed": false,
+     "type": "extrude"
+    }
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "id": 5,
+     "name": "BackSketch",
+     "plane": {
+      "name": "YZ",
+      "type": "origin"
+     },
+     "sketch": {
+      "constraints": [
+       {
+        "a": 0,
+        "b": 1,
+        "id": "k1",
+        "type": "perpendicular"
+       },
+       {
+        "a": 0,
+        "b": 2,
+        "id": "k2",
+        "type": "parallel"
+       },
+       {
+        "a": 1,
+        "b": 3,
+        "id": "k3",
+        "type": "parallel"
+       },
+       {
+        "id": "k4",
+        "p": 0,
+        "param": "d8",
+        "q": 1,
+        "type": "distance_x",
+        "value": 16.0
+       },
+       {
+        "id": "k5",
+        "p": 0,
+        "param": "d9",
+        "q": 1,
+        "type": "distance_y",
+        "value": 4.0
+       },
+       {
+        "id": "k6",
+        "l": 0,
+        "param": "d10",
+        "type": "length",
+        "value": 90.0
+       },
+       {
+        "id": "k7",
+        "l": 1,
+        "param": "d11",
+        "type": "length",
+        "value": 4.0
+       },
+       {
+        "id": "k8",
+        "p": 1,
+        "param": "d12",
+        "q": 2,
+        "type": "distance_x",
+        "value": 30.781812899310186
+       }
+      ],
+      "counters": {
+       "k": 8,
+       "l": 4,
+       "p": 4
+      },
+      "curves": [
+       {
+        "a": 1,
+        "b": 2,
+        "construction": false,
+        "id": "l1",
+        "type": "line"
+       },
+       {
+        "a": 2,
+        "b": 3,
+        "construction": false,
+        "id": "l2",
+        "type": "line"
+       },
+       {
+        "a": 3,
+        "b": 4,
+        "construction": false,
+        "id": "l3",
+        "type": "line"
+       },
+       {
+        "a": 4,
+        "b": 1,
+        "construction": false,
+        "id": "l4",
+        "type": "line"
+       }
+      ],
+      "points": [
+       {
+        "fixed": true,
+        "id": "origin",
+        "pos": [
+         0.0,
+         0.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p1",
+        "pos": [
+         16.0,
+         4.0
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p2",
+        "pos": [
+         46.78181289931018,
+         88.57233587073176
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p3",
+        "pos": [
+         50.54058338245382,
+         87.20425529742909
+        ]
+       },
+       {
+        "fixed": false,
+        "id": "p4",
+        "pos": [
+         19.75877048314362,
+         2.6319194266973267
+        ]
+       }
+      ]
+     },
+     "suppressed": false,
+     "type": "sketch"
+    },
+    "params": [
+     {
+      "expression": "thickness + slot",
+      "name": "d8",
+      "unit": "mm"
+     },
+     {
+      "expression": "thickness",
+      "name": "d9",
+      "unit": "mm"
+     },
+     {
+      "expression": "back_height",
+      "name": "d10",
+      "unit": "mm"
+     },
+     {
+      "expression": "thickness",
+      "name": "d11",
+      "unit": "mm"
+     },
+     {
+      "expression": "back_height * sin(angle)",
+      "name": "d12",
+      "unit": "mm"
+     }
+    ]
+   }
+  },
+  {
+   "command": "timeline.add",
+   "params": {
+    "feature": {
+     "extent": {
+      "convention": "total_distance",
+      "direction": "symmetric",
+      "distance": "width"
+     },
+     "id": 6,
+     "name": "BackRest",
+     "operation": "join",
+     "param_names": [
+      "d13"
+     ],
+     "profiles": {
+      "type": "all"
+     },
+     "sketch": 5,
+     "suppressed": false,
+     "type": "extrude"
+    }
+   }
+  }
+ ]
+}

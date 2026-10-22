@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "python3 -m dealscreener --listing: from pasted listing to PASS or FAIL",
+    "output": ".archify/sequence-listing-verdict-20261022-120000/listing-verdict.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://example.com/deal-screener.git",
+      "link_mode": "local-only",
+      "revision": "8661edcb52803533a8d6b3353bade8cf5085e2c3"
+    }
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "User", "sublabel": "terminal" },
+    { "id": "cli", "type": "backend", "label": "__main__", "sublabel": "run / listing_step",
+      "sources": [
+        { "path": "dealscreener/__main__.py", "line": 36, "end_line": 77, "label": "run" },
+        { "path": "dealscreener/__main__.py", "line": 80, "end_line": 113, "label": "listing_step" },
+        { "path": "dealscreener/__main__.py", "line": 202, "end_line": 206, "label": "entry point" }
+      ] },
+    { "id": "extract", "type": "backend", "label": "extract", "sublabel": "extract_listing",
+      "sources": [
+        { "path": "dealscreener/extract.py", "line": 102, "end_line": 114, "label": "make_client" },
+        { "path": "dealscreener/extract.py", "line": 126, "end_line": 154, "label": "extract_listing" }
+      ] },
+    { "id": "model", "type": "external", "label": "Claude Haiku 5.5", "sublabel": "Anthropic API",
+      "sources": [
+        { "path": "dealscreener/extract.py", "line": 16, "label": "MODEL" },
+        { "path": "dealscreener/extract.py", "line": 128, "end_line": 134, "label": "messages.create" }
+      ] },
+    { "id": "calc", "type": "backend", "label": "calculator", "sublabel": "analyse",
+      "sources": [
+        { "path": "dealscreener/calculator.py", "line": 50, "end_line": 84, "label": "analyse" }
+      ] },
+    { "id": "buybox", "type": "backend", "label": "buybox", "sublabel": "check / passes",
+      "sources": [
+        { "path": "dealscreener/buybox.py", "line": 24, "end_line": 34, "label": "check, passes" },
+        { "path": "dealscreener/buybox.py", "line": 9, "end_line": 12, "label": "thresholds" }
+      ] }
+  ],
+  "segments": [
+    { "from": 150, "to": 425, "label": "Paste and read" },
+    { "from": 435, "to": 575, "label": "Confirm" },
+    { "from": 580, "to": 755, "label": "Verdict" }
+  ],
+  "messages": [
+    { "id": "launch", "from": "user", "to": "cli", "y": 160, "label": "python3 -m dealscreener --listing", "variant": "emphasis" },
+    { "id": "env", "from": "cli", "to": "extract", "y": 196, "label": "load_env_file()", "variant": "default" },
+    { "id": "paste-prompt", "from": "cli", "to": "user", "y": 232, "label": "paste listing, then type done", "variant": "return" },
+    { "id": "paste", "from": "user", "to": "cli", "y": 268, "label": "listing text + done", "variant": "default" },
+    { "id": "extract-call", "from": "cli", "to": "extract", "y": 304, "label": "extract_listing(text, client)", "variant": "emphasis" },
+    { "id": "model-call", "from": "extract", "to": "model", "y": 340, "label": "messages.create (JSON schema)", "variant": "emphasis" },
+    { "id": "model-reply", "from": "model", "to": "extract", "y": 376, "label": "five numbers or null", "variant": "return" },
+    { "id": "values", "from": "extract", "to": "cli", "y": 412, "label": "values + token counts", "variant": "return" },
+    { "id": "confirm-prompt", "from": "cli", "to": "user", "y": 448, "label": "[from the listing: N]: Enter keeps", "variant": "return" },
+    { "id": "confirm", "from": "user", "to": "cli", "y": 484, "label": "Enter, or a corrected number", "variant": "emphasis" },
+    { "id": "loan-prompt", "from": "cli", "to": "user", "y": 520, "label": "loan questions", "variant": "return" },
+    { "id": "loan", "from": "user", "to": "cli", "y": 556, "label": "down %, rate, years, closing", "variant": "default" },
+    { "id": "analyse", "from": "cli", "to": "calc", "y": 592, "label": "analyse(Listing)", "variant": "emphasis" },
+    { "id": "results", "from": "calc", "to": "cli", "y": 628, "label": "Results", "variant": "return" },
+    { "id": "check", "from": "cli", "to": "buybox", "y": 664, "label": "check(results)", "variant": "default" },
+    { "id": "rules", "from": "buybox", "to": "cli", "y": 700, "label": "two RuleResults", "variant": "return" },
+    { "id": "verdict", "from": "cli", "to": "user", "y": 736, "label": "PASS/FAIL per rule + Overall", "variant": "emphasis" }
+  ],
+  "activations": [
+    { "participant": "cli", "from": 160, "to": 745, "type": "backend" },
+    { "participant": "extract", "from": 300, "to": 416, "type": "backend" },
+    { "participant": "model", "from": 336, "to": 380, "type": "external" },
+    { "participant": "calc", "from": 588, "to": 632, "type": "backend" },
+    { "participant": "buybox", "from": 660, "to": 704, "type": "backend" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Sources (local-only)",
+      "items": [
+        "Launch and --listing flag: __main__.py:202-206",
+        "Paste until 'done', 20,000-char cap: __main__.py:85-100",
+        "One model call, no retries: extract.py:126-134",
+        "Enter keeps the listing number: __main__.py:116-136"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Branches not drawn",
+      "items": [
+        "Empty paste, too long, or any failed call: every question is asked by hand (__main__.py:96-109)",
+        "Cash invested of $0 re-asks the loan questions (__main__.py:52-59)",
+        "Loan questions never use the model (__main__.py:51)"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Verdict rule",
+      "items": [
+        "Overall PASS only if every rule passes: buybox.py:32-34",
+        "Defaults: cash-on-cash 10% and cash flow $100/month: buybox.py:11-12",
+        "Printed at __main__.py:72-76"
+      ]
+    }
+  ]
+}

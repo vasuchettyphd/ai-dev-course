@@ -1,0 +1,107 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "app.py:download_attachment:send-file-path-traversal",
+    "title": "Path traversal in GET /attachments lets any logged-in user read arbitrary server-readable files",
+    "description": "GET /attachments (app.py:88-92) requires only a session user_id, then passes request.args['name'] unchanged into os.path.join(UPLOAD_DIR, name) and flask.send_file with no normalization or containment check. '../' segments leave uploads/ and an absolute name makes os.path.join discard UPLOAD_DIR. The sibling /avatars route uses send_from_directory (app.py:97), which is the contained variant. A verifier read Flask 3.1.3 helpers.send_file and Werkzeug 3.1.9 utils.send_file in a local uv cache and found no safe_join on this path, but the behavior was not observed running. Impact if confirmed: read of any file the server process can read, including notes.db (plaintext passwords, seed.py:13). Suggested fix: use send_from_directory(UPLOAD_DIR, name) or werkzeug.security.safe_join with abort(404) on None; regression cases ?name=../notes.db and an absolute path must both return 404.",
+    "claimed_root_cause": "The user-controlled query parameter 'name' is joined onto UPLOAD_DIR and passed to send_file without containment or normalization.",
+    "trace": [
+      {"kind": "entrypoint", "file": "app.py", "line": 88, "scope": "download_attachment (GET /attachments)", "description": "Route reachable by any client with a valid session cookie; current_user() at line 90 checks only that user_id exists."},
+      {"kind": "propagation", "file": "app.py", "line": 91, "scope": "download_attachment", "description": "name is read from the query string with no validation, allow-list, or basename stripping."},
+      {"kind": "propagation", "file": "app.py", "line": 92, "scope": "download_attachment", "description": "os.path.join(UPLOAD_DIR, name) does not contain the path: '../' segments escape and an absolute name replaces UPLOAD_DIR."},
+      {"kind": "sink", "file": "app.py", "line": 92, "scope": "send_file(...) in download_attachment", "description": "send_file opens and streams the resulting path; the library read by the verifier adds no containment on this call."}
+    ],
+    "evidence": [
+      {"file": "app.py", "line": 90, "description": "The only gate is current_user(), a session presence check with no ownership or role logic."},
+      {"file": "app.py", "line": 92, "description": "Unsanitized os.path.join(UPLOAD_DIR, name) is passed directly to send_file."},
+      {"file": "app.py", "line": 97, "description": "Contrast: /avatars uses send_from_directory, which applies safe_join; /attachments does not."},
+      {"file": "seed.py", "line": 13, "description": "users table stores plaintext passwords in notes.db, one '../' from UPLOAD_DIR, a concrete traversal target."}
+    ],
+    "blockers": [
+      "No verified OS-enforced sandbox on this host, so no target code was run and no observed result exists.",
+      "Library behavior was read from a uv-cache copy of Flask 3.1.3 / Werkzeug 3.1.9 source, not observed running; that these are the versions that run this app is not established.",
+      "Process filesystem permissions and any front-end that normalizes '../' or rejects absolute names are not visible from source."
+    ],
+    "validation_plan": {
+      "local": "In a scratch copy of the repo, run seed.py to create notes.db and uploads/welcome.txt. From a separate script directory, run python -I with the already-installed Flask and use app.test_client() with no network. Control: GET /attachments?name=welcome.txt with no session expects 401; after POST /login as alice, expects 200 with the welcome text. Test: GET /attachments?name=../notes.db expects 200 with a body beginning 'SQLite format 3' if the bug is real, and GET with the absolute path of the copy's seed.py expects 200. Contrast: GET /avatars/..%2Fnotes.db expects 404. After applying send_from_directory, the two traversal requests must return 404."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "app.py:get_invoice:missing-owner-check-idor",
+    "title": "Invoice endpoint lacks an ownership check: any logged-in user can read any invoice by id",
+    "description": "GET /invoices/<int:invoice_id> calls current_user() at app.py:78 and discards the result, queries invoices by id alone (app.py:79-82), and returns id, owner_id, customer and amount_cents (app.py:85). From the seed data, alice (id 1) could request /invoices/2 and read bob's Globex invoice (seed.py:20). The verifier found no decorator, before_request hook, or role/tenant logic that binds ownership, and no sharing model that would make cross-user access intended. The path is plain application logic, so source establishes it; only the observed local result is missing. Suggested fix: user_id = current_user() and query 'WHERE id = ? AND owner_id = ?' with 404 on no match; regression case: alice requesting invoice 2 gets 404.",
+    "claimed_root_cause": "get_invoice discards the authenticated user id returned by current_user() and selects the invoice by primary key alone, so there is no owner_id = session user predicate.",
+    "trace": [
+      {"kind": "entrypoint", "file": "app.py", "line": 76, "scope": "get_invoice (GET /invoices/<int:invoice_id>)", "description": "Route reachable by any logged-in low-privilege user; invoice_id is attacker-chosen and cast to int by Flask."},
+      {"kind": "propagation", "file": "app.py", "line": 78, "scope": "get_invoice", "description": "current_user() aborts 401 only when no session user_id exists; its return value is discarded, so identity is never bound to the query."},
+      {"kind": "propagation", "file": "app.py", "line": 79, "scope": "get_invoice", "description": "Parameterized query with id as the only predicate (app.py:80-81) and no owner_id filter."},
+      {"kind": "sink", "file": "app.py", "line": 85, "scope": "get_invoice", "description": "jsonify(dict(row)) returns the matched invoice, including owner_id, regardless of who owns it."}
+    ],
+    "evidence": [
+      {"file": "app.py", "line": 78, "description": "current_user() is called as a bare statement, unlike list_notes (app.py:58) and search_notes (app.py:69), which assign and use user_id."},
+      {"file": "app.py", "line": 80, "description": "The SQL selects from invoices WHERE id = ? with no owner_id condition."},
+      {"file": "seed.py", "line": 20, "description": "Invoice 1 belongs to user 1 and invoice 2 to user 2, giving a cross-user test pair."}
+    ],
+    "blockers": [
+      "No verified OS-enforced sandbox on this host, so no target code was run and no bounded local reproduction was observed. Source review found no refuting control."
+    ],
+    "validation_plan": {
+      "local": "In a scratch copy, run seed.py, then use python -I with the already-installed Flask and app.test_client() (no network). POST /login as alice/alice-pw; GET /invoices/1 expects 200 with owner_id 1; GET /invoices/2 expects 200 with {id 2, owner_id 2, customer Globex, amount_cents 990000} if the bug is real, while a 403/404 would refute it. Control: an unauthenticated client GET /invoices/2 expects 401. After the owner-scoped query fix, alice requesting invoice 2 must return 404."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "app.py:search_notes:sql-interpolation",
+    "title": "SQL injection in GET /notes/search: unparameterized q can escape the owner filter and read other tables",
+    "description": "search_notes reads q (app.py:70) and interpolates it into a LIKE literal with an f-string (app.py:71), then runs it with no bound parameters (app.py:72) and returns rows as JSON (app.py:73). A quote in q can close the literal and remove the owner_id scope, and the two-column shape (id, title) admits a two-column UNION against other tables, including users (plaintext passwords, seed.py:13-16). user_id comes from the signed session and is not request-controlled here. sqlite3 execute() allows one statement, so impact is read access via OR/UNION, not stacked writes. Exact payload behavior was inferred from SQLite semantics and the seed schema, not observed. Suggested fix: bind both values, 'WHERE owner_id = ? AND title LIKE ?' with (user_id, f'%{q}%'); regression: q=\"' OR '1'='1\" returns only the caller's rows.",
+    "claimed_root_cause": "User-controlled q is concatenated into the SQL text by an f-string at app.py:71 instead of being passed as a bound parameter, so SQL syntax in q changes the query structure including the owner_id predicate.",
+    "trace": [
+      {"kind": "entrypoint", "file": "app.py", "line": 68, "scope": "search_notes (GET /notes/search, registered at line 67)", "description": "Reachable by any caller holding a valid session; current_user() at line 69 aborts only when user_id is missing."},
+      {"kind": "propagation", "file": "app.py", "line": 70, "scope": "search_notes", "description": "q = request.args.get('q', '') takes the raw value with no validation, length limit, or escaping."},
+      {"kind": "propagation", "file": "app.py", "line": 71, "scope": "search_notes", "description": "f-string builds the SQL with q inside a single-quoted LIKE literal, so a quote ends the literal and the rest of q parses as SQL."},
+      {"kind": "sink", "file": "app.py", "line": 72, "scope": "search_notes", "description": "db().execute(sql) runs the interpolated string with no parameters; rows are returned by jsonify at line 73."}
+    ],
+    "evidence": [
+      {"file": "app.py", "line": 71, "description": "q is interpolated inside LIKE '%...%', unlike the bound parameters at lines 47, 61-62 and 80-81."},
+      {"file": "app.py", "line": 69, "description": "The only control is current_user(), which does no input filtering."},
+      {"file": "app.py", "line": 73, "description": "Result rows are returned as JSON, so UNION-selected data would be directly visible."},
+      {"file": "seed.py", "line": 13, "description": "users has id, username, password, which fits a two-column UNION against SELECT id, title."}
+    ],
+    "blockers": [
+      "No verified OS-enforced sandbox on this host, so target code was not run and no bounded local reproduction was performed.",
+      "Exact UNION/OR payload results (column count, type affinity, comment handling, JSON output) are inferred from SQLite semantics and the seed schema, not observed."
+    ],
+    "validation_plan": {
+      "local": "In a scratch copy, run seed.py to create a throwaway notes.db, then use python -I with the already-installed Flask and app.test_client() (no network). Log in as alice/alice-pw. Baseline: GET /notes/search?q=Alice returns only note 1. Scope bypass: q = \"zzz%' OR owner_id=2 --\" returns 'Bob secret plans' if the bug is real. UNION: q = \"zzz%' UNION SELECT id, username||':'||password FROM users --\" returns 'alice:alice-pw' and 'bob:bob-pw' if real. Repeat both after the bound-parameter fix; each must return an empty list. Do not run destructive payloads."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "app.py:secret_key:hardcoded-session-signing-key",
+    "title": "Hardcoded Flask session-signing key would allow forging a session cookie for any user_id",
+    "description": "app.py:17 sets app.secret_key to a literal string, with no environment or config override (the only environment read is PORT at app.py:101). current_user() (app.py:36-40) accepts any session['user_id'] once Flask's signed cookie verifies, with no server-side session record or other credential. Anyone who can read the source could therefore sign a cookie for user_id 1 or 2 (seed.py:16) and pass every current_user() gate (/notes, /notes/search, /invoices/<id>, /attachments) without calling /login. The docstring (app.py:3-4) says demo-only and the bind is 127.0.0.1 (app.py:101); those are context, not mitigations. Flask's signing behavior was stated from general knowledge and not read from installed source by this verifier. Suggested fix: load the key from a per-deployment secret (fail startup if absent, at least 32 random bytes) and rotate the committed value; consider server-side sessions for revocation.",
+    "claimed_root_cause": "The session-signing secret is a constant committed to source, so the cookie signature gives no authentication guarantee against anyone holding the code.",
+    "trace": [
+      {"kind": "entrypoint", "file": "app.py", "line": 17, "scope": "module level, app.secret_key assignment", "description": "The signing key is a literal in source with no override; an anonymous client holding the source knows it."},
+      {"kind": "propagation", "file": "app.py", "line": 37, "scope": "current_user", "description": "session.get('user_id') reads identity from the cookie once the signature verifies against the known key."},
+      {"kind": "propagation", "file": "app.py", "line": 58, "scope": "list_notes", "description": "current_user() returns the cookie-chosen user_id with no further authentication."},
+      {"kind": "sink", "file": "app.py", "line": 60, "scope": "list_notes", "description": "The notes query runs with owner_id equal to the forged user_id, returning that user's notes."}
+    ],
+    "evidence": [
+      {"file": "app.py", "line": 17, "description": "app.secret_key is assigned a literal constant."},
+      {"file": "app.py", "line": 36, "description": "current_user() trusts session['user_id'] and only aborts 401 when it is absent."},
+      {"file": "seed.py", "line": 16, "description": "Known user ids: alice = 1, bob = 2."},
+      {"file": "app.py", "line": 101, "description": "The only environment read is PORT; the key is never overridden."}
+    ],
+    "blockers": [
+      "No verified OS-enforced sandbox on this host, so no code was run and no bounded local reproduction was observed.",
+      "Flask/itsdangerous SecureCookieSessionInterface behavior was not read from installed source by this verifier, so cookie acceptance is unverified.",
+      "Exploitation requires the attacker to know the key, i.e. read access to the source; who can read the repository is a deployment fact not determinable from source."
+    ],
+    "validation_plan": {
+      "local": "In a scratch copy, run seed.py, then with the already-installed Flask build a cookie in a separate script (a = Flask('x'); a.secret_key = <the literal from app.py:17>; c = a.session_interface.get_signing_serializer(a).dumps({'user_id': 2})). Using app.test_client() with no network and no prior login, send GET /notes with that cookie: HTTP 200 containing 'Bob secret plans' would confirm it. Control: a cookie signed with a different key must return 401.",
+      "deployment": "The owner can confirm whether any running instance uses the committed value by checking its configured SECRET_KEY, or by rotating the key and confirming old cookies are rejected; no audit traffic should be sent to a deployment."
+    }
+  }
+]

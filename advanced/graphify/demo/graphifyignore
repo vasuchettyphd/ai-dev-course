@@ -1,0 +1,17 @@
+# Copied into the practice project as .graphifyignore by setup.sh.
+# Keeps the demo small and cheap: the long tutorial write-ups and the eval
+# fixtures are skipped, so the graph covers the app code, its tests, the
+# plan, the bug list, the landlord notes and the two sample listings.
+README.md
+DEMO.md
+FINAL.md
+REVIEW.md
+FEEDBACK.md
+Dockerfile
+.dockerignore
+.env.example
+docs/
+evals/
+# Claude Code setup files (the graphify skill itself, the reviewer agents)
+.claude/
+CLAUDE.md

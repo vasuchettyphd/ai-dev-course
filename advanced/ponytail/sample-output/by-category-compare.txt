@@ -1,0 +1,38 @@
+=================== baseline ===================
+--- lines changed (git diff --stat) ---
+ test_tracker.py | 28 +++++++++++++++++++++++++++-
+ tracker.py      | 24 +++++++++++++++++++++++-
+ 2 files changed, 50 insertions(+), 2 deletions(-)
+--- file sizes now (starter: tracker.py 57, test_tracker.py 26) ---
+  52 ./test_tracker.py
+  79 ./tracker.py
+ 131 total
+--- tests ---
+Ran 7 tests in 0.003s
+
+OK
+--- python3 tracker.py by-category --month 2026-09 ---
+rent            $950.00
+groceries       $164.15
+eating out       $50.50
+transport         $5.50
+
+=================== ponytail ===================
+--- lines changed (git diff --stat) ---
+ test_tracker.py | 23 ++++++++++++++++++++++-
+ tracker.py      | 22 +++++++++++++++++++++-
+ 2 files changed, 43 insertions(+), 2 deletions(-)
+--- file sizes now (starter: tracker.py 57, test_tracker.py 26) ---
+  47 ./test_tracker.py
+  77 ./tracker.py
+ 124 total
+--- tests ---
+Ran 6 tests in 0.003s
+
+OK
+--- python3 tracker.py by-category --month 2026-09 ---
+rent            $950.00
+groceries       $164.15
+eating out       $50.50
+transport         $5.50
+

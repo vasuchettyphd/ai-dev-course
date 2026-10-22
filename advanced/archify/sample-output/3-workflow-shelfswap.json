@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "ShelfSwap: sell, pay, hand off, refund",
+    "quality_profile": "showcase",
+    "output": ".archify/workflow-shelfswap-20261022-120000/shelfswap-workflow.html"
+  },
+  "lanes": [
+    { "id": "seller", "label": "Seller" },
+    { "id": "buyer", "label": "Buyer" },
+    { "id": "app", "label": "ShelfSwap app" },
+    { "id": "money", "label": "Held money", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "list", "label": "List the book", "fromCol": 0, "toCol": 3 },
+    { "id": "buy", "label": "Buy and hand off", "fromCol": 4, "toCol": 5, "variant": "emphasis" }
+  ],
+  "groups": [
+    { "id": "refund_branch", "label": "7-day refund branch", "lane": "money", "fromCol": 3, "toCol": 4, "variant": "security" }
+  ],
+  "mainPath": ["scan", "lookup", "price_gate", "listing", "search", "pay", "meet", "confirm", "release"],
+  "nodes": [
+    { "id": "scan", "lane": "seller", "col": 0, "type": "frontend", "label": "Scan barcode", "sublabel": "photo in web app", "icon": "start" },
+    { "id": "price_gate", "lane": "seller", "col": 2, "type": "security", "label": "Gate 1: price", "sublabel": "accept or change", "tag": "seller approves", "icon": "decision" },
+    { "id": "search", "lane": "buyer", "col": 3, "type": "frontend", "label": "Search course", "sublabel": "e.g. ACC 2010" },
+    { "id": "pay", "lane": "buyer", "col": 4, "type": "frontend", "label": "Pay by card", "sublabel": "in the app" },
+    { "id": "meet", "lane": "buyer", "col": 5, "type": "external", "label": "Meet at library", "sublabel": "hand-off shelf", "icon": "person" },
+    { "id": "lookup", "lane": "app", "col": 1, "type": "backend", "label": "Book lookup", "sublabel": "title, new price, ask 40%" },
+    { "id": "listing", "lane": "app", "col": 3, "type": "backend", "label": "Listing live", "sublabel": "visible to buyers", "icon": "active" },
+    { "id": "confirm", "lane": "app", "col": 5, "type": "security", "label": "Gate 2: hand-off", "sublabel": "buyer scans seller code", "tag": "both present", "icon": "decision" },
+    { "id": "refund", "lane": "money", "col": 3, "type": "security", "label": "Full refund", "sublabel": "buyer paid back", "icon": "failure" },
+    { "id": "escrow", "lane": "money", "col": 4, "type": "database", "label": "Funds held", "sublabel": "not yet with seller", "icon": "waiting" },
+    { "id": "release", "lane": "money", "col": 5, "type": "cloud", "label": "Pay seller", "sublabel": "minus 10% fee", "icon": "success" }
+  ],
+  "edges": [
+    { "id": "e1", "from": "scan", "to": "lookup", "label": "barcode", "variant": "default" },
+    { "id": "e2", "from": "lookup", "to": "price_gate", "label": "suggested price", "variant": "emphasis" },
+    { "id": "e3", "from": "price_gate", "to": "listing", "label": "approved", "variant": "security" },
+    { "id": "e4", "from": "listing", "to": "search", "variant": "default" },
+    { "id": "e5", "from": "search", "to": "pay", "label": "choose", "variant": "emphasis" },
+    { "id": "e6", "from": "pay", "to": "escrow", "label": "charge", "variant": "default" },
+    { "id": "e7", "from": "pay", "to": "meet", "variant": "emphasis" },
+    { "id": "e8", "from": "meet", "to": "confirm", "label": "scan code", "variant": "emphasis" },
+    { "id": "e9", "from": "confirm", "to": "release", "label": "confirmed", "variant": "security" },
+    { "id": "e10", "from": "escrow", "to": "release", "variant": "dashed", "role": "async" },
+    { "id": "e11", "from": "escrow", "to": "refund", "label": "no confirm in 7 days", "variant": "security", "role": "error" },
+    { "id": "e12", "from": "refund", "to": "listing", "label": "relist", "variant": "dashed", "role": "return" }
+  ],
+  "cards": [
+    { "dot": "rose", "title": "Approval gates", "items": ["Gate 1: seller accepts or edits the 40% price before going live", "Gate 2: money moves only after the hand-off scan"] },
+    { "dot": "cyan", "title": "Refund branch", "items": ["No confirmation within 7 days: buyer refunded in full, listing goes back up"] }
+  ]
+}

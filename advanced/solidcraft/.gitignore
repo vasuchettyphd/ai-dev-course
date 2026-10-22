@@ -1,0 +1,17 @@
+# Made by demo/setup.sh: the downloaded program and the practice folder
+demo/bin/
+demo/practice/
+# Anything a run generates inside demo/ (sample-output/ is tracked on purpose)
+demo/**/*.step
+demo/**/*.stp
+demo/**/*.stl
+demo/**/*.3mf
+demo/**/*.solidcraft
+demo/**/*.bak
+demo/**/*.png
+.env
+.env.*
+!.env.example
+node_modules/
+.venv/
+__pycache__/

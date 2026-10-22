@@ -62,6 +62,20 @@ Optional, for after the core course or for extra credit. Each one stands alone.
 | [`/grill-me` and Superpowers in depth](advanced/grill-me-superpowers/) | The full rental deal screener walkthrough | Claude Code |
 | [Beads](advanced/beads/) | Keep an agent's task list across sessions (optional in week 5) | Python 3.10+, git, Claude Code (about $1-2 of model usage) |
 
+### Seven add-ins tour
+
+One lesson day, seven add-ins for Claude Code: five are skills, and SolidCraft and xerj are MCP servers that come with skills. Each folder has its own demo and stands alone, so do them in any order.
+
+| Topic | What you learn | You need |
+|---|---|---|
+| [Security audit](advanced/security-audit/) | Run Cloudflare's security-audit skill on a deliberately leaky app and grade it against an answer key | git, Node 22.20+, uv or Python 3.10+, Claude Code (about $2 of model usage) |
+| [Ponytail](advanced/ponytail/) | Make the agent write less code, and measure whether it did | Python 3.10+, git, curl, Claude Code (about $0.30) |
+| [SolidCraft](advanced/solidcraft/) | Design a parametric 3D part by talking to a CAD app over MCP, then export STL and STEP | Linux or WSL (macOS untested), git, curl, Claude Code (about $0.35) |
+| [Anatomy](advanced/anatomy/) | Explain an idea as an interactive isometric machine figure | git, Node 22.20+, Claude Code, Chrome optional (about $1.30) |
+| [xerj](advanced/xerj/) | Give the agent a local search engine and memory over MCP, and compare it with plain grep | Linux, macOS or WSL, git, curl, Claude Code (under $0.50) |
+| [graphify](advanced/graphify/) | Turn a project into a knowledge graph the agent can query | git, uv, Claude Code (about $0.80) |
+| [Archify](advanced/archify/) | Generate architecture, sequence and workflow diagrams from code or a plain description | git, Node 22.20+, Chrome or Chromium (inside Linux on WSL), Claude Code (about $0.90) |
+
 ## History
 
 The advanced tutorials started as separate repositories and keep their full commit history here. Run `git log --graph --oneline` to see each tutorial's original commits join the course.

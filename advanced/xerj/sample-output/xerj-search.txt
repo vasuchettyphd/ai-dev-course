@@ -1,0 +1,39 @@
+xerj search: these hits are lexical; this command does not consult the embedding.
+
+─── 09-calling-a-model/assignment.md:1  (score 11.60)
+    # Week 9 assignment: Calling a model from code
+    
+    ## What to do
+    
+    Follow the [week 9 README](README.md) on your own laptop, in your private `semester-project` repo, and collect four things.
+    
+    **(a) Your m
+    … (--full 400 to see more)
+
+─── 06-reviewing-code/slides.pdf page 8  (score 11.41)
+    A reviewer file: does-it-work.md
+    
+    ---name: does-it-work description: Use after a build to check that the code gives the right answers and has good tests. Only reports problems; never changes files.too
+    … (--full 400 to see more)
+
+─── 14-final-demos/slides.pdf page 15  (score 10.46)
+    Fourteen weeks
+    
+    From "what is a model?" to a tested, reviewed, evaluated and secured AI feature, merged
+    through pull requests.
+    
+    Thank you, and good luck with your demos.
+
+─── 12-evaluation/README.md:103  (score 10.45)
+    `--all` run, on the very same listing, it answered `null`. **The same input got two different answers in two runs.** That's why you run an evaluation more than once, and why one good run proves little
+    … (--full 400 to see more)
+
+─── 14-final-demos/slides.md:132  (score 10.42)
+    - Click every link
+    ---
+    ## Heading 6 matters most
+    > Claude Code wrote nearly all of the code, the tests, the evaluation cases and most of the text in this folder, working from plans that I approved
+    - W
+    … (--full 400 to see more)
+
+5 passage(s) from 'course-*'. Cite ax_path:line (ax_path#locator for a data row) for anything you rely on.

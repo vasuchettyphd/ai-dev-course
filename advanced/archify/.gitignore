@@ -1,0 +1,15 @@
+# Practice copies made by demo/setup.sh
+demo/practice/
+# Archify working folders and receipts
+.archify/
+*.finalize-summary.json
+*.browser-check.json
+# Usual suspects
+.env
+node_modules/
+__pycache__/
+.venv/
+venv/
+bin/
+*.png
+*.webm
