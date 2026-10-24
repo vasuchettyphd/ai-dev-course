@@ -11,7 +11,7 @@ Turn `ai-dev-course` from six standalone advanced tutorials into a full 14-week 
 ## Audience and constraints
 
 - **Students:** business and other non-CS majors, with little or no coding. They want to build useful tools, not become software engineers. All material uses plain language and shows every command.
-- **Format:** a semester of weekly sessions. 14 teaching weeks, plus one buffer week in a roughly 15-week UVU semester.
+- **Format:** a semester of weekly sessions. 14 teaching weeks, plus one buffer week in a roughly 15-week UVU semester. Amended 2026-10-24, see "Session schedule" below.
 - **Student cost:** each student buys Claude Pro (about $20/month), which covers Claude Code. Weeks 9-11 call a model from the student's own code, which Pro does not cover, so students also need about $5 of one-time API credit. The syllabus states both costs up front.
 - **Platforms:** macOS and Windows (via WSL). Steps that can only be tested on WSL are marked "untested on native Windows" until someone confirms them.
 - **Visibility:** the course repo is public. Instructor notes and answer keys go in a separate private repo.
@@ -37,6 +37,18 @@ Turn `ai-dev-course` from six standalone advanced tutorials into a full 14-week 
 | 14 | Final demos | Presentations | Demo and a short write-up |
 
 **Advanced topics** come after the core weeks and are optional extra credit or further study: dbt, running a local LLM in Docker, Jev, the Wordle agent, `/grill-me` and Superpowers in depth, and Beads. Week 12 uses Jev as its case study, and Beads is offered as an optional extra in week 5.
+
+## Session schedule (amended 2026-10-24)
+
+The class meets on Thursdays in Spring 2027, 2.5 hours a session, twice the 75 minutes the weeks were written for. The 14 week folders stay as they are (folder names, example-project tags and links don't change); the root README maps them to 14 sessions:
+
+- Session 1 does week 1 (shortened) and nearly all the setup: week 2 and week 3 steps 1 to 4. Pro, WSL and a GitHub account are done before it.
+- Session 2 is week 3 steps 5 to 9 and week 4. Session 5 is week 7 and the in-class part of week 8 (the peer demo). Weeks 6 and 7 are not paired, because week 7's review needs week 6's reviewers on `main`.
+- Weeks 5, 6 and 9 to 13 each keep a session to themselves, and use the extra time as supervised work time.
+- Session 11 is the seven add-ins tour; session 12 is the Wordle agent, then Beads or dbt. Neither is graded.
+- One buffer session (catch-up and rehearsal) comes before demo day. Spring break (Mar 15 to 21) has no class.
+
+Session-by-session timing is in the instructor repo's `sessions.md`.
 
 ## Repository layout
 
