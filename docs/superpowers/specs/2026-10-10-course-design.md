@@ -45,7 +45,7 @@ The class meets on Thursdays in Spring 2027, 2.5 hours a session, twice the 75 m
 - Session 1 does week 1 (shortened) and nearly all the setup: week 2 and week 3 steps 1 to 4. Pro, WSL and a GitHub account are done before it.
 - Session 2 is week 3 steps 5 to 9 and week 4. Session 5 is week 7 and the in-class part of week 8 (the peer demo). Weeks 6 and 7 are not paired, because week 7's review needs week 6's reviewers on `main`.
 - Weeks 5, 6 and 9 to 13 each keep a session to themselves, and use the extra time as supervised work time.
-- Session 11 is the seven add-ins tour; session 12 is the Wordle agent, then Beads or dbt. Neither is graded.
+- Session 11 is the seven add-ins tour; session 12 is the Wordle agent, then Beads or dbt. Together they are one 10-point grade: 5 points for each of two advanced topics tried.
 - One buffer session (catch-up and rehearsal) comes before demo day. Spring break (Mar 15 to 21) has no class.
 
 Session-by-session timing is in the instructor repo's `sessions.md`.

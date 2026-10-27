@@ -58,7 +58,7 @@ In week 4 you choose a small tool to build, something useful for your work, stud
 
 ## Grading
 
-Weeks 1-13 each have a 10-point assignment with a rubric in that week's `assignment.md`. When a session covers two week folders, both assignments are due; the course site gives each due date. The final project in week 14 is worth 30 points. The two advanced sessions have no graded assignment.
+Weeks 1-13 each have a 10-point assignment with a rubric in that week's `assignment.md`. When a session covers two week folders, both assignments are due; the course site gives each due date. The final project in week 14 is worth 30 points. The two advanced sessions (11 and 12) share one 10-point grade: try two advanced topics, 5 points each. For each, hand in a screenshot of it working and two or three sentences on what it did well and what it got wrong. Any two count: the ones done in class are fine.
 
 ## Advanced topics
 
