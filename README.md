@@ -75,7 +75,7 @@ Each one stands alone. Sessions 11 and 12 teach the seven add-ins tour, the Word
 
 ### Seven add-ins tour
 
-One lesson day, seven add-ins for Claude Code: five are skills, and SolidCraft and xerj are MCP servers that come with skills. Each folder has its own demo and stands alone, so do them in any order. Security audit, Anatomy and Archify need Node.js 22.20 or later, which no earlier week installs: check with `node --version`, and if it's missing or older, follow [week 5, step 3d](weeks/05-building-with-ai/#3-pick-your-tools) before session 11.
+One lesson day, seven add-ins for Claude Code: five are skills, and SolidCraft and xerj are MCP servers that come with skills. Each folder has its own demo and stands alone, so do them in any order. Security audit, Anatomy and Archify need Node.js 22.20 or later, which you may not have: week 5 installs it only if Claude chose Node for your project. Check with `node --version`, and if it's missing or older, follow [week 5, step 3d](weeks/05-building-with-ai/#3-pick-your-tools) before you try one of them.
 
 | Topic | What you learn | You need |
 |---|---|---|
