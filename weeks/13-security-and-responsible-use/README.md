@@ -17,6 +17,8 @@ You need:
 - Weeks 9 to 12 done: an AI feature in your `semester-project`, your keys in `.env`, the `Read(./.env)` deny rule, your week 12 evaluation script, and the course repo's `example-project` set up with its `.venv` and `.env` (week 10 step 4a).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
+**On the Gemini path** (no API credit, set up in week 9; see [week 9's Gemini page](../09-calling-a-model/gemini.md)): your feature keeps running on Google's free tier, so this week is the same, with three differences. The deal screener's run in step 3a needs a Claude key: read the course's results in step 3b instead. Your hostile cases go to Google, where human reviewers may read them, so make them up: course-safe only. Report each run's cost as $0 (free tier) with its token counts. If you hit a free-tier limit (error 429), wait and run again, and don't add billing.
+
 "Your terminal" means **Terminal** on a Mac (Apple chip or Intel) and the **Ubuntu window** on Windows; the commands are the same on all three. On Windows, stay in your Ubuntu home folder (paths start `/home/<you>/`, never `C:\`). As in weeks 11 and 12, start Claude Code only in a window where no key is loaded.
 
 ### How you'll work this week

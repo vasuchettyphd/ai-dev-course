@@ -4,6 +4,8 @@
 
 Follow the [week 9 README](README.md) on your own laptop, in your private `semester-project` repo, and collect four things.
 
+On the [Gemini path](gemini.md)? Read its [hand-in differences](gemini.md#hand-in-differences) too.
+
 **(a) Your merged AI feature.** The address of the merged pull request from your `ai-feature` branch (README steps 5 to 7). Its **Files changed** must show:
 
 - the feature's code, with the key read only from the environment;

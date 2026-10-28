@@ -19,6 +19,8 @@ You need:
 - **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
+**On the Gemini path** (no Anthropic credit, agreed with your instructor in week 9)? Use [week 11 on the Gemini path](gemini.md) alongside this page.
+
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows. Claude Code and your MCP server both run there; on Windows, nothing this week goes in PowerShell.
 
 ### How you'll work this week
