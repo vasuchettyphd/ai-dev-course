@@ -15,6 +15,7 @@ The material comes in 14 week folders. Follow each week's README from inside its
 
 - **Claude Pro, about $20/month**, for Claude Code. Week 2 walks you through signing up.
 - **About $5 of one-time API credit**, used in weeks 9-14 (and the Wordle agent session) when your own code calls a model (each call costs a fraction of a cent). Claude Pro doesn't cover this.
+  If you have no way to pay for it, tell your instructor before week 9. The department may cover it; if not, you'll do weeks 9 to 12 on the **Gemini path** (Google's free tier, 18 or older; each of those weeks has a `gemini.md` page), with the same assignments and grading.
 
 Some advanced topics need their own API key and credit, beyond the costs above; the table under Advanced topics says which. Keep API keys in a `.env` file: the course's `.gitignore` keeps `.env` files out of commits.
 

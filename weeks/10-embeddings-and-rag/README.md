@@ -16,6 +16,7 @@ You need:
 
 - Week 9 done: your AI feature merged into `main` of your **private** `semester-project`, your Anthropic key in `~/semester-project/.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, and `~/first-call/.venv` from week 9 step 3.
 - A Google account that can use Google AI Studio (step 2a explains which). Google's terms say "You must be 18 years of age or older to use the APIs."
+- On the **Gemini path** (you got your Google key in week 9 instead of buying API credit)? You have one key, not two, and only the answer step changes: follow [week 10 on the Gemini path](gemini.md) alongside this page.
 - A few **course-safe documents** for your project (step 5c says what that means).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 

@@ -17,6 +17,8 @@ You need:
 - Weeks 9 to 11 done: an AI feature in your `semester-project` (week 9, 10 or 11), your keys in `.env`, the `Read(./.env)` deny rule, and the course repo's `example-project` set up with its `.venv` and `.env` (week 10 step 4a).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
+On the **Gemini path** (no paid API credit, set up in week 9)? Almost everything is the same: read [week 12 on the Gemini path](gemini.md) first for the few differences.
+
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows. As in week 11, start Claude Code only in a window where no key is loaded. The commands are the same on a Mac with an Apple chip, an Intel Mac and Windows; on Windows, stay in your Ubuntu home folder (paths start `/home/<you>/`, never `C:\`).
 
 ### How you'll work this week

@@ -4,6 +4,8 @@
 
 Follow the [week 12 README](README.md) on your own laptop, in your private `semester-project` repo, and collect three things.
 
+On the Gemini path? Read [week 12 on the Gemini path](gemini.md) too: the hand-in is the same, with costs reported as $0 plus token counts.
+
 **(a) Your test set.** The link to your 20 test cases, their expected answers (each with a one-line reason) and your written scoring rule, on `main` after the merge. Five cases are marked held out. Course-safe data only. In the pull request's **Commits** tab, the commit that adds them must come **before** your evaluation script (merge with "Create a merge commit" this week, so `main` keeps that order too).
 
 **(b) Your merged evaluation script.** The address of the merged pull request from your `eval` branch. Its **Files changed** must show the script, its offline tests (a fake model, including a miss and an error), the saved results files and `REVIEW.md` with the week 12 section. **No `.env` and no real key** anywhere, including the results files.

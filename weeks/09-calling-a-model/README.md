@@ -19,6 +19,7 @@ You need:
 - Superpowers (week 5), your week 6 reviewers in `.claude/agents/`, and Docker Desktop (week 7).
 - Python 3.10 or newer for step 3 (step 3a shows how to check). On a Mac, Apple's own Python is often 3.9, which is too old for the `anthropic` package.
 - A way to pay for API credit (step 2b). If you can't, tell your instructor **before** class.
+  If there's no way to pay, your instructor may put you on the [Gemini path](gemini.md): the same week with Google's free tier.
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
 "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows, as in weeks 2 to 8. Every command below says where to type it: **in your terminal**, **in Claude Code**, or **in a text editor**. On Windows, nothing this week goes in PowerShell.
