@@ -16,6 +16,8 @@ You need:
 - Weeks 3 to 13 done: your private `semester-project` with its AI feature, `REVIEW.md`, your week 12 evaluation and week 13 injection results, a `Dockerfile`, your keys in `.env` and the `Read(./.env)` deny rule.
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
+**On the Gemini path** (no API credit, set up in week 9; see [week 9's Gemini page](../09-calling-a-model/gemini.md)): your rehearsals and your demo call Google's free tier, so they cost nothing; everything else is the same. A free-tier model can be busy (error 503) or you can hit a limit (error 429), so rehearse what your program says when a call fails: if it happens on demo day, that's the fallback you show.
+
 "Your terminal" means **Terminal** on a Mac (Apple chip or Intel) and the **Ubuntu window** on Windows; the commands are the same on all three. On Windows, stay in your Ubuntu home folder (paths start `/home/<you>/`, never `C:\`). As in weeks 11 to 13, start Claude Code only in a window where no key is loaded.
 
 ### How you'll work this week

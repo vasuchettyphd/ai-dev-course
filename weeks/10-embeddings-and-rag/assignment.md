@@ -4,7 +4,7 @@
 
 Follow the [week 10 README](README.md) on your own laptop, in your private `semester-project` repo, and collect four things.
 
-On the Gemini path? Use [week 10 on the Gemini path](gemini.md) too: the hand-in is the same, with one key instead of two.
+On the Gemini path? Use [week 10 on the Gemini path](gemini.md) too: the [hand-in](gemini.md#hand-in-differences) is the same, with one key instead of two.
 
 **(a) Your merged RAG feature.** The address of the merged pull request from your `rag` branch (README steps 5 to 7). Its **Files changed** must show:
 

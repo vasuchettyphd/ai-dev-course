@@ -4,7 +4,7 @@
 
 Follow the [week 11 README](README.md) on your own laptop, in your private `semester-project` repo, and collect four things.
 
-On the Gemini path? See [week 11 on the Gemini path](gemini.md) for the small differences in your hand-in.
+On the Gemini path? See [week 11 on the Gemini path](gemini.md) for the small [hand-in differences](gemini.md#hand-in-differences).
 
 **(a) Your merged tool.** The address of the merged pull request from your `tool` branch (README steps 4 to 6). Its **Files changed** must show:
 

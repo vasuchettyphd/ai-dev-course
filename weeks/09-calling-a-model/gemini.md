@@ -1,10 +1,10 @@
 # Week 9 on the Gemini path
 
-This page is for students who **can't pay for API credit**. If that's you, you told your instructor before class (the README's "Before you start"), and your instructor first asked the department to fund credit on your own Anthropic account. If the department can't, you follow this page: the same week, with Google's **free tier** and the model `gemini-3.5-flash-lite` instead of Claude Haiku 5.5 and paid credit.
+This page is for students on the **Gemini path**: no API credit. You set it up this week. You told your instructor before class and the department couldn't fund credit on your own account, so you do the same week with Google's **free tier** and the model `gemini-3.5-flash-lite` instead of Claude Haiku 5.5. Never use someone else's key, Anthropic or Google.
 
-You must be **18 or older**: Google says "You must be 18 years of age or older to use the APIs." If you're under 18 and have no card, talk to your instructor: there's an offline version of this week.
+You must be **18 or older**: Google says "You must be 18 years of age or older to use the APIs." Under 18 with no card? Talk to your instructor: there's an offline version of this week.
 
-Never use someone else's key, Anthropic or Google.
+**On the free tier, Google uses what you send, and human reviewers may read it** (week 10 step 2c quotes Google's terms). Send only course-safe data. Anything you type into AI Studio's web page is on the free tier too, so keep that course-safe as well.
 
 ## What changes and what doesn't
 
@@ -12,7 +12,7 @@ Never use someone else's key, Anthropic or Google.
 
 - You call Google's model with Google's package, `google-genai`, using a **Google key** (`GEMINI_API_KEY`). You get it this week, by following week 10's key steps early.
 - Your calls cost **$0**. You still work out what each call **would** cost on Google's paid tier, so you learn the arithmetic.
-- **Google may read what you send.** On the free tier, Google uses what you send to improve its products, and people may read it (week 10 step 2c quotes Google's terms). On this path that's true of everything your program sends in weeks 9 to 12, so every input must be **course-safe**: no personal, customer or real business data.
+- **Privacy:** see the note above. It covers everything your program sends in weeks 9 to 12: no personal, customer or real business data.
 - No Console, no credit and no spend limit. Instead: **don't add billing** to your Google account for this course. Google's free tier has limits per minute and per day; if you hit one, you get error 429: wait and try again.
 - The deal screener's AI steps use Claude, so where the README runs them with a Claude key, you read the README's recorded output instead.
 
@@ -20,7 +20,7 @@ Never use someone else's key, Anthropic or Google.
 
 - Rule 5 (spend limit) becomes: never add billing for this course.
 - Rule 6 becomes: if a key leaks, **delete it in AI Studio first** (week 10 step 2e), then clean up.
-- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys usually start with `AIza`).
+- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys usually start with `AIza`, being tested).
 
 The steps below are keyed to the README's step numbers. Where a step isn't listed, or says "as in the README", do it exactly as the README says.
 
@@ -43,12 +43,13 @@ The README's worked example (500 input tokens, 200 output tokens) on the paid ti
 total                    =  $0.00065
 ```
 
-What you actually pay: $0. For comparison, the first call in step 3 would cost about $0.000102 on Gemini's paid tier, against about $0.000031 on Claude Haiku 5.5.
+What you actually pay: $0. For comparison, the first call in step 3 would cost about $0.000102 on Gemini's paid tier; the README's Claude run cost about $0.000031 on Claude Haiku 5.5 (a different run, with different token counts).
 
 ### 2. Get a key safely (before class)
 
-Skip the README's 2a to 2c (Console, credit, spend limit) and 2d's Anthropic key. Instead, **get your Google key now** by following [week 10 step 2, parts a to f](../10-embeddings-and-rag/README.md#2-get-a-google-key-safely-before-class). Two differences from what week 10 says:
+Skip the README's 2a to 2c (Console, credit, spend limit) and 2d's Anthropic key. Instead, **get your Google key now** by following [week 10 step 2, parts a to f](../10-embeddings-and-rag/README.md#2-get-a-google-key-safely-before-class). Three differences from what week 10 says:
 
+- Create the key in a **new** project, not one that has billing switched on (a key in a project with billing is on the paid tier and is charged). Check AI Studio shows the key on the free tier (being tested).
 - Make the `~/first-call` folder and open a new `.env` exactly as in the README's step 2d item 3.
 - Your `.env` holds just **one** line, the Google key, with no spaces and no quote marks:
 
@@ -76,7 +77,7 @@ pip install google-genai==2.30.0
 Check:
 
 ```bash
-python -c "import google.genai as g; print(g.__version__)"
+python -c "from google import genai; print(genai.__version__)"
 ```
 
 It prints `2.30.0`. (The ensurepip fix in the README is the same.)
@@ -128,9 +129,9 @@ Output tokens: 39
 Cost: $0 on the free tier (about $0.000102 on the paid tier)
 ```
 
-`STOP` is Gemini's way of saying the model finished its answer (Claude's `end_turn`). Check the paid-tier figure by hand with step 1's arithmetic. Where the README says to check the Console's **Usage** page: AI Studio has usage and rate-limit screens, but which page shows your calls is **being tested**.
+`STOP` is Gemini's way of saying the model finished its answer (Claude's `end_turn`). Check what it would cost on the paid tier by hand, with step 1's arithmetic. Where the README says to check the Console's **Usage** page: AI Studio has usage and rate-limit screens, but which page shows your calls is **being tested**.
 
-If you see `ValueError: No API key was provided...`, the key isn't loaded: run the `set -a` line again, in `~/first-call`. Other errors: see Troubleshooting below.
+If you see `ValueError: No API key was provided. Please pass a valid API key. ...`, the key isn't loaded: run the `set -a` line again, in `~/first-call`. Other errors: see Troubleshooting below.
 
 ### 4. The settings that matter
 
@@ -193,7 +194,7 @@ EOF
 python structured.py
 ```
 
-The course's run printed `{'price': 189000, 'bedrooms': 3}`, then `Input tokens: 42 Output tokens: 23`. Google's guide: <https://ai.google.dev/gemini-api/docs/structured-output> (its examples use the newer way of calling, so they look different). As in the README: structured output fixes the **shape** of the answer, not whether it's **right**.
+The course's run printed `{'price': 189000, 'bedrooms': 3}`, then `Input tokens: 42 Output tokens: 23`. This run's token counts don't include thinking tokens (structured.py prints only the answer's tokens); your own program should add `thoughts_token_count`, as first_call.py does. Google's guide: <https://ai.google.dev/gemini-api/docs/structured-output> (its examples use the newer way of calling, so they look different). As in the README: structured output fixes the **shape** of the answer, not whether it's **right**.
 
 **e. Choosing a model.** You use `gemini-3.5-flash-lite` on the free tier. Google's models page (<https://ai.google.dev/gemini-api/docs/models>, read 28 October 2026) lists it as a current stable model and, for new projects, recommends "3.5 Flash-Lite or 3.8 Flash". Stay on Flash-Lite for this course. Read the README's table anyway: you're expected to understand the Claude choices too.
 
@@ -208,8 +209,8 @@ As in the README, except:
   /superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-3.5-flash-lite and structured output (response_mime_type application/json with response_json_schema) if the answer must be read by the program. Rules: the program reads the key only from the GEMINI_API_KEY environment variable (it may load .env into the environment when it starts), and you, Claude, must never open, read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; if the call fails with a 429 or 503 error, say so in one plain sentence and carry on; check the finish reason and check every value the model returns before using it; print the input tokens and output tokens of each call, and the cost it would have on the paid tier ($0.30 per million input, $2.50 per million output tokens, counting thinking tokens as output); tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
   ```
 
-  When you watch the build: **No** to a key, or anything starting `sk-ant-` or `AIza`, in a file. Python's official package is `google-genai`; for any other name, ask "Is this Google's official package?" before answering Yes.
-- **5e and 5f.** As in the README. Remember everything you send is course-safe test data. For your cost log, write down the tokens and the paid-tier cost each real call printed (your real cost is $0).
+  When you watch the build: **No** to a key, or anything starting `sk-ant-` or `AIza`, in a file. Python's official package is `google-genai`, and a Node.js project uses `@google/genai` (being tested); for any other name, ask "Is this Google's official package?" before answering Yes.
+- **5e and 5f.** As in the README. Remember everything you send is course-safe test data. For your cost log, write down the tokens each real call printed and what it would cost on the paid tier; real cost $0 (free tier).
 - **The deal screener's version** needs a Claude key, so don't run it: read the README's recorded output instead.
 
 ### 6. Review and run
@@ -220,16 +221,16 @@ As in the README, except in the 6a review prompt, change "an API key or anything
 
 As in the README, except in 7b use the browser's Find for **both** `sk-ant-` and `AIza`. If a real key is there, don't merge: delete it in AI Studio first (week 10 step 2e).
 
-In "Check it worked", the last line becomes: you never added billing, and your three logged calls show tokens, a paid-tier cost worked out from them, and a real cost of $0.
+In "Check it worked", the last line becomes: you never added billing, and your three logged calls show tokens, what they would cost on the paid tier worked out from them, and real cost $0 (free tier).
 
 ## Hand-in differences
 
-Same assignment, same rubric, same points. Where the assignment says "cost", give the paid-tier figure you worked out **and** the real cost, $0.
+Same assignment, same rubric, same points. Where the assignment says "cost", give what it would cost on the paid tier, worked out by you, **and** the real cost $0 (free tier).
 
 - **(a)** As in the assignment, and no real key of either kind (`sk-ant-` or `AIza`) anywhere.
-- **(b) Cost log:** three real calls with input and output tokens; real cost $0 (free tier); show the arithmetic once for what each would cost on the paid tier ($0.30 / $2.50 per million). Instead of the Console screenshot: a screenshot of AI Studio's usage or rate-limit page, if it shows your calls (being tested). If it doesn't, say so.
+- **(b) Cost log:** three real calls with input and output tokens; real cost $0 (free tier); show the arithmetic once (required) for what each would cost on the paid tier ($0.30 / $2.50 per million). Instead of the Console screenshot: a screenshot of AI Studio's usage or rate-limit page, if it shows your calls (being tested). If it doesn't, say so.
 - **(c)** As in the assignment.
-- **(d) 1. Which model, and why:** say you used `gemini-3.5-flash-lite` on the free tier, what one call would cost on the paid tier, and what the free tier costs you instead (Google may use what you send).
+- **(d) 1. Which model, and why:** say you used `gemini-3.5-flash-lite` on the free tier, what one call would cost on the paid tier, what the free tier costs you instead (Google may use what you send), and whether a stronger Gemini model, or Claude, would be worth paying for in your feature.
 - **(d) 2. Dependable answers:** the same question. You left temperature out (step 4a), so how did you make the answers dependable?
 
 If you think a key got into your hand-in or your repo, delete it in AI Studio first (week 10 step 2e).
@@ -238,7 +239,7 @@ If you think a key got into your hand-in or your repo, delete it in AI Studio fi
 
 | What you see | What to do |
 |---|---|
-| `ValueError: No API key was provided. Please pass a valid API key...` | The key isn't loaded. In the same terminal window, in the folder with `.env`, run `set -a; . ./.env; set +a`. Check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. In Docker, add `--env-file .env`. |
+| `ValueError: No API key was provided. Please pass a valid API key. ...` | The key isn't loaded. In the same terminal window, in the folder with `.env`, run `set -a; . ./.env; set +a`. Check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. In Docker, add `--env-file .env`. |
 | `google.genai.errors.ClientError: 400 INVALID_ARGUMENT` with `API key not valid` | The key is wrong, or has spaces or quote marks around it. Check the line in `.env`, or make a new key (week 10 step 2b). Also check you haven't set `GOOGLE_API_KEY` as well. |
 | `google.genai.errors.ServerError: 503 UNAVAILABLE` with `This model is currently experiencing high demand` | Google is busy (it happened in the course's test). Wait a minute and run again. Your program should treat it like any failed call: say so in one sentence and carry on without the feature. |
 | Error 429 | You hit a free-tier limit (per minute or per day). Wait and try again; the daily count resets at midnight Pacific time. Don't add billing. |

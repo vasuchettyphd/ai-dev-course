@@ -1,22 +1,22 @@
 # Week 11 on the Gemini path
 
-This page is for students on the **Gemini path**: you agreed with your instructor that you can't pay for Anthropic API credit, and in week 9 you set up `~/first-call` with Google's free tier instead (see [week 9 on the Gemini path](../09-calling-a-model/gemini.md)). Follow the [week 11 README](README.md) as usual, and use this page in place of the parts that call Claude through the API. Each section below matches a README step.
+This page is for students on the **Gemini path**: no API credit, set up in week 9. You set up `~/first-call` with Google's free tier then (see [week 9 on the Gemini path](../09-calling-a-model/gemini.md)). Follow the [week 11 README](README.md) as usual, and use this page in place of the parts that call Claude through the API. Each section below matches a README step.
 
 What stays the same: the tool rules, the git rules, the review, Docker and the pull request. **Claude Code and the MCP part (step 5) are unchanged**: they use your Claude Pro login, not an API key.
 
 Two reminders from week 9:
 
 - **Free tier, free of charge.** You never add billing for this course. Your real cost this week is $0. You still work out what each call would cost on Google's paid tier, so you learn the arithmetic.
-- **Google may use what you send.** On the free tier, Google uses your inputs to improve its products (week 10 step 2c quotes the terms). Everything your program sends must be course-safe: no personal, customer or real business data.
+- **Google may use what you send.** On the free tier, Google uses your inputs to improve its products, and human reviewers may read them. Google says "Do not submit sensitive, confidential, or personal information to the Unpaid Services" (week 10 step 2c quotes the terms). Everything your program sends must be course-safe: no personal, customer or real business data.
 
-**Tested with** (28 October 2026): `google-genai` 2.30.0, `gemini-3.5-flash-lite` on a free-tier key, Python 3.12, with real calls (the output below is from that run). **Being tested:** every step on a Mac or in Windows (WSL), and your own project's agent.
+**Tested with** (28 October 2026): `google-genai` 2.30.0, `gemini-3.5-flash-lite` on a free-tier key, Python 3.12, with real calls (the output below is from that run). **Being tested:** everything inside a signed-in Claude Code session, everything on GitHub, every step on a Mac or in Windows (WSL), and your own project's agent.
 
 ## Before you start
 
-The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
+The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path; Google keys usually start with `AIza`, being tested), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
 
 ```bash
-python -c "import google.genai as g; print(g.__version__)"
+python -c "from google import genai; print(genai.__version__)"
 grep -c '^GEMINI_API_KEY=' .env
 ```
 
@@ -105,7 +105,7 @@ What happened, and how it differs from Claude:
 - **Gemini's turn goes back unchanged** (`first.candidates[0].content`), just like Claude's. Don't rebuild it by hand: it can carry hidden parts the model needs to see again. Google's function calling guide is at <https://ai.google.dev/gemini-api/docs/function-calling> (read 28 October 2026); it also says "The model doesn't execute the function itself."
 - **The result goes back as a `function_response`**, with the same `id` and `name` as Gemini's request. That's Gemini's version of Claude's `tool_result` with its `tool_use_id`.
 - **Call 2** finished with `STOP`: the answer, built on your number. Gemini sometimes answers in Markdown (the `**` around `13.33%` means bold). In an earlier run it added `(or $\frac{40}{3}\%$)`, a fraction nobody asked for: read real answers, as the README says.
-- **Two calls, and you pay nothing** on the free tier. On the paid tier, it would be (108 + 148) x $0.30 / 1,000,000 + (24 + 13) x $2.50 / 1,000,000 = $0.0000768 + $0.0000925 = about $0.00017.
+- **Two calls, and you pay nothing** on the free tier. On the paid tier, it would be (108 + 148) x $0.30 / 1,000,000 + (24 + 13) x $2.50 / 1,000,000 = $0.0000768 + $0.0000925 = about $0.00017. This run's token counts don't include thinking tokens (tool_call.py prints only the answer's tokens); your own program should add `thoughts_token_count`, as week 9's first_call.py does.
 
 One more difference: the `google-genai` package can run a Python function for you automatically ("automatic function calling") if you hand it the function itself, but this program hands it only a description, so nothing runs unless **your code** runs it.
 
@@ -127,10 +127,10 @@ The ideas are the same on Gemini, and you'll use every one in step 4:
 **c. Plan and build it.** Use this prompt in place of the README's (replace the parts in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan to give my project one tool the model can call: <name>, which <what it reads or calculates>, using <the existing function, if there is one>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-3.5-flash-lite and an agent loop: send the tool's name, description and parameters_json_schema as a function declaration; when the reply has function_calls, run each tool and send back a function_response part with the same id and name (errors as {"error": "..."}), appending Gemini's turn to the conversation unchanged; when it has no function_calls and finished with STOP, that's the answer; stop after 5 turns and say so; handle MAX_TOKENS and SAFETY finish reasons with a plain sentence; pass the tool as a declaration, not a Python function, so nothing runs automatically; omit temperature. If a call fails with a 429 or 503 error, say so in one plain sentence and carry on. Rules: the tool only reads or calculates; check every input the model sends, the same way the program checks a person's input; tell the model in the system prompt to use the tool for every number and to ask for missing inputs instead of guessing; print each tool call, the input tokens and output tokens, and the cost it would have on the paid tier ($0.30 per million input, $2.50 per million output tokens, counting thinking tokens as output), with "$0 (free tier)" as the real cost; read the key only from the GEMINI_API_KEY environment variable and never read or print .env; tests must use a fake model that asks for the tool, including a bad input, two tool calls in one reply, and hitting the 5-turn limit, and never call Google, plus one live test that runs only when I set RUN_LIVE_TESTS=1. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan to give my project one tool the model can call: <name>, which <what it reads or calculates>, using <the existing function, if there is one>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-3.5-flash-lite and an agent loop: send the tool's name, description and parameters_json_schema as a function declaration; when the reply has function_calls, run each tool and send back a function_response part with the same id and name (errors as {"error": "..."}), appending Gemini's turn to the conversation unchanged; when it has no function_calls and finished with STOP, that's the answer; stop after 5 turns and say so; handle MAX_TOKENS and SAFETY finish reasons with a plain sentence; pass the tool as a declaration, not a Python function, so nothing runs automatically; leave out temperature. If a call fails with a 429 or 503 error, say so in one plain sentence and carry on. Rules: the tool only reads or calculates; check every input the model sends, the same way the program checks a person's input; tell the model in the system prompt to use the tool for every number and to ask for missing inputs instead of guessing; print each tool call, the input tokens and output tokens, and the cost it would have on the paid tier ($0.30 per million input, $2.50 per million output tokens, counting thinking tokens as output), with "$0 (free tier)" as the real cost; read the key only from the GEMINI_API_KEY environment variable and never read or print .env; tests must use a fake model that asks for the tool, including a bad input, two tool calls in one reply, and hitting the 5-turn limit, and never call Google, plus one live test that runs only when I set RUN_LIVE_TESTS=1. I'm not a programmer, so keep each task small.
 ```
 
-Sending errors back as `{"error": "..."}` is the course's choice: it's Gemini's equivalent of Claude's `is_error: true`. The course tested only the Python package; for a Node.js project, ask Claude Code to use Google's official package for Node instead (being tested).
+Sending errors back as `{"error": "..."}` is the course's choice: it's Gemini's equivalent of Claude's `is_error: true`. The course tested only the Python package; for a Node.js project, ask Claude Code to use Google's official package `@google/genai` instead (being tested).
 
 Then `/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.` as in the README.
 
@@ -152,22 +152,22 @@ Same as the README, with your key's names in place of Anthropic's:
 
 - **a.** In the review prompt, change "whether any test calls Anthropic by default" to "whether any test calls Google by default".
 - **b.** Run your agent in the container with `--env-file .env`, as in the README.
-- **c.** In **Files changed**, Find `AIza` and `GEMINI_API_KEY=` instead of `sk-ant-` and `ANTHROPIC_API_KEY=`. Neither may appear.
+- **c.** In **Files changed**, Find `GEMINI_API_KEY=` instead of `ANTHROPIC_API_KEY=`: it should show only the fake value in `.env.example`. Also Find both `sk-ant-` and `AIza` (an old Anthropic key could have been pasted in): only fake values are allowed.
 
-## What's different in your hand-in
+## Hand-in differences
 
 Everything in the [assignment](assignment.md) is the same, with the same points, except:
 
-- **(c) One agent run's printed output:** your cost line shows the input and output tokens, the paid-tier figure, and "$0 (free tier)".
-- **No `.env` and no real key** means no `AIza...` key anywhere, including `.mcp.json`.
+- **(c) One agent run's printed output:** copy the cost line as your program prints it: the input and output tokens, real cost $0 (free tier), and what it would cost on the paid tier.
+- **No `.env` and no real key** means no real `sk-ant-` or `AIza` key anywhere, including `.mcp.json`.
 
 ## Troubleshooting
 
 | What you see | What to do |
 |---|---|
-| `ValueError: No API key was provided. ...` | Your key isn't loaded. In the folder with `.env`: `set -a; . ./.env; set +a`. Check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. |
+| `ValueError: No API key was provided. Please pass a valid API key. ...` | Your key isn't loaded. In the folder with `.env`: `set -a; . ./.env; set +a`. Check `grep -c '^GEMINI_API_KEY=' .env` prints `1`. |
 | `400 INVALID_ARGUMENT` with `API key not valid` | Check the `GEMINI_API_KEY=` line in `.env`, or make a new key (week 10 step 2b). |
-| `429` | You hit a free-tier rate limit (per minute or per day). Wait a minute and run again. The daily count resets at midnight Pacific time. |
+| `429` | You hit a free-tier rate limit (per minute or per day). Wait a minute and run again. The daily count resets at midnight Pacific time. Don't add billing. |
 | `503 UNAVAILABLE` with `This model is currently experiencing high demand` | Google's model is busy. Wait a minute and run again. Your agent should treat it like any failed call: say so in one plain sentence and carry on. |
 | The model answered without calling the tool, or did sums itself | Tighten the tool's description and the system prompt, as in the README's step 3, "What the live runs taught": say exactly what the tool is for, and "use the tool for every number; never work numbers out yourself". Then read a real answer again. |
 | Anything else | See [week 9 on the Gemini path](../09-calling-a-model/gemini.md) and the README's [Troubleshooting](README.md#troubleshooting). |
