@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296, superpowers 6.4.1 and Python 3.12.3 on Ubuntu Linux (in a container), 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, installing Node.js, or on a Mac or in Windows (WSL) is being tested on real Mac and Windows laptops.</p>
+<p class="small">Tested with Claude Code 2.1.296, superpowers 6.4.1 and Python 3.12.3 on Ubuntu Linux (in a container), 12 October 2026, without signing in; and signed in on Windows (WSL) with Claude Code 2.1.312 and superpowers 7.0.0, 29 October 2026. GitHub and the Mac are being tested.</p>
 
 ---
 
@@ -58,7 +58,7 @@ Claude writes the code. **You** decide what gets built, read what it asks to do,
 
 <style scoped>section { font-size: 25px; }</style>
 
-## Install Superpowers, then branch (being tested)
+## Install Superpowers, then branch
 
 In your terminal: `cd ~/semester-project && claude`, then `manual mode on`. In Claude Code:
 
@@ -66,7 +66,7 @@ In your terminal: `cd ~/semester-project && claude`, then `manual mode on`. In C
 /plugin install superpowers@claude-plugins-official
 ```
 
-**Install for you (user scope)**, then `/reload-plugins` if asked. Check: `claude plugin list` (second terminal window) shows `Version: 6.4.1` or higher.
+**Install for you (user scope)**, then `/reload-plugins` if asked. Check: `claude plugin list` (second terminal window) shows `Version: 7.0.0` or higher.
 
 **Branch now, before Claude writes anything.** `Show me git status.` must say `nothing to commit, working tree clean`. Then:
 
@@ -108,7 +108,7 @@ Check three things: did Claude **explain it first**? Is it **for your laptop**? 
 
 Always **No**: `--force`, `rm -rf`, `--break-system-packages`, `sudo pip`, any `curl | bash` (one exception: nodejs.org's nvm line on WSL, typed by you).
 
-WSL `sudo`: choose No and **run it yourself** in a second Ubuntu window. Mac `.pkg`: asks in its own window. Never type a password into Claude.
+WSL `sudo`: choose No and **run it yourself** in a second Ubuntu window (not with `!` in Claude Code). Mac `.pkg`: asks in its own window. Never type a password into Claude.
 
 ---
 
@@ -121,7 +121,7 @@ Check first, in a second terminal window: `python3 --version`, `node --version`
 | | Python | Node.js (LTS) |
 |---|---|---|
 | **Mac, Apple chip or Intel** | 3.9 or higher already? Use it. Else python.org/downloads/macos, **macOS installer** (3.15.0 when we checked) | nodejs.org/en/download, **macOS Installer** (being tested) |
-| **Windows (WSL)** | Missing? `sudo apt update && sudo apt install -y python3 python3-venv` (3.12.3 in our test) | nvm, from nodejs.org: type it yourself, one line at a time (being tested) |
+| **Windows (WSL)** | Missing? `sudo apt update && sudo apt install -y python3 python3-venv` (3.12.3 in our test) | nvm, from nodejs.org: type it yourself, one line at a time |
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
@@ -129,11 +129,11 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
 nvm install 24
 ```
 
-After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project && claude`, `manual mode on`, then "We chose Python. It's installed. We're on the build-first-steps branch." Check `--version` in a second window.
+After an install: `/exit`, quit and reopen your terminal, `cd ~/semester-project && claude`, `manual mode on`, then "We chose Python with built-in unittest, no installs. It's installed. We're on the build-first-steps branch. Don't write any code yet: we plan first." Check `--version` in a second window.
 
 ---
 
-## Plan the first three steps (being tested)
+## Plan the first three steps
 
 Keep tool folders out of git first:
 
@@ -217,7 +217,7 @@ this branch if it isn't committed yet.
 
 ---
 
-## The build (being tested)
+## The build
 
 Worktree question? "Would you like me to set up an isolated worktree?"
 
@@ -250,7 +250,7 @@ At the end: a whole-branch review, and "Rulings I made". **Note one review findi
 | Read-only: `git diff`, `git log`, `git merge-base`, `git status` | **Yes** |
 | `git push` | **No** (you push in step 7) |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
-| At the very end: delete `.superpowers/sdd/...` with `rm -rf` | **No** is fine: "Carry on without deleting it." |
+| At the end: any command with `rm -rf .superpowers/sdd/...`, even inside a longer one | **No** is fine: "Carry on without deleting it." |
 
 It only stops by itself for: can't-be-undone, security-sensitive, outside your project (push, merge, publish), or a plan too broken to guess.
 
@@ -261,7 +261,7 @@ It only stops by itself for: can't-be-undone, security-sensitive, outside your p
 `.superpowers/sdd/<plan-name>/progress.md`, in your project folder
 
 - `# SDD ledger`, then `Task 1: complete` ... as tasks finish
-- git ignores it; Superpowers may ask to delete the folder when the build finishes (you can say No)
+- git ignores it; Superpowers may ask to delete the folder when the build finishes, often inside a longer command: read it all, and say No to `rm -rf`
 
 **Stop safely:** just after a task finishes, `Esc`, then `/exit`.
 
@@ -291,7 +291,7 @@ ledger. The plan is docs/superpowers/plans/<your-plan-file>.md.
 
 <style scoped>section { font-size: 25px; }</style>
 
-## Finish (being tested)
+## Finish
 
 ```text
 Implementation complete. What would you like to do?

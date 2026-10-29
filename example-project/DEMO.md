@@ -129,10 +129,10 @@ You'll see (the dots are cut short here):
 ```
 Ran 236 tests in 0.062s
 
-OK (skipped=9)
+OK (skipped=4)
 ```
 
-(If the `mcp` package isn't installed, for example on Python 3.10, it says `skipped=10`: that's fine.)
+(The 4 skipped are the live tests, which run only with `RUN_LIVE_TESTS=1`. If the `mcp` package isn't installed, for example on Python 3.10, it says `skipped=9`; run as root, one more: that's fine.)
 
 Say: "All 236 tests pass with no key and no internet: they use a fake model, so the calculator and the program are checked every time." Then show the results files as in the 1:45 and 2:20 rows: they are committed files, so they work offline too. A demo that fails live is fine if you use the fallback well and say what happened.
 

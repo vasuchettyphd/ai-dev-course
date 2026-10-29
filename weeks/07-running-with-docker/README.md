@@ -10,10 +10,11 @@
 
 - Docker Engine 29.8.0 (build 88096ef) on Linux (WSL 2, Intel/AMD chip), **not** Docker Desktop.
 - The official `python:3.12-slim` image, which was Python 3.12.15 that day.
-- The deal screener example in a container: its 39 tests passed; listing B gave the same answer as outside the container, character for character; without `-it` it stopped with `Stopped before all the numbers were typed.`; the image was about 180 MB (177 MB on Docker Engine; the number Docker Desktop shows is being tested).
+- The deal screener example in a container: its 39 tests passed; listing B gave the same answer as outside the container, character for character; without `-it` it stopped with `Stopped before all the numbers were typed.`; the image was about 180 MB (177 MB on Docker Engine, and 177 MB in the `DISK USAGE` column of `docker image ls` on Docker Desktop 4.97.0 for Windows).
 - `docker run hello-world`, `docker build`, `docker run --rm`, `docker image ls` and the `docker image prune` question.
 - The instructor ran the `safe-and-private` reviewer on the deal screener's `Dockerfile` and `.dockerignore`. The result is the "Week 7" section of [`example-project/REVIEW.md`](../../example-project/REVIEW.md).
-- Being tested on real Mac and Windows laptops: installing and running Docker Desktop (Mac with an Apple chip, Intel Mac, Windows with WSL 2), its screens, prompts and settings, Windows Home, typing into a program in a container in a real terminal, everything inside a signed-in Claude Code session, and everything on GitHub. These follow Docker's official docs, linked in each step.
+- Also tested on Windows (WSL 2, Ubuntu 26.04) with Docker Desktop 4.97.0 already installed and Claude Code 2.1.312 signed in (29 October 2026, on a Claude Max plan): steps 3 to 6, except GitHub.
+- Being tested on real Mac and Windows laptops: installing Docker Desktop (Mac with an Apple chip, Intel Mac, Windows with WSL 2), its screens, prompts and settings, Windows Home, Docker Desktop on a Mac, a Pro plan, and everything on GitHub. These follow Docker's official docs, linked in each step.
 
 ## Before you start
 
@@ -173,7 +174,7 @@ then a blank line, then **`Hello from Docker!`** and "This message shows that yo
 
 ### 3. Containerize your project
 
-> **Being tested:** This step needs a signed-in session and is being tested. The deal screener's two files were tested for real.
+> Tested in a signed-in session on Windows (WSL 2) on 29 October 2026. Claude's exact words will differ. A Mac and a Pro plan are being tested.
 
 **a. Start Claude Code and make the branch, before Claude writes anything.** In your terminal:
 
@@ -193,7 +194,7 @@ It should say `nothing to commit, working tree clean`. If it lists files, don't 
 Switch to main and pull the latest changes from GitHub. Then make a new branch called containerize and switch to it.
 ```
 
-It will probably run `git switch main`, `git pull` and `git switch -c containerize`. Plain **Yes**. Check: ask "What branch am I on?". It should say `containerize`. (If that name is taken, use `containerize-2`, here and everywhere this README says `containerize`.)
+It will probably run `git switch main` (or `git checkout main`), `git pull` and `git switch -c containerize` (or `git checkout -b containerize`), sometimes as one command. Plain **Yes**. Check: ask "What branch am I on?". It should say `containerize`. (If that name is taken, use `containerize-2`, here and everywhere this README says `containerize`. If Claude asks to `git checkout containerize` after a `fatal: a branch named 'containerize' already exists`, say **No** and type `That name is taken. Use containerize-2 instead.`)
 
 **b. Copy the deal screener's two files as a starting point.** As in week 6 step 3b, you copy them yourself, in a **second terminal window**. First update the course repo, then copy:
 
@@ -228,7 +229,7 @@ Compare with the five lines in step 1. If a line is there that you don't follow,
 
 ### 4. Build and run
 
-> **Being tested:** The commands, and the deal screener's output below, were tested on Docker Engine 29.8.0. Docker Desktop on a Mac or Windows, and your own project, are being tested.
+> **Being tested:** The commands, and the deal screener's output below, were tested on Docker Engine 29.8.0. They were also tested on Docker Desktop 4.97.0 for Windows (WSL 2), with the same output. Docker Desktop on a Mac is being tested.
 
 Type these **yourself**, in your **second terminal window** (`cd ~/semester-project` first), with Docker Desktop running. To open one: on a Mac, click Terminal and press `Cmd + N`; on Windows, open **Ubuntu** again from the Start menu (don't type `wsl` in PowerShell). You see the output directly, and you can type into your program.
 
@@ -238,7 +239,7 @@ Type these **yourself**, in your **second terminal window** (`cd ~/semester-proj
 docker build -t semester-project .
 ```
 
-`-t semester-project` names the image `semester-project`; the final `.` means "this folder" (Docker looks for the `Dockerfile` there). The first build downloads the official base image, so it takes longer; later builds are quick. It prints numbered steps such as `[1/3] FROM docker.io/library/python:3.12-slim` and ends with a line like `naming to docker.io/library/semester-project:latest done`. That `latest` is the label Docker gives **your own** image when you don't give one; it's fine. The "never latest" rule is about the `FROM` line.
+`-t semester-project` names the image `semester-project`; the final `.` means "this folder" (Docker looks for the `Dockerfile` there). The first build downloads the official base image, so it takes longer; later builds are quick. It prints numbered steps such as `[1/3] FROM docker.io/library/python:3.12-slim` and near the end prints a line like `naming to docker.io/library/semester-project:latest` (Docker Desktop adds an `unpacking to ...` line after it). That `latest` is the label Docker gives **your own** image when you don't give one; it's fine. The "never latest" rule is about the `FROM` line.
 
 Build failed? Copy the last 20 lines into Claude Code and see Troubleshooting.
 
@@ -251,7 +252,7 @@ docker run -it --rm semester-project
 - `-it` lets you type into the program: `-i` keeps your typing connected to it, `-t` makes it act like a terminal. If you leave it out, a program that asks questions can't read what you type. The deal screener then prints `Stopped before all the numbers were typed.` and stops.
 - `--rm` deletes the container when the program ends, so stopped containers don't pile up. The image stays, so you can run it again.
 
-If your program isn't something you type into (for example a web page), ask Claude how to start it in the container before you run it. For a web page, ask Claude for the `docker run` line with `-p` (for example `-p 8000:8000`) and open the address it gives; the program must listen on `0.0.0.0` inside the container. For a program that writes a file, ask Claude where the file goes so you can see it after the container stops (`--rm` deletes the container). (being tested)
+If your program isn't something you type into (for example a web page), ask Claude how to start it in the container before you run it. For a web page, ask Claude for the `docker run` line with `-p` (for example `-p 8000:8000`) and open the address it gives; the program must listen on `0.0.0.0` inside the container. For a program that writes a file, ask Claude where the file goes: without a mount it is deleted with the container (`--rm`). Claude will probably suggest mounting only this project folder (`-v "$PWD":/app`), and `--user "$(id -u):$(id -g)"` if the `Dockerfile` has `USER nobody`; ask it why first, then **Yes**. (Web page: being tested.)
 
 Type in your **hand-worked example from week 5** and compare the answer with yours. It should match, as it did outside the container (to the cent, for money). Take a **screenshot** of the answer with your hand-worked answer beside it: the assignment asks for it. (If your program isn't typed into, use the run command from the paragraph above, with your example as its input, or for a web page a screenshot of the page in your browser with your example entered.) For the deal screener, listing B (price 150000, rent 1700, tax 2400, insurance 1200, HOA 0, down payment 25, interest rate 7, loan term 30, closing costs 6000) gives in the container the same answer as outside it:
 
@@ -326,7 +327,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 ### 5. Review it with `safe-and-private`
 
-> **Being tested:** The deal screener's Dockerfile review was run with these reviewer instructions on 12 October 2026. Running this prompt in a signed-in session is being tested.
+> **Being tested:** The deal screener's Dockerfile review was run with these reviewer instructions on 12 October 2026. It was also run in a signed-in session on Windows (WSL 2) on 29 October 2026: three Nice to have findings, in about a minute.
 
 A `Dockerfile` decides what goes into an image, so it's exactly what your week 6 `safe-and-private` reviewer is for. This time you run only that one reviewer, on the two new files.
 
@@ -336,13 +337,13 @@ A `Dockerfile` decides what goes into an image, so it's exactly what your week 6
 Run the safe-and-private reviewer as a subagent on Dockerfile and .dockerignore only. Then add a new section at the end of REVIEW.md, headed "## Week 7: Dockerfile review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason. Number the findings D1, D2 and so on, so they don't clash with week 6's numbers. Sort the rows: Must fix first, then Should fix, then Nice to have. Keep each finding's wording close to what the reviewer wrote, and keep its file and line numbers. Leave Decision and Reason empty. Do not add any finding the reviewer did not report, and do not change any file except REVIEW.md. After the table, list in a few words the areas where the reviewer said "Nothing found".
 ```
 
-Answer as in week 6 step 4c: **Yes** to editing `REVIEW.md`, **No** to editing any other file. After a No, type: "Don't change any file except REVIEW.md." Then read the new section and commit it:
+Answer as in week 6 step 4c: **Yes** to editing `REVIEW.md` (Claude may ask with an edit prompt, or with a command that starts `cat >> REVIEW.md`; check that the command names `REVIEW.md` only), **No** to anything that changes another file. After a No, type: "Don't change any file except REVIEW.md." Then read the new section and commit it:
 
 ```text
 Commit REVIEW.md on this branch with the message "Review of the Dockerfile".
 ```
 
-**b. Triage, as in week 6 step 5.** Check each finding against the files before you decide ("Check finding D1 in REVIEW.md against the files. Is it right, and are the file and line numbers right? Explain in plain English. Don't change any file."). Then give each one a **Decision** (`Fix` or `Won't fix`) and a **Reason** of one plain sentence. Every Must fix is `Fix`, unless the finding is wrong. The deal screener's reviewer found four things, all Nice to have. Two of its rows (shortened):
+**b. Triage, as in week 6 step 5.** Check each finding against the files before you decide ("Check finding D1 in REVIEW.md against the files. Is it right, and are the file and line numbers right? Explain in plain English. Don't change any file."). Then give each one a **Decision** (`Fix` or `Won't fix`) and a **Reason** of one plain sentence. Every Must fix is `Fix`, unless the finding is wrong. Before you choose Fix, check the fix won't leave out something your program or your tests need, such as the `tests` folder or a data file. The deal screener's reviewer found four things, all Nice to have. Two of its rows (shortened):
 
 | # | Label | Finding | Decision | Reason |
 |---|---|---|---|---|
@@ -430,11 +431,11 @@ The [assignment](assignment.md) asks for the pull request's address, two screens
 | Your Windows edition is **Home** | Ask your instructor before installing (step 2d.1). Home is being tested. |
 | (being tested) `no space left on device`, or your disk is nearly full | In your terminal: `docker image ls` to see your images, then `docker image prune` (step 6e) to delete unused leftovers. Delete any test image you don't need with `docker image rm <name>` (as in our test). **No** to `docker system prune -a`. |
 | The build stops at an install line (an error from `pip`, `npm` or `apt-get`) | Copy the last 20 lines into Claude Code: "My docker build failed with this error: <paste>. Explain it in plain English, then fix the Dockerfile. Keep an official image with a pinned version, never latest, and don't change my code." Then build again. |
-| (being tested) `failed to read dockerfile` or `no such file or directory` when you build | You're not in your project folder, or the `Dockerfile` isn't there. `cd ~/semester-project`, check `ls` shows `Dockerfile`, and build again. |
+| `ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory` when you build | You're not in your project folder, or the `Dockerfile` isn't there. `cd ~/semester-project`, check `ls` shows `Dockerfile`, and build again. |
 | `Stopped before all the numbers were typed.`, or your own program stops with an "end of file" error such as Python's `EOFError` (being tested) | You left out `-it`, so the program couldn't read your typing. Use `docker run -it --rm semester-project`. |
 | (being tested) The program waits and nothing happens | It may be waiting for you to type. If you typed `docker run` without `-it`, press `Ctrl + C` and use `docker run -it --rm semester-project`. If it still seems stuck, press `Ctrl + C` and ask Claude: "My program waits forever in the container. Explain why in plain English." |
 | (being tested) `exec format error`, or `no matching manifest` with `arm64` or `amd64` in the message | Something in the image was made for another kind of chip. The official `python` image page lists both kinds (`amd64` for Intel and AMD, `arm64v8` for Apple chips; each tag is being tested), so it's usually a package or a non-official image. Ask Claude: "This error mentions my chip: <paste>. I'm on [a Mac with an Apple chip / an Intel Mac / Windows]. Use only official images and package versions made for my chip, and explain the change first." |
-| (being tested) The program can't find a file in the container (for example `No such file or directory` or `FileNotFoundError`) | `.dockerignore` probably left it out. Ask Claude: "My program can't find <file> in the container. Which files does it need? Change .dockerignore so only those go in, without copying anything private." Then build again. |
+| The program can't find a file in the container (for Python, `FileNotFoundError: [Errno 2] No such file or directory: 'data.csv'`) | `.dockerignore` probably left it out. Ask Claude: "My program can't find <file> in the container. Which files does it need? Change .dockerignore so only those go in, without copying anything private." Then build again. |
 | `Permission denied` when your program saves a file | The `USER nobody` line stops writing inside `/app`. Remove that line from the `Dockerfile`, or ask Claude: "My program gets Permission denied when it saves a file in the container. Fix the Dockerfile, and explain the change." Then build again. |
 | `Permission denied` or `EACCES` when your program or your test command runs (for example npm writing its cache) | Remove the `USER nobody` line, or ask Claude: "My program (or my test command) gets Permission denied in the container. Fix the Dockerfile, and explain the change." Then build again. (being tested) |
 | `No module named pytest` (or your test tool is missing) | Ask Claude to install your test tool in the image: "My tests need <tool>, which isn't in the image. Add it to the Dockerfile, and explain the change." Then build again. (being tested) |

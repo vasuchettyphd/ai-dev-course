@@ -4,7 +4,7 @@
 
 **Time:** plan for about 90 minutes (an estimate); the grilling can take longer if your idea is big. **Cost:** nothing beyond your Claude plan. The add-in you install is free.
 
-**Tested with:** Claude Code 2.1.296, `mattpocock-skills` 1.2.3, `superpowers` 6.4.1 and AI-DLC 2.11.0, on Ubuntu 24.04 Linux (in a container), 12 October 2026. These are the versions tested; the official add-in marketplace updates itself, so yours may be newer. We tested, without signing in to Claude: installing Claude Code, adding Anthropic's official add-in marketplace, installing, listing, updating and removing the add-ins from the terminal, reading the `/grill-me` and Superpowers instructions inside them, and installing and setting up AI-DLC. Everything inside a signed-in Claude Code session (plan mode, the `/plugin` screen, running `/grill-me`, writing `PLAN.md`, Superpowers and AI-DLC runs), everything on GitHub, and every step on a Mac or in Windows (WSL) follow the official docs and are being tested on real Mac and Windows laptops.
+**Tested with:** Claude Code 2.1.296, `mattpocock-skills` 1.2.3, `superpowers` 6.4.1 and AI-DLC 2.11.0, on Ubuntu 24.04 Linux (in a container), 12 October 2026. These are the versions tested; the official add-in marketplace updates itself, so yours may be newer. We tested, without signing in to Claude: installing Claude Code, adding Anthropic's official add-in marketplace, installing, listing, updating and removing the add-ins from the terminal, reading the `/grill-me` and Superpowers instructions inside them, and installing and setting up AI-DLC. On 29 October 2026 we also tested, signed in, in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, `mattpocock-skills` 1.3.1 and `superpowers` 7.0.0: plan mode, the `/plugin` screen, `/grill-me` and Superpowers. Everything on GitHub, AI-DLC runs inside Claude Code, and every step on a Mac follow the official docs and are being tested.
 
 ## Before you start
 
@@ -101,7 +101,7 @@ Your project gets its **own new private repo**. `my-first-project` from week 3 s
 cd ~ && mkdir semester-project && cd semester-project && claude
 ```
 
-Claude Code may ask whether you trust the files in this folder. It's your own new, empty folder, so say yes. Then check the bottom line, and press `Shift + Tab` until it says `manual mode on`.
+Claude Code asks `Quick safety check: Is this a project you created or one you trust?`. It's your own new, empty folder: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits). Then check the bottom line: it probably starts in `auto mode on`. Press `Shift + Tab` until it says `manual mode on` (from auto mode, one press). Every new session starts in auto mode again, so check the bottom line each time you start `claude`.
 
 **b. The prompt.** In Claude Code, type this, with your own one-sentence idea in place of the example:
 
@@ -111,7 +111,7 @@ Create README.md with the title "Semester project" and this one-sentence descrip
 
 **What Claude Code will probably do:**
 
-- create `README.md` (an edit prompt)
+- create `README.md` (an edit prompt, or as part of one shell command)
 - run `git init -b main` (or `git init` then `git branch -M main`), `git add` and `git commit -m "Start project"`
 - run a command like this one:
 
@@ -136,7 +136,7 @@ The **Collaborators** list should now show `vasuchettyphd` as a pending invitati
 
 ### 4. Plan in plan mode
 
-> **Being tested:** Plan mode needs a signed-in session, so the exact screens are being tested. The behaviour below is from Claude Code's docs, <https://code.claude.com/docs/en/permission-modes>.
+> **Tested on Windows (WSL):** The behaviour below matches Claude Code 2.1.312 and the docs, <https://code.claude.com/docs/en/permission-modes>. The Mac check is still being done.
 
 In **plan mode**, Claude Code reads files and thinks, then proposes a plan. It doesn't edit your files until you approve the plan. The docs: "Plan mode tells Claude to research and propose changes without making them."
 
@@ -146,7 +146,7 @@ In **plan mode**, Claude Code reads files and thinks, then proposes a plan. It d
 auto mode on  ->  manual mode on  ->  accept edits on  ->  plan mode on  ->  back to auto
 ```
 
-(Or skip the key presses: type `/plan` followed by your prompt, and that one prompt runs in plan mode.)
+(Or skip the key presses: type `/plan` followed by your prompt. This switches on plan mode, and it stays on until you press `Shift + Tab`.)
 
 **b. The prompt.** In Claude Code, type this, with your own idea:
 
@@ -156,10 +156,11 @@ I want to build this for my semester project: "A tool that turns my weekly sales
 
 **What Claude Code will probably do:** read the folder, maybe ask you a question or two, then show a plan and ask how to proceed.
 
-**c. Don't approve it for building.** The docs list approve options such as "Yes, and use auto mode" (or "Yes, auto-accept edits"), "Yes, manually approve edits", and "No, keep planning"; your labels may differ. The approve options mean "start building now": the docs say "approving a plan exits plan mode ... so Claude starts editing". You're not building this week. So:
+**c. Don't approve it for building.** Claude Code shows the plan and asks `Would you like to proceed?` with `1. Yes, and use auto mode`, `2. Yes, manually approve edits` and `3. Tell Claude what to change`. Both Yes options mean "start building now": the docs say "approving a plan exits plan mode ... so Claude starts editing". You're not building this week. So:
 
-- To change something: choose **No, keep planning**, and tell Claude what to change. It updates the plan.
-- When the plan looks reasonable: choose **No, keep planning**, then press `Shift + Tab` to leave plan mode without approving. Keep pressing until the bottom line says `manual mode on`.
+- To change something: choose **3. Tell Claude what to change**, type what to change, and press Enter. It updates the plan and asks again.
+- When the plan looks reasonable: press `Esc`. The question closes and the bottom line still says `plan mode on`. Then press `Shift + Tab` until it says `manual mode on` (two presses: `auto mode on`, then `manual mode on`).
+- Don't press `Shift + Tab` while the question is on screen: there it means "approve with this feedback".
 
 Optional: press `Ctrl + G` while the plan is shown to open it in a text editor and change it yourself.
 
@@ -167,7 +168,7 @@ Claude Code keeps its own copy of plans in a hidden folder on your laptop (`~/.c
 
 ### 5. Install `/grill-me` and get grilled
 
-> **Being tested:** Installing from the terminal is from our test (without signing in). The `/plugin` screen and running `/grill-me` need a signed-in session and are being tested.
+> **Tested on Windows (WSL)** with Claude Code 2.1.312 and `mattpocock-skills` 1.3.1. Installing from the terminal is from our earlier Linux test. The Mac check is still being done.
 
 `/grill-me` comes in **`mattpocock-skills`**, a free add-in (a **plugin**) by Matt Pocock, from Anthropic's official marketplace (<https://github.com/mattpocock/skills>). You install it once, and it works in every folder. It's the same on Mac and Windows: you type it inside Claude Code.
 
@@ -203,7 +204,7 @@ claude plugin marketplace add anthropics/claude-plugins-official
 
 In our test it ended with `✔ Successfully added marketplace: claude-plugins-official (declared in user settings)`. (Inside Claude Code, the same thing is `/plugin marketplace add anthropics/claude-plugins-official`.) If you installed from the terminal while Claude Code was open, type `/reload-plugins` in Claude Code.
 
-**b. Check it's installed.** In Claude Code, type `/grill` and look at the list that appears: you should see `/grill-me`. Or, in your terminal, type `claude plugin list`. In our test:
+**b. Check it's installed.** In Claude Code, type `/grill` and look at the list that appears: you should see `/mattpocock-skills:grill-me (grill-me)`. Typing `/grill-me` works. Or, in your terminal, type `claude plugin list`. In our test:
 
 ```text
 Installed plugins:
@@ -222,7 +223,7 @@ Your version number may be higher.
 /grill-me Grill me on the plan you just proposed for my semester project. I'm not a programmer and I have about eight weeks to build it.
 ```
 
-If `/grill-me` isn't in the list, type `/mattpocock-skills:grill-me` instead (being tested). If you closed Claude Code since step 4, put your one-sentence idea in place of "the plan you just proposed".
+If `/grill-me` isn't in the list, type `/mattpocock-skills:grill-me` instead. If you closed Claude Code since step 4, put your one-sentence idea in place of "the plan you just proposed".
 
 **What it does** (from the skill's own instructions, at <https://github.com/mattpocock/skills>):
 
@@ -233,7 +234,7 @@ If `/grill-me` isn't in the list, type `/mattpocock-skills:grill-me` instead (be
 
 **As you go, copy the three questions you find hardest, and your answers, into a note.** The assignment asks for them.
 
-**d. How it ends.** It finishes when there are no open questions left, and it asks you to confirm that you both agree. Read what it says it has understood, correct anything that's wrong, then confirm (being tested), for example: `Yes, we agree.`
+**d. How it ends.** It finishes when there are no open questions left, and it asks you to confirm that you both agree. Read what it says it has understood, correct anything that's wrong, then confirm. It asks something like `Is that a shared understanding, so I can treat the plan as final? I won't build anything until you say so.` Reply, for example: `Yes, we agree.`
 
 **To stop early** (you're out of time, or it's going round in circles), type:
 
@@ -270,9 +271,9 @@ See the instructor's worked example: [`example-project/PLAN.md`](../../example-p
 Make a new branch called add-plan. On it, write PLAN.md from our grilling session, with a title line "# Plan: <my project's name>" and exactly these seven headings, in this order: Goal, Who it's for, Must-haves, Not in this version, Data it uses, First three build steps, Open questions. Use my answers, not your own ideas. Be specific: numbers, names and examples. Keep it to about one page. Show it to me before you commit.
 ```
 
-If you closed Claude Code since the grilling, paste your summary before this prompt.
+If you closed Claude Code since the grilling, paste your summary before this prompt. (A new session starts in `auto mode on` again: press `Shift + Tab` once first.)
 
-**What Claude Code will probably do:** `git switch -c add-plan`, then create `PLAN.md` (an edit prompt). Choose plain **Yes**.
+**What Claude Code will probably do:** `git switch -c add-plan` (or `git checkout -b add-plan`), then create `PLAN.md` (an edit prompt). Choose plain **Yes**.
 
 **b. Read it, and make it specific.** Open `PLAN.md` (or ask "Show me PLAN.md"). Check:
 
@@ -305,7 +306,7 @@ You don't need either of these for the assignment. Your instructor demonstrates 
 |---|---|---|---|
 | **What it is** | A Claude Code mode plus a free plugin (`mattpocock-skills`) | A free plugin (`superpowers`, by Jesse Vincent, <https://github.com/obra/superpowers>) that gives Claude a careful build process | A free, open-source workflow from AWS (`awslabs/aidlc-workflows`) that runs inside Claude Code and other AI tools |
 | **How it plans** | Plan mode drafts a plan; `/grill-me` asks rounds of numbered questions with recommended answers | Brainstorming asks one question at a time, proposes 2 or 3 approaches, then gets your approval section by section | Runs through phases (Initialization, Ideation, Inception, Construction, Operation), one stage at a time, and stops for your approval at each gate |
-| **What it produces** | Nothing by itself; you ask for `PLAN.md` | A design file and a step-by-step build plan, saved under `docs/superpowers/` and committed to git | A folder of records for each stage under `aidlc/`, plus a `.claude/` folder with about 40 AI-DLC skills |
+| **What it produces** | Nothing by itself; you ask for `PLAN.md` | A design (in the chat, or a file under `docs/superpowers/specs/`) and then a step-by-step build plan | A folder of records for each stage under `aidlc/`, plus a `.claude/` folder with about 40 AI-DLC skills |
 | **When to use it** | Any idea, even with no software at all. Best for deciding what to build | When you're ready to build software and want it built in small, tested steps | Team software projects that want a full, documented process |
 
 Both Superpowers and AI-DLC are made for building software, and both write many files. **If you try either, use a throwaway folder, never your project repo this week**, and only after your `PLAN.md` pull request is merged.
@@ -314,8 +315,6 @@ Both Superpowers and AI-DLC are made for building software, and both write many 
 
 #### Try Superpowers
 
-> **Being tested:** Running Superpowers needs a signed-in session and is being tested.
-
 **Try it only after your `PLAN.md` pull request is merged.** A plugin installed "for you" (user scope) is switched on in **every** folder, including `semester-project`, and Superpowers' brainstorming can start by itself whenever you ask Claude to build or change something. So try it, then remove it until next week (see the end of this part).
 
 **a. Make a throwaway folder and start Claude Code there.** In your terminal:
@@ -323,6 +322,8 @@ Both Superpowers and AI-DLC are made for building software, and both write many 
 ```bash
 mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 ```
+
+It asks the trust question again: press the down arrow to **Yes, I trust this folder**, then Enter.
 
 **b. Install it,** the same way as `mattpocock-skills` (choose **Install for you (user scope)**, then `/reload-plugins` if asked). In Claude Code:
 
@@ -336,9 +337,9 @@ mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 /superpowers:brainstorming I want to plan a tool that turns my weekly sales spreadsheet into a one-page summary.
 ```
 
-It asks one question at a time, then writes a design file to `docs/superpowers/specs/` and asks you to review it. Source: <https://github.com/obra/superpowers>. The [advanced tutorial](../../advanced/grill-me-superpowers/) shows a full run.
+It asks one question at a time (it may offer to show mockups in a browser tab; you can say no). For a small idea it may just confirm the design in the chat and offer to build; for a bigger one, or if you ask it to write the design to a file first, it writes a design file under `docs/superpowers/specs/` and asks you to review it. Say no when it offers to build. Source: <https://github.com/obra/superpowers>. The [advanced tutorial](../../advanced/grill-me-superpowers/) shows a full run.
 
-**d. Remove it when you're done.** In Claude Code, type `/plugin uninstall superpowers@claude-plugins-official` (it opens the plugin screen; choose to uninstall it there, being tested), or in your terminal:
+**d. Remove it when you're done.** In Claude Code, type `/plugin uninstall superpowers@claude-plugins-official`. It opens the plugin screen with `✔ Uninstalled superpowers. Applies when you close this menu.` Press `Esc`, then type `/reload-plugins`. Or in your terminal:
 
 ```bash
 claude plugin uninstall superpowers@claude-plugins-official
@@ -408,12 +409,12 @@ The [assignment](assignment.md) asks for the repo's address, a screenshot, the m
 | What you see | What to do |
 |---|---|
 | `/grill-me` isn't in the list when you type `/grill` | Type `/reload-plugins`, then try again. Still missing? Type `/mattpocock-skills:grill-me`. Still missing? In your terminal, type `claude plugin list` and check `mattpocock-skills` is there and enabled; if not, do step 5a again. |
-| `Plugin "mattpocock-skills" not found in marketplace "claude-plugins-official"` | Add the official marketplace first: in your terminal, `claude plugin marketplace add anthropics/claude-plugins-official`, then install again (step 5a). |
-| (being tested) The `/plugin` screen asks where to install | Choose **Install for you (user scope)**, not project scope. |
-| (being tested) In plan mode, Claude asks to edit or create a file in your project folder | Choose **No**. Check the bottom line says `plan mode on`. Plan mode shouldn't edit files until you approve a plan. |
-| You approved the plan by mistake, and Claude is building | Press `Esc` to stop it. Choose **No** to any edit prompt. Then ask: "What files did you create or change? Don't change anything else." If it made changes you don't want, ask in office hours before you delete anything. |
+| `Plugin "mattpocock-skills" not found in marketplace "claude-plugins-official"` | Add the official marketplace first: in your terminal, `claude plugin marketplace add anthropics/claude-plugins-official`, then install again (step 5a). (It may also suggest `marketplace update`; use `marketplace add` as here.) |
+| The `/plugin` screen asks where to install | Choose **Install for you (user scope)**, not project scope. |
+| In plan mode, Claude asks to edit or create a file in your project folder | Choose **No**. Check the bottom line says `plan mode on`. Plan mode shouldn't edit files until you approve a plan. |
+| You approved the plan by mistake, and Claude is building | Press `Esc` to stop it. Choose **No** to any edit prompt. Approving switches the mode, so press `Shift + Tab` until the bottom line says `manual mode on`. Then ask: "What files did you create or change? Don't change anything else." If it made changes you don't want, ask in office hours before you delete anything. |
 | The grilling goes on and on | Type `Stop grilling, summarise the decisions so far`. If it keeps opening new topics round after round, your idea is probably too big: go back to the too-big test in step 2. |
-| (being tested) It answers its own questions, or decides for you | Tell it: "The decisions are mine. Ask me, with your recommendation." |
+| It answers its own questions, or decides for you | Tell it: "The decisions are mine. Ask me, with your recommendation." |
 | Claude asks to edit a file during the grilling | Choose **No**. `/grill-me` writes no files. You write `PLAN.md` in step 6. |
 | `gh repo create` shows `--public`, or no `--private` | Choose **No** and say: "It must be private." |
 | The repo is public | (being tested) On github.com, open the repo, then **Settings**. In the **Danger Zone** at the bottom, click **Change visibility**, choose private, and follow the confirmation steps until you click **Make this repository private**. |

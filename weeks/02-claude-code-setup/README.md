@@ -4,7 +4,7 @@
 
 **Time:** plan for about 90 minutes, plus a restart on Windows; your first install may take longer. **Cost:** a Claude Pro subscription, about $20/month (see step 1).
 
-**Tested with:** Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026, up to the sign-in screen. Everything after sign-in follows Anthropic's docs and is being tested on real Mac and Windows laptops.
+**Tested with:** Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026. Steps 3e-6 tested in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026. The Mac steps and the Windows steps that turn on WSL (3a-3d) are being tested on real laptops.
 
 ## Before you start
 
@@ -102,7 +102,7 @@ Mac students: go to step 4.
 
 ### 3. Install on Windows (with WSL)
 
-> **Being tested:** These steps are being tested on a real Windows laptop. If something looks different, tell your instructor.
+> **Being tested:** Steps a-d (turning on WSL) are being tested on a real Windows laptop. Steps e-g were tested in Ubuntu on WSL 2. If something looks different, tell your instructor.
 
 On Windows you'll run Claude Code inside **WSL**, the Windows Subsystem for Linux. It's a small Linux computer built into Windows, and it opens as a window called **Ubuntu**. Once it's set up, your steps are the same as a Mac student's.
 
@@ -191,7 +191,7 @@ The dot means "the folder I'm in now". A normal File Explorer window opens on th
 
 ### 4. Your first session
 
-> **Being tested:** The screens after sign-in are being tested on real Mac and Windows laptops. If something looks different, tell your instructor.
+> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312. The Mac check is still being done; if something looks different, tell your instructor.
 
 From here on, Mac and Windows are the same. "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows.
 
@@ -221,9 +221,9 @@ It's already highlighted, so press Enter.
 
 When it works, the terminal shows `Login successful`. Press Enter. You only need to sign in once on this laptop.
 
-**e. Trust the folder.** Claude Code may ask whether you trust the files in this folder. It's your own new, empty practice folder, so say yes. (For a folder someone else gave you, think first.)
+**e. Trust the folder.** Claude Code asks "Quick safety check: Is this a project you created or one you trust?". The highlighted choice is **No, exit**, so don't just press Enter: press the down arrow to **Yes, I trust this folder**, then press Enter. It's your own new, empty practice folder, so that's safe. (For a folder someone else gave you, think first.)
 
-**f. Look at the bottom of the screen.** You now see the Claude Code prompt, where you type. At the bottom, a short line shows the **permission mode**, for example `auto mode on`. Read what yours says; don't assume. Recent versions often start in **auto** mode, which asks you fewer questions.
+**f. Look at the bottom of the screen.** You now see the Claude Code prompt, where you type. At the bottom, a short line shows the **permission mode**, for example `auto mode on`. Read what yours says; don't assume. Recent versions often start in **auto** mode, which asks you fewer questions. (On WSL with a Max plan it started in `auto mode on`; this may differ on Pro, being tested.)
 
 **g. Switch to manual mode.** For this exercise you want Claude Code to ask before every change. Press `Shift + Tab` and watch the bottom line change. Keep pressing until it says `manual mode on`. The order is:
 
@@ -241,15 +241,15 @@ auto mode on  ->  manual mode on  ->  accept edits on  ->  plan mode on  ->  bac
 Create a file called hello.md with three tips for staying organised, then explain what you did
 ```
 
-**i. Meet a permission prompt.** Before creating the file, Claude Code stops and asks you to approve. You'll see what it wants to do, then a question with choices like these:
+**i. Meet a permission prompt.** Before creating the file, Claude Code stops and asks you to approve. You'll see the file it wants to create, then a question such as `Do you want to create hello.md?` with choices like these:
 
 | Choice | What it means |
 |---|---|
 | **Yes** | Do this one thing. It will ask again next time. |
-| **Yes, and don't ask again for ...** | Do this, and stop asking about this kind of action. For file edits this lasts until you end the session; for some commands it is saved for this folder. |
+| **Yes, and switch to accept edits ...** (for a file) or **Yes, and don't ask again for ...** (for a command) | Do this, and stop asking about this kind of action. For a file, it switches the whole session to accept edits mode (the bottom line changes to `accept edits on`) until you press `Shift + Tab` or end the session. For some commands the choice is saved for this folder. |
 | **No** | Don't do it. Claude Code stops and you can tell it what to do differently. |
 
-A fourth choice, "Yes, and switch to auto mode", may also appear. If you see it, don't pick it this week. The exact wording changes with the action (running a command vs editing a file); the meanings are the same.
+Other wording, such as "Yes, and switch to auto mode", may appear for some actions. This week, always pick plain **Yes** or **No**. The exact wording changes with the action (running a command vs editing a file); the meanings are the same.
 
 Use the arrow keys to pick **Yes** and press Enter. Note what the prompt showed you; the assignment asks about it. Claude Code creates `hello.md` and explains what it did. Then ask:
 
@@ -274,7 +274,7 @@ Press `Shift + Tab` at any time to switch. While you're learning, **manual** is 
 
 ### 5. CLAUDE.md: your standing instructions
 
-> **Being tested:** These steps are being tested on real Mac and Windows laptops. If something looks different, tell your instructor.
+> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312. The Mac check is still being done; if something looks different, tell your instructor.
 
 Every Claude Code session starts fresh: it doesn't remember your last conversation. **CLAUDE.md** is a plain text file where you write instructions that it reads at the start of every session in that folder. Think of it as a note you leave for a new assistant each morning.
 
@@ -323,7 +323,7 @@ The answer should follow your preferences: plain English and short. If it doesn'
 
 ### 6. Cost and safety
 
-> **Being tested:** These steps are being tested on real Mac and Windows laptops. If something looks different, tell your instructor.
+> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312, on a Max plan (the `/usage` screen may differ on Pro; being tested). The Mac check is still being done; if something looks different, tell your instructor.
 
 **Cost.** Claude Pro covers Claude Code. To see how much of your plan you've used: in your terminal, in `~/my-first-project`, type `claude` to start a session, then type:
 
@@ -332,6 +332,8 @@ The answer should follow your preferences: plain English and short. If it doesn'
 ```
 
 It shows your plan's usage bars. The breakdown below them only counts use on this laptop. Limits depend on your plan; see <https://claude.com/pricing>. If you reach one, Claude Code shows a message such as "You've hit your session limit" (there is also a weekly limit). Starting a fresh conversation with `/clear` between unrelated tasks helps your usage go further.
+
+The top of the `/usage` screen may also show a "Total cost" in dollars for this session. That is what the same use would cost on the API; your Pro plan does not charge it.
 
 **Safety.** Claude Code can change real files on your laptop, so:
 
@@ -357,7 +359,7 @@ The [assignment](assignment.md) asks for screenshots of the first two and the te
 | `zsh: command not found: claude` (Mac) or `bash: claude: command not found` (Ubuntu) after installing | First try a new terminal: close it, open a new one, and run `claude --version` again. If it's still missing, run the fix. Mac: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc` then `source ~/.zshrc`. Ubuntu: run `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc`. Then `claude --version` again. |
 | `bash: claude: command not found` on a Mac | Your Mac uses Bash instead of zsh. Use the Mac fix from the row above, but with `~/.bash_profile` instead of `~/.zshrc` in both lines. |
 | `mkdir` says something like `File exists` (or the folder is already there from an earlier try) | That's fine, the folder exists. Run `cd ~/my-first-project && claude` instead. |
-| An error after pasting `curl -fsSL https://claude.ai/install.sh \| bash` on Windows, and the line starts with `PS C:\` | You're in PowerShell, not Ubuntu. Close it, open **Ubuntu** from the Start menu, and paste the line there. PowerShell is only for `wsl --install` and the WSL fixes below. |
+| `Invoke-WebRequest : A parameter cannot be found that matches parameter name 'fsSL'.` (or another red error) after pasting `curl -fsSL https://claude.ai/install.sh \| bash` on Windows, and the line starts with `PS C:\` | You're in PowerShell, not Ubuntu. Close it, open **Ubuntu** from the Start menu, and paste the line there. PowerShell is only for `wsl --install` and the WSL fixes below. |
 | `wsl --install` fails, or mentions virtualization | Virtualization is turned off in your laptop's settings (BIOS or UEFI). See Microsoft's guide at <https://learn.microsoft.com/en-us/windows/wsl/troubleshooting> and come to office hours; we'll do it together. |
 | `wsl --install` seems stuck at 0.0% | Close that PowerShell window, open a new one as administrator, and run `wsl --install --web-download -d Ubuntu` (from Microsoft's install page, <https://learn.microsoft.com/en-us/windows/wsl/install>). |
 | `cannot execute binary file: Exec format error` when you install or run `claude` in Ubuntu | You're on WSL 1. In **PowerShell**, run `wsl -l -v` to see your Ubuntu's name (for example `Ubuntu`) and its VERSION. Then run `wsl --set-version Ubuntu 2`, using the name you saw. Open a new Ubuntu window and try `claude` again. If `wsl --set-version` fails, see the virtualization row above. |

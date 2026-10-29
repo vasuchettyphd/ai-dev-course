@@ -4,7 +4,7 @@
 
 **Time:** plan for about 2 hours of your own time (an estimate), spread over more than one day: the build runs for a while by itself, and it can pause at a usage limit (step 6). **Start early in the week.** **Cost:** nothing beyond your Claude plan. Superpowers is free, and so are Python and Node.js.
 
-**Tested with:** Claude Code 2.1.296, `superpowers` 6.4.1 and Python 3.12.3, on Ubuntu 24.04 Linux (in a container), 12 October 2026. The newest installers on the official sites that day were Python 3.15.0 (python.org) and Node.js 24.21.0 LTS (nodejs.org). These are the versions tested; yours may be newer. We tested, without signing in to Claude: installing Claude Code, installing and listing Superpowers from the terminal, reading the Superpowers instructions this week uses, installing Python with `apt` and running a test with it, and the deal screener example's tests and program (with Python 3.9 and newer). Everything inside a signed-in Claude Code session (the `/plugin` screen, choosing tools, writing the plan, the build, usage limits, finishing), everything on GitHub, installing Node.js, and every step on a Mac or in Windows (WSL) follow the official docs and are being tested on real Mac and Windows laptops.
+**Tested with:** Claude Code 2.1.296, `superpowers` 6.4.1 and Python 3.12.3, on Ubuntu 24.04 Linux (in a container), 12 October 2026. The newest installers on the official sites that day were Python 3.15.0 (python.org) and Node.js 24.21.0 LTS (nodejs.org). These are the versions tested; yours may be newer. We tested, without signing in to Claude: installing Claude Code, installing and listing Superpowers from the terminal, reading the Superpowers instructions this week uses, installing Python with `apt` and running a test with it, and the deal screener example's tests and program (with Python 3.9 and newer). We also tested signed in, on Windows (WSL, Ubuntu 26.04) with Claude Code 2.1.312, Superpowers 7.0.0 and Python 3.14.4, 29 October 2026 (on a Claude Max plan): the `/plugin` screen, choosing tools, installing Node.js with nvm, writing the plan, the build, `/usage` and the finishing menu. Everything on GitHub, and every step on a Mac, follow the official docs and are being tested.
 
 ## Before you start
 
@@ -54,7 +54,7 @@ For much more on how Superpowers works, read [the `/grill-me` and Superpowers tu
 
 ### 2. Install Superpowers again
 
-> **Being tested:** Installing from the terminal is from our test (without signing in). The `/plugin` screen needs a signed-in session and is being tested.
+> **Tested** on Windows (WSL), 29 October 2026, Claude Code 2.1.312, Superpowers 7.0.0, both from the `/plugin` screen and from the terminal.
 
 At the end of week 4 you removed Superpowers. Install it again, the same way. It's the same on Mac and Windows.
 
@@ -64,7 +64,7 @@ At the end of week 4 you removed Superpowers. Install it again, the same way. It
 cd ~/semester-project && claude
 ```
 
-Check the bottom line, and press `Shift + Tab` until it says `manual mode on`.
+If it asks "Is this a project you created or one you trust?", press the down arrow to **Yes, I trust this folder** and Enter. Check the bottom line. If it says `auto mode on` (it did in our WSL test; may differ on Pro, being tested), press `Shift + Tab` until it says `manual mode on`.
 
 **b. Install it.** In Claude Code, type:
 
@@ -72,7 +72,7 @@ Check the bottom line, and press `Shift + Tab` until it says `manual mode on`.
 /plugin install superpowers@claude-plugins-official
 ```
 
-It opens the plugin's details. Choose **Install for you (user scope)**, not project scope. If the summary says `Run /reload-plugins to apply.`, type:
+It opens the plugin's details. Choose **Install for you (user scope)**, not project scope. In our test it ended `✓ Installed superpowers. Plugin is now active.` with no reload needed. If the summary says `Run /reload-plugins to apply.`, type:
 
 ```text
 /reload-plugins
@@ -86,14 +86,14 @@ claude plugin install superpowers@claude-plugins-official
 
 In our test it ended with `Successfully installed plugin: superpowers@claude-plugins-official (scope: user)`. If it says the plugin was **not found in marketplace**, add Anthropic's official marketplace first (in a second terminal window, `claude plugin marketplace add anthropics/claude-plugins-official`), then run the install again. If you installed from the terminal while Claude Code was open, type `/reload-plugins` in Claude Code.
 
-**c. Check it's installed.** In Claude Code, type `/plugin` and look for `superpowers` among your installed plugins (the exact screen is being tested; press `Esc` to close it). Or, in a second terminal window, type `claude plugin list`. In our test it showed:
+**c. Check it's installed.** In Claude Code, type `/plugin` and look for `superpowers` among your installed plugins (it opens on the plugin list; press the right arrow to the **Installed** tab, where `superpowers` is listed under **User**; press `Esc` to close it). Or, in a second terminal window, type `claude plugin list`. In our test it showed:
 
 ```text
 Installed plugins:
   superpowers@claude-plugins-official
-    Version: 6.4.1
+    Version: 7.0.0
     Scope: user
-    Status: enabled
+    Status: ✔ enabled
 ```
 
 Your version number may be higher. Superpowers stays installed from now on: you use it again in later weeks.
@@ -110,7 +110,7 @@ It should say `nothing to commit, working tree clean`. If it lists files, don't 
 Switch to main and pull the latest changes from GitHub. Then make a new branch called build-first-steps and switch to it.
 ```
 
-It will probably run `git switch main`, `git pull` and `git switch -c build-first-steps`. Plain **Yes**. Check: ask "What branch am I on?". It should say `build-first-steps`. (If it says a branch with that name already exists, use `build-first-steps-2` instead, here and everywhere this README says `build-first-steps`.)
+It will probably run `git switch main` (or `git checkout main`), `git pull` and `git switch -c build-first-steps` (or `git checkout -b`), maybe all in one prompt. Plain **Yes**. Check: ask "What branch am I on?". It should say `build-first-steps`. (If it says a branch with that name already exists, don't let it reset or recreate it: type "Use a new branch called build-first-steps-2 instead, and switch to it." and use `build-first-steps-2` here and everywhere this README says `build-first-steps`.)
 
 ### 3. Pick your tools
 
@@ -140,7 +140,7 @@ If Superpowers starts **brainstorming** (asking design questions one at a time),
 
 Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` or `sudo pip`, to any `curl ... | bash` (the one exception is the Node.js line in step 3d, on Windows only, which you type yourself), and to anything you don't understand. Saying No is always safe: Claude stops and asks what to do instead. Choose plain **Yes** for installs, never "don't ask again".
 
-**On Windows (WSL), commands that start with `sudo`** ask for the Ubuntu password you made in week 2 (typing it shows nothing; that's normal). Run them **yourself, in a second Ubuntu window**, so the password goes to Ubuntu and never to Claude: when Claude asks to run one, choose **No**, type "I'll run that myself", copy the command into the second window, and tell Claude when it's done (being tested). **On a Mac,** the `.pkg` installers below ask for your Mac password in their own window. **Never type a password into Claude Code.**
+**On Windows (WSL), commands that start with `sudo`** ask for the Ubuntu password you made in week 2 (typing it shows nothing; that's normal). Run them **yourself, in a second Ubuntu window**, so the password goes to Ubuntu and never to Claude: when Claude asks to run one, choose **No**, type "I'll run that myself", copy the command into the second window, and tell Claude when it's done. If Claude says to type it in Claude Code with a `!` in front (like `! sudo apt install ...`), don't: that runs it inside Claude Code, so the password would go there. Leave out the `!` and type it in the second Ubuntu window instead. **On a Mac,** the `.pkg` installers below ask for your Mac password in their own window. **Never type a password into Claude Code.**
 
 **c. Install Python, if you need it.** Check first: in a second terminal window, type `python3 --version`.
 
@@ -151,11 +151,11 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
   sudo apt update && sudo apt install -y python3 python3-venv
   ```
 
-  In our test (Ubuntu 24.04) this installed Python 3.12.3, and `python3 --version` then printed `Python 3.12.3`. If Python is there but Claude's plan needs extra Python packages, also install `python3-venv` this way (being tested on real WSL).
+  In our test (Ubuntu 24.04) this installed Python 3.12.3, and `python3 --version` then printed `Python 3.12.3`. A newer WSL Ubuntu (26.04) already has Python 3.14 but not pip or venv: if the plan needs extra Python packages, install `python3-venv` this way (the error may name `python3.14-venv`; installing it on 26.04 is being tested).
 
-**Extra Python packages.** If the plan needs packages from outside Python (installed with `pip`), ask Claude to put them in a **virtual environment** in your project: "Use a virtual environment in .venv for any Python packages." In WSL (Ubuntu 24.04) and with Homebrew's Python on a Mac, plain `pip install` outside one is blocked (an `externally-managed-environment` error), so say **No** to `--break-system-packages`. In WSL, a virtual environment needs `python3-venv` (above). Being tested. The deal screener needs no extra packages at all.
+**Extra Python packages.** If the plan needs packages from outside Python (installed with `pip`), ask Claude to put them in a **virtual environment** in your project: "Use a virtual environment in .venv for any Python packages." In WSL (Ubuntu 24.04) and with Homebrew's Python on a Mac, plain `pip install` outside one is blocked (an `externally-managed-environment` error, or on Ubuntu 26.04 `No module named pip`), so say **No** to `--break-system-packages`. In WSL, a virtual environment needs `python3-venv` (above). The deal screener needs no extra packages at all.
 
-**d. Install Node.js, if Claude chose it.** The official page is <https://nodejs.org/en/download> (Node.js 24.21.0 was the LTS, "long-term support", version when we checked; pick the LTS one). The add-ins tour in session 11 also sends you here: install the same way, then close and reopen your terminal, and skip the `semester-project` steps under "After an install". Being tested:
+**d. Install Node.js, if Claude chose it.** The official page is <https://nodejs.org/en/download> (Node.js 24.21.0 was the LTS, "long-term support", version when we checked; pick the LTS one). The add-ins tour in session 11 also sends you here: install the same way, then close and reopen your terminal, and skip the `semester-project` steps under "After an install". Tested on WSL (29 October 2026): nvm v0.40.8 installed Node.js 24.22.2 (npm 11.19.1), and `node --version` worked in the same window straight away. The Mac installer is being tested.
 
 - **Mac (Apple chip or Intel):** on that page, download the **macOS Installer** (`.pkg`), double-click it in **Downloads** and follow the steps. Then come back as in "After an install" below.
 - **Windows (WSL):** nodejs.org's Linux instructions use **nvm**, a Node.js version manager. Type these three lines yourself in a second **Ubuntu window**, one at a time, exactly as shown (they come from nodejs.org's own download instructions). The first line is this course's one exception to "say No to `curl ... | bash`": only on Windows (WSL), only this line, and you type it yourself:
@@ -173,7 +173,7 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
 1. In Claude Code, type `/exit`.
 2. Close the window: on a Mac, quit Terminal (`Cmd + Q`); on Windows, close every Ubuntu window. Then open it again.
 3. Type `cd ~/semester-project && claude`, and press `Shift + Tab` until the bottom line says `manual mode on`.
-4. Tell Claude: "We chose [Python / Node.js]. It's installed. We're on the build-first-steps branch."
+4. Tell Claude: "We chose [Python / Node.js] with [the test tool it recommended, for example Python's built-in unittest, no installs]. It's installed. We're on the build-first-steps branch. Don't write any code yet: we plan first (step 4)." The new session doesn't remember step 3, so name the tools. In our test, without the last sentence, Claude started writing tests straight away.
 
 **e. Check what was installed.** In a second terminal window, type the line for your language:
 
@@ -189,7 +189,7 @@ Each prints a version number. `command not found`? Do "After an install" (step 3
 
 ### 4. Plan the first three steps
 
-> **Being tested:** This step needs a signed-in session and is being tested. What the plan contains comes from the `writing-plans` skill's own instructions (Superpowers 6.4.1).
+> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026: it announced "I'm using the writing-plans skill to create the implementation plan.", took about a minute, and saved a plan with exactly three tasks.
 
 **a. Keep tool folders out of git.** Some tools make big folders inside your project (`.venv/` for a Python virtual environment, `node_modules/` for Node.js, `__pycache__/` for Python's own scratch files, `.claude/worktrees/` for the extra folders Claude Code can make). They must never go to GitHub. Still on `build-first-steps`, in Claude Code, type:
 
@@ -205,7 +205,7 @@ It edits or creates `.gitignore` (an edit prompt) and commits it. Plain **Yes**.
 /superpowers:writing-plans Write an implementation plan for only the first three build steps in PLAN.md (the section "First three build steps"), one task per step, nothing else. Use the language and tools we just chose. Build each task test first, with tests I can run with one command, and include at least one example worked out by hand. I'm not a programmer, so keep each task small.
 ```
 
-If `/superpowers:writing-plans` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers writing-plans skill to` instead (being tested).
+If `/superpowers:writing-plans` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers writing-plans skill to` instead (in our test the command was in the list straight after installing).
 
 **What Claude Code will probably do:** say "I'm using the writing-plans skill to create the implementation plan.", read `PLAN.md`, then create one file (an edit prompt; plain **Yes**). The plan is saved in your project at:
 
@@ -217,12 +217,13 @@ with today's date and a short name, for example `docs/superpowers/plans/2026-10-
 
 **c. Read the plan.** Open it (or ask "Show me the plan file"). It starts with a **Goal**, an **Architecture** (how the pieces fit), a **Tech Stack** (your language and tools) and the **Spec** (your `PLAN.md`), then **Global Constraints** and a **Review Focus** (the risky cases the reviewers must check). Then come the tasks, `### Task 1:` and so on. Each task lists:
 
-- **Files:** what it creates or changes, with the test file marked **Test:**.
+- **Files:** what it creates or changes, including the test file (it may be marked **Test:** or just listed under Create).
 - **Steps,** as checkboxes, always in this order: write the failing test, run it and see it fail, write the code, run it and see it pass, commit.
 
 Check:
 
 - There are **exactly three tasks**, one for each of your three build steps. More than three? See Troubleshooting before you go on.
+- The **Tech Stack** matches what Claude recommended in step 3 (for example "built-in unittest, no installs"). If it adds a new tool or a `.venv` you didn't agree to, tell Claude: "Change the plan to use [the tool from step 3] with no installs." (In our test the new session planned `pytest` in a `.venv`; that reply fixed it.)
 - Every task **writes its test first**.
 - The tests include an example **worked out by hand**, with the expected answer written in the plan.
 - It doesn't add things from your "Not in this version" list.
@@ -253,11 +254,11 @@ Subagent-driven. Before you start building, commit the plan file on this branch 
 
 ### 5. Build with `subagent-driven-development`
 
-> **Being tested:** The build needs a signed-in session and is being tested. How it works comes from the `subagent-driven-development` skill's own instructions (Superpowers 6.4.1).
+> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026: three tasks built in about 7 minutes, with about 20 prompts and no fix rounds.
 
 Your answer starts the build. Keep the bottom line at `manual mode on`.
 
-**a. The worktree question: say No.** First, Superpowers may ask: "Would you like me to set up an isolated worktree? It protects your current branch from changes." A **worktree** is a second copy of your project in another folder, with its own branch. You don't need one: your `build-first-steps` branch already protects `main`. Reply:
+**a. The worktree question: say No.** First, Superpowers may ask (in our test it didn't ask; it built in the project folder): "Would you like me to set up an isolated worktree? It protects your current branch from changes." A **worktree** is a second copy of your project in another folder, with its own branch. You don't need one: your `build-first-steps` branch already protects `main`. Reply:
 
 ```text
 No. Work here, on the build-first-steps branch.
@@ -265,7 +266,7 @@ No. Work here, on the build-first-steps branch.
 
 Superpowers then builds in your `~/semester-project` folder. If a worktree gets made anyway, see "If a worktree was made" below.
 
-**b. What you'll see, task by task.** Before Task 1 it may run the tests once; with no tests yet it may ask whether to go on: answer Yes (being tested). The build runs **without stopping between tasks**. Claude writes at most a short line between actions, so you mostly see a stream of subagents starting and finishing, short status lines, and prompts for you to answer. For each task:
+**b. What you'll see, task by task.** Before Task 1 it may run the tests once; with no tests yet it may ask whether to go on: answer Yes (in our test it went straight to Task 1 without asking). The build runs **without stopping between tasks**. Claude writes at most a short line between actions, so you mostly see a stream of subagents starting and finishing, short status lines, and prompts for you to answer. For each task:
 
 1. **An implementer** (a fresh Claude that sees only that task) writes the test, runs it and sees it **fail**, writes the code, runs the test and sees it **pass**, then commits. It reports back with a status: `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT` or `BLOCKED`.
 2. **A reviewer** (another fresh Claude) checks the work against the plan and for quality, and sorts what it finds as Critical, Important or Minor.
@@ -281,7 +282,7 @@ The skill only stops to ask you for four reasons: something that can't be undone
 .superpowers/sdd/<your-plan-file's-name>/progress.md
 ```
 
-Its first line is `# SDD ledger`, followed by the plan's path, and it gets a line such as `Task 1: complete` as each task finishes. The folder also holds each task's brief and report. Git ignores it, so it doesn't appear in `git status` and never goes to GitHub. To check progress, ask "Show me the ledger", or open the file. Superpowers may ask to delete the folder when the build finishes (you can say No). Never ask Claude to "clean" untracked files (`git clean`) in the middle of a build: that deletes the ledger.
+Its first line is `# SDD ledger`, followed by the plan's path, and it gets a line such as `Task 1: complete` as each task finishes. The folder also holds each task's brief and report. Git ignores it, so it doesn't appear in `git status` and never goes to GitHub. To check progress, ask "Show me the ledger", or open the file. Superpowers may ask to delete the folder when the build finishes, often inside a longer command: read the whole command, and say No if it has `rm -rf`. Never ask Claude to "clean" untracked files (`git clean`) in the middle of a build: that deletes the ledger.
 
 **d. Which prompts to say Yes or No to.** Read each one.
 
@@ -295,8 +296,9 @@ Its first line is `# SDD ledger`, followed by the plan's path, and it gets a lin
 | Anything that **changes** `main` (`git switch main`, `git checkout main`, `git merge` into main, `git push origin main`, `git branch -f main`) | **No** |
 | Read-only git commands that only mention `main` (`git diff`, `git log`, `git merge-base`, `git status`) | **Yes** |
 | `git push` during the build | **No**: you push in step 7 |
+| Run a Superpowers script or update its ledger (the command mentions `superpowers/.../scripts/` or `.superpowers/sdd/`), or a subagent ("from the general-purpose agent") running tests | plain **Yes**, unless it includes `rm -rf`, `git push` or anything on the No list |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
-| At the very end, Claude may ask to delete `.superpowers/sdd/...` with `rm -rf` | **No** is fine. That folder is git-ignored and harmless. Type `Carry on without deleting it.` |
+| At the very end, a command that includes `rm -rf .superpowers/sdd/...` (its title may say "delete workspace", and it may be bundled with other commands) | **No** is fine. That folder is git-ignored and harmless. Type `Carry on without deleting it.` |
 | Change files outside your project folder | **No** |
 
 You ask Claude to switch to `main` only after the merge, in step 7d. After a No, Claude stops and asks what to do instead. Tell it, or type "Carry on with the plan without that."
@@ -322,7 +324,7 @@ It reads the ledger, skips the tasks marked complete, and carries on from the fi
 
 ### 6. Usage limits
 
-> **Being tested:** Usage limits need a signed-in session. The messages below are from Claude Code's docs, <https://code.claude.com/docs/en/errors>, and are being tested.
+> **Partly tested:** `/usage` was tested on WSL on a Claude Max plan (may differ on Pro; being tested). The limit messages below are from Claude Code's docs, <https://code.claude.com/docs/en/errors>, and are being tested.
 
 Your Claude Pro plan has a **five-hour session limit** and a **weekly limit**, and Claude and Claude Code share them: chatting on claude.ai uses the same allowance (Claude's help article, <https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan>). Anthropic doesn't publish a fixed number of messages, so this README doesn't give one.
 
@@ -334,7 +336,7 @@ Your Claude Pro plan has a **five-hour session limit** and a **weekly limit**, a
 /usage
 ```
 
-On a Pro plan it shows your plan's usage bars, when they reset, and which share went to skills, subagents and plugins (<https://code.claude.com/docs/en/costs>). Press `d` or `w` to switch between day and week. (Claude's help article names `/status` for the same check; Claude Code's docs name `/usage`. Use whichever your version shows.) Check it before you start the build, and again after: the assignment asks roughly how much of your usage the build took.
+It opens a panel (tabs Settings, Status, Config, Usage, Stats) with "Current session" and "Current week" bars, their reset times, and "What's contributing to your usage?" with shares for skills, plugins and subagents (<https://code.claude.com/docs/en/costs>). Press `d` or `w` for the last day or week. (Claude's help article names `/status`; in our test `/status` opened the same panel on the Status tab, with no usage bars, so use `/usage`. Seen on a Max plan; may differ on Pro, being tested.) Check it before you start the build, and again after: the assignment asks roughly how much of your usage the build took.
 
 **b. What happens at the limit.** You'll see warnings as you get close. At the limit, Claude Code shows a message like `You've hit your session limit · resets 3:45pm` (or `weekly limit`, with a day), and stops sending requests until that time. Switching models doesn't help: the limits cover all models.
 
@@ -348,7 +350,7 @@ On a Pro plan it shows your plan's usage bars, when they reset, and which share 
 
 ### 7. Finish
 
-> **Being tested:** This step needs a signed-in session and a real GitHub account, and is being tested. The menu below is from the `finishing-a-development-branch` skill's own instructions.
+> **Tested** on WSL (the menu and the test run), 29 October 2026; the menu below matched word for word. The GitHub part is being tested.
 
 When the build is done, Superpowers moves on to `finishing-a-development-branch` by itself. It runs all the tests first and only goes on if they pass. Then it asks something like:
 
@@ -396,7 +398,7 @@ Overall: PASS
 2
 ```
 
-**Never choose 1** (that merges into `main` on your laptop, skipping the pull request). It will probably run `git push -u origin build-first-steps` and `gh pr create ...`. Plain **Yes** to each. It prints the pull request's address. Copy it: you hand it in. If it asks "This branch split from main - is that correct?", answer yes. The menu has no "throw it away" choice, and you don't need one.
+**Never choose 1** (that merges into `main` on your laptop, skipping the pull request). It will probably run `git push -u origin build-first-steps` and `gh pr create ...` (maybe in one prompt). Plain **Yes**, never "don't ask again for git push". It prints the pull request's address. Copy it: you hand it in. If it asks "This branch split from main - is that correct?", answer yes. The menu has no "throw it away" choice, and you don't need one.
 
 If the menu never appeared (for example, you stopped and came back), type `/superpowers:finishing-a-development-branch` in Claude Code.
 
@@ -429,8 +431,8 @@ The [assignment](assignment.md) asks for the PR's address, two screenshots and a
 | An install command for the wrong laptop (`apt` on a Mac, `brew` on an Intel Mac or in WSL, `winget`, `.exe` or PowerShell on Windows) | Choose **No**. Type: "That's not for my laptop. I'm on [a Mac with an Apple chip / an Intel Mac / Windows with WSL Ubuntu]. Use the official installer for it, and explain it first." |
 | `python3: command not found` or `node: command not found` | Do "After an install" (step 3d): `/exit`, close and reopen your terminal, start Claude Code again, then try again. On Windows, check you're in the **Ubuntu window**, not PowerShell. Still missing? Do step 3c or 3d again. |
 | `command not found` for something Claude installed | Do "After an install" (step 3d). If you used a virtual environment, ask Claude: "How do I run the tests and the program with the virtual environment?" |
-| `error: externally-managed-environment` | Choose **No** to `--break-system-packages`. Ask Claude: "Use a virtual environment in .venv instead." In WSL, install `python3-venv` first (step 3c). |
-| (being tested) Superpowers starts brainstorming, asking design questions one at a time | Type: "Skip brainstorming: PLAN.md is the design. Use writing-plans for its first three build steps." |
+| `error: externally-managed-environment` or `No module named pip` | Choose **No** to `--break-system-packages`. Ask Claude: "Use a virtual environment in .venv instead." In WSL, install `python3-venv` first (step 3c). |
+| Superpowers starts brainstorming, asking design questions one at a time | Type: "Skip brainstorming: PLAN.md is the design. Use writing-plans for its first three build steps." |
 | `/superpowers:...` isn't in the list | Type `/reload-plugins`, then try again. Still missing? In a second terminal window, `claude plugin list`, and check `superpowers` is there and enabled; if not, do step 2 again. |
 | `You've hit your session limit` or `weekly limit` | Normal. Wait for the reset time it shows (step 6). Leave Claude Code open, or come back later and carry on (step 5e). If you hit the weekly limit with days to go, tell your instructor. |
 | A task goes round and round in review and fix rounds | Up to 5 rounds per task is normal; after that Claude decides and writes down a ruling. If it seems stuck, press `Esc` and ask: "Summarise in plain English what's still failing and why." Check `/usage`. Ask in office hours if it's still stuck. |
@@ -443,7 +445,7 @@ The [assignment](assignment.md) asks for the PR's address, two screenshots and a
 
 ### If it committed to `main`
 
-> **Being tested** with real students. The git commands were tested in a scratch repository on Linux, 12 October 2026.
+> **Being tested** with real students. The git commands were tested in a scratch repository on Linux, 12 October 2026, and on Windows (WSL), 29 October 2026.
 
 If Claude committed your work on `main` instead of your branch, you move the work to a new branch yourself. Type these commands **yourself, in a second terminal window** (Terminal on a Mac, a second Ubuntu window on Windows), one at a time, and check each result before the next.
 

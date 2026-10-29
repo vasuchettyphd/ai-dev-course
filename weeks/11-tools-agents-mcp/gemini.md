@@ -9,11 +9,11 @@ Two reminders from week 9:
 - **Free tier, free of charge.** You never add billing for this course. Your real cost this week is $0. You still work out what each call would cost on Google's paid tier, so you learn the arithmetic.
 - **Google may use what you send.** On the free tier, Google uses your inputs to improve its products, and human reviewers may read them. Google says "Do not submit sensitive, confidential, or personal information to the Unpaid Services" (week 10 step 2c quotes the terms). Everything your program sends must be course-safe: no personal, customer or real business data.
 
-**Tested with** (28 October 2026): `google-genai` 2.30.0, `gemini-3.5-flash-lite` on a free-tier key, Python 3.12, with real calls (the output below is from that run). **Being tested:** everything inside a signed-in Claude Code session, everything on GitHub, every step on a Mac or in Windows (WSL), and your own project's agent.
+**Tested with** (28 October 2026): `google-genai` 2.30.0, `gemini-3.5-flash-lite` on a free-tier key, Python 3.12, with real calls (the output below is from that run). The Gemini `tool_call.py` and the signed-in Claude Code MCP steps were also run in Windows (WSL) on 29 October 2026. **Being tested:** everything on GitHub, every step on a Mac, and your own project's Gemini agent.
 
 ## Before you start
 
-The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path; Google keys usually start with `AIza`, being tested), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
+The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path; Google keys start with `AIza`), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
 
 ```bash
 python -c "from google import genai; print(genai.__version__)"

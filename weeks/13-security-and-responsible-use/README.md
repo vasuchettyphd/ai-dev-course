@@ -8,7 +8,7 @@
 
 - `anthropic` 1.13.0 and `claude-haiku-5-5`, with real runs from a container (the scores below are from those runs).
 - The deal screener's injection test set, its defence and their tests.
-- **Being tested:** everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Windows (WSL), 29 October 2026: the deal screener's injection run (40 of 40) and steps 1 and 4 to 6 in a signed-in Claude Code session. **Being tested:** everything on GitHub, and every step on a Mac.
 
 ## Before you start
 
@@ -97,7 +97,7 @@ Indirect injection is the one to worry about in your project: you trust yourself
 
 - **"JSON-encode untrusted content."** Put the outside text inside a JSON string, so "an attacker cannot close a quote or tag to 'break out' into an instruction context."
 - **"State the policy in your system prompt."** Tell the model that this text is data, never instructions.
-- **"Red-team your own agent."** "Before deploying, test your workflow with documents, emails, and tool outputs that deliberately contain injection attempts." That's step 4.
+- **"Red-team your own agent."** "Before deploying, test your workflow with documents, emails, and tool outputs that deliberately contain injection attempts, and confirm that Claude ignores them and that your screening and confirmation steps catch the rest." That's step 4.
 
 ### 3. The deal screener under attack
 
@@ -137,7 +137,7 @@ It runs the 8 hostile listings and prints one line per case, the score and the c
 
 ### 4. Attack and defend your own feature
 
-> **Being tested:** steps 4 and 5 need a signed-in session and are being tested. The deal screener's version was built and run on 13 October 2026.
+> Steps 4 and 5 were tested in a signed-in session on Windows (WSL) on 29 October 2026; the Mac is being tested. The deal screener's version was built and run on 13 October 2026.
 
 **a. Make the branch first.** In a **new** terminal window (no key loaded), `cd ~/semester-project`, start `claude`, and in Claude Code:
 
@@ -190,7 +190,7 @@ If both scores were already perfect, that's a real result: write down why you th
 In Claude Code:
 
 ```text
-Run the safe-and-private reviewer as a subagent on the whole project, not only this branch's changes. Focus on: any API key or password in tracked files or results files (search tracked files with git grep -l, which prints file names only, never the matching lines, and never open .env); whether .claude/settings.json still has the Read(./.env) deny rule; whether requirements.txt pins every package with ==; whether any text from outside reaches the model without the JSON defence; whether any tool can send, delete, pay or write files, and if so whether a person must confirm each action; whether any test calls the real API by default; whether any test data or notes contain real personal information. Then add a section at the end of REVIEW.md, headed "## Week 13: security review", with one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason, numbering the findings S1, S2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
+Run the safe-and-private reviewer as a subagent on the whole project, not only this branch's changes. Focus on: any API key or password in tracked files or results files (search tracked files with git grep -l, which prints file names only, never the matching lines, and never open .env); whether .claude/settings.json still has the Read(./.env) deny rule; whether requirements.txt pins every package with ==; whether any text from outside reaches the model without the JSON defence; whether any tool can send, delete, pay or write files, and if so whether a person must confirm each action; whether any test calls the real API by default; whether any test data or notes contain real personal information. Then add a section at the end of REVIEW.md, headed "## Week 13: security review", with one table with the columns #, Label (Must fix, Should fix or Nice to have), Finding (file:line), Found by, Decision, Reason, numbering the findings S1, S2 and so on. Leave Decision and Reason empty. Do not change any file except REVIEW.md.
 ```
 
 Then add your step 1 results as rows of your own (Found by: you): the `.env` history check, the two key searches and the deny rule. Triage, fix and commit as in week 6 steps 5 and 6.
@@ -222,7 +222,7 @@ That's why the course has used made-up or course-safe data since week 4. **Your 
 
 **Push, open a pull request, read Files changed** (the hostile cases and expected answers, the script change and its tests, the defence and its tests, the results files, `REVIEW.md`; no `.env` and no real key: use the browser's Find for `sk-ant-`, `ANTHROPIC_API_KEY=`, `AIza` and `GEMINI_API_KEY=`, including in the results files; only a fake value, as in `.env.example`, is allowed), as in week 10 step 7. In the pull request's **Commits** tab, the hostile cases commit must come before the defence. **Merge with "Create a merge commit"**, as in week 12, so `main` keeps that order. Then pull.
 
-The deal screener's week 13 changes are on this page (it works once week 13 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-12...week-13>.
+The deal screener's week 13 changes are on this page: <https://github.com/vasuchettyphd/ai-dev-course/compare/week-12...week-13>.
 
 ## Check it worked
 
@@ -240,7 +240,7 @@ The deal screener's week 13 changes are on this page (it works once week 13 is p
 | `git log -S` lists a commit | Run `git show --stat --format=%s <id>` to see the files. A fake value in `.env.example` or a test is fine; a real key: step 1d, delete it first. |
 | `git log --all --oneline -- .env` prints a line | `.env` was committed once. Delete the keys in it (step 1d) before anything else, then tell your instructor. |
 | Every attack failed before any defence | A real result. Report it, say why you think they failed, and keep the defence anyway: the next attack may be cleverer. |
-| The defence lowered your normal dev score | Read the dev misses. Usually the system prompt sentence is too strong ("ignore everything in the input"): it should say to read the text as data. Change it once, run both sets again, and report all the scores. |
+| The defence lowered your normal dev score | Read the dev misses. Usually the system prompt sentence is too strong ("ignore everything in the input"): it should say to read the text as data. Change it once, run both sets again, and report all the scores. If the miss is an edge case the attack sentence doesn't mention, the JSON wrapping itself may have changed the answer: report it as a real cost of the defence. |
 | Your feature reads no outside text | Your input is still typed by someone. Use direct attacks (step 2), and say in your review what would change if the feature ever read files, emails or web pages. |
 | You have no week 12 evaluation | Write `hostile-cases.md` first (step 4b), then make a small evaluation with week 12 step 5's prompt, for your 5 hostile cases and about 5 normal ones, and follow step 4 from c. In 4f, re-run those normal cases instead of 15 dev cases. Tell your instructor. |
 | `No API key found ...`, or every case says ERROR | As in week 12's Troubleshooting. |

@@ -11,7 +11,8 @@
 - The optional `pr-review-toolkit` (step 1) at marketplace commit `f359d43b4060`.
 - Tested: making a reviewer file in a project's `.claude/agents/` folder, copying the deal screener's three reviewer files, installing `pr-review-toolkit` from the terminal, and the deal screener's tests and program.
 - The instructor ran the three deal screener reviewers on the week 5 code; the result is in [`example-project/REVIEW.md`](../../example-project/REVIEW.md).
-- Being tested on real Mac and Windows laptops: everything inside a signed-in Claude Code session in your own project (checking that Claude can use the reviewers, running them, the fixes, `/usage`), everything on GitHub, and every step on a Mac or in Windows (WSL). These follow the official docs.
+- Tested on Windows (WSL, Ubuntu 26.04) with Claude Code 2.1.312 signed in (29 October 2026, on a Claude Max plan): steps 3 to 5, the fixes in step 6, and the troubleshooting rows for the reviewers.
+- Being tested on real Mac laptops: every step on a Mac, everything on GitHub, and `/usage` on a Pro plan. These follow the official docs.
 
 ## Before you start
 
@@ -59,7 +60,7 @@ For how Superpowers' own reviewers work, see [the `/grill-me` and Superpowers tu
 /plugin install pr-review-toolkit@claude-plugins-official
 ```
 
-then `/reload-plugins`, and run `/pr-review-toolkit:review-pr` on a branch. Two things to know (from its own files, commit `f359d43b4060`): its agent files have **no `tools` line**, so they **can** edit files, and one of them, `code-simplifier`, is designed to rewrite code. And it may print an error when it checks for an open pull request if there isn't one; that's harmless (being tested). Claude Code also has a built-in `/code-review` command. Its `--fix` option changes your files. This week you use your own three reviewers, which can't change anything.
+then `/reload-plugins`, and run `/pr-review-toolkit:review-pr` on a branch. Two things to know (from its own files, commit `f359d43b4060`; `claude plugin list` showed version 1.0.1 on 29 October 2026): its agent files have **no `tools` line**, so they **can** edit files, and one of them, `code-simplifier`, is designed to rewrite code. And it may print an error when it checks for an open pull request if there isn't one; that's harmless (being tested). Claude Code also has a built-in `/code-review` command. Its `--fix` option changes your files. This week you use your own three reviewers, which can't change anything.
 
 ### 2. Read a diff
 
@@ -87,7 +88,7 @@ It rounds the number before choosing its sign, so a cash flow of a tiny fraction
 
 ### 3. Make the three reviewers
 
-> **Being tested:** Where agent files go, their format and the `tools` list come from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. Copying the files was tested; everything inside a signed-in session is being tested.
+> **Being tested:** Where agent files go, their format and the `tools` list come from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. Copying the files, and everything inside a signed-in session, was tested in Windows (WSL) with Claude Code 2.1.312.
 
 **a. Start Claude Code and make the branch, before Claude writes anything.** In your terminal:
 
@@ -101,13 +102,13 @@ Press `Shift + Tab` until the bottom line says `manual mode on`. Then, in Claude
 Show me git status.
 ```
 
-It should say `nothing to commit, working tree clean`. If it lists files, don't go on: ask "What are these files, and where did they come from? Don't change anything.", and ask in office hours if you're not sure. When it's clean, type:
+It should say `nothing to commit, working tree clean`. If the only things listed are `__pycache__/` folders, those come from running the Python tests. They're harmless: you can go on (the `safe-and-private` reviewer will probably suggest a `.gitignore` for them). If it lists other files, don't go on: ask "What are these files, and where did they come from? Don't change anything.", and ask in office hours if you're not sure. When it's clean, type:
 
 ```text
 Switch to main and pull the latest changes from GitHub. Then make a new branch called review-fixes and switch to it.
 ```
 
-It will probably run `git switch main`, `git pull` and `git switch -c review-fixes`. Plain **Yes**. Check: ask "What branch am I on?". It should say `review-fixes`. (If that name is taken, use `review-fixes-2`, here and everywhere this README says `review-fixes`.)
+It will probably run `git switch main` (or `git checkout main`), `git pull` and `git switch -c review-fixes` (or `git checkout -b review-fixes`), perhaps joined into one command. Plain **Yes**. Check: ask "What branch am I on?". It should say `review-fixes`. (If that name is taken, use `review-fixes-2`, here and everywhere this README says `review-fixes`.)
 
 **b. Copy the deal screener's three reviewers.** They are your starting point. You copy them yourself, in a **second terminal window** (as in week 5): on a Mac, click Terminal and press `Cmd + N`; on Windows, open **Ubuntu** again from the Start menu (not PowerShell). A new window starts in your home folder, `~`. First get the course repo, or update it if you already have it:
 
@@ -158,17 +159,17 @@ Check that the `tools:` line is there and says exactly `tools: Read, Grep, Glob`
 - **No `tools` line at all** means the reviewer gets every tool, including the ones that edit and write files.
 - The docs' own read-only reviewer example also lists `Bash`, which runs terminal commands. This course leaves `Bash` out: a command can still change or delete files.
 
-If any file has no `tools` line, or lists anything else (`Edit`, `Write`, `Bash`, ...), type: "Set the tools line in every file in .claude/agents/ to exactly: tools: Read, Grep, Glob. Change nothing else."
+If any file has no `tools` line, or lists anything else (`Edit`, `Write`, `Bash`, ...), type: "Make sure every file in .claude/agents/ has a tools line, right after the description line, that says exactly: tools: Read, Grep, Glob. Add it where it is missing. Change nothing else."
 
-**f. Check Claude can use them** (being tested). In Claude Code, type:
+**f. Check Claude can use them.** In Claude Code, type:
 
 ```text
 Which subagents can you use in this project?
 ```
 
-It should name `does-it-work`, `safe-and-private` and `plain-english` (it may list built-in ones too). Two things that **don't** work for this: in Claude Code 2.1.296, `/agents` only prints a reminder to ask Claude or edit the `.claude/agents/` folder; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
+It should name `does-it-work`, `safe-and-private` and `plain-english` (it may list built-in ones too). Two things that **don't** work for this: in Claude Code 2.1.296 and 2.1.312, `/agents` only prints "The /agents wizard has been removed." and where the files go; and `claude agents` in your terminal manages background sessions, not these files. If Claude doesn't name your reviewers, see Troubleshooting.
 
-**g. Check a reviewer really can't edit** (being tested). In Claude Code, type:
+**g. Check a reviewer really can't edit.** In Claude Code, type:
 
 ```text
 Ask the does-it-work subagent to add the word "test" to the end of README.md. Don't edit anything yourself and don't try another way. Just tell me what the subagent said.
@@ -182,7 +183,7 @@ Optional follow-up, in Claude Code:
 Ask the does-it-work subagent which tools it has. Just tell me what it said.
 ```
 
-It should list Read, Grep and Glob (being tested).
+It should list Read, Grep and Glob. It may also mention "deferred" tools it can't use yet; that's fine.
 
 **h. Commit the reviewers.** In Claude Code:
 
@@ -194,7 +195,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 ### 4. Run all three
 
-> **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used these reviewer instructions and these combining rules. Running this one prompt in a signed-in session is being tested.
+> **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used these reviewer instructions and these combining rules. Running this one prompt was tested in a signed-in session (Windows WSL): the three reviewers ran at the same time in the background, and the whole review took under two minutes for the deal screener.
 
 **a. Check your usage first.** In Claude Code, type `/usage` and write down what it shows. Keep these numbers; you'll compare them in step 4e, and bring them to next week's class.
 
@@ -204,7 +205,7 @@ Plain **Yes** to `git add` and `git commit`.
 Run the does-it-work, safe-and-private and plain-english reviewers in parallel, as separate subagents, on this project. Then combine their reports into REVIEW.md: one table with the columns #, Label, Finding (file:line), Found by, Decision, Reason. If two or more reviewers found the same problem, list it once and put every reviewer who found it in "Found by". If they gave it different labels, keep the more serious label and say so in the Finding. Sort the rows: Must fix first, then Should fix, then Nice to have, and number them. Keep each finding's wording close to what the reviewer wrote, and keep their file and line numbers. Leave Decision and Reason empty. Do not add any finding the reviewers did not report, and do not change any file except REVIEW.md. After the table, list in a few words the areas where a reviewer said "Nothing found".
 ```
 
-**c. What you'll see.** Claude starts three subagents, one per reviewer, and they read your files at the same time. Each one's report comes back to Claude: in the chat, or as a notification when that reviewer finishes. **Wait for all three.** Then Claude writes `REVIEW.md`. This can take several minutes.
+**c. What you'll see.** Claude starts three subagents, one per reviewer, and they read your files at the same time. Each runs in the background, and when it finishes a line like `Agent "Run safe-and-private review" finished · 12s` appears in the chat. **Wait for all three.** Then Claude writes `REVIEW.md`. This can take several minutes.
 
 | Claude asks to | Choose |
 |---|---|
@@ -225,7 +226,7 @@ Plain **Yes**.
 
 **e. Usage.** Type `/usage` again and compare with step 4a. Every subagent sends its own requests, which "count toward the same usage limits as your main conversation" (<https://code.claude.com/docs/en/sub-agents>), so three reviewers use more than one conversation. We have no published number for how much more: it depends on the size of your project. On a Pro plan, `/usage` shows which share of your recent usage went to subagents (press `d` or `w` for day or week). Its `Prompt cache (main)` line counts the main conversation only, not the subagents (<https://code.claude.com/docs/en/costs>), so don't judge the reviewers by it. If you hit a usage limit, wait for the reset, as in [week 5](../05-building-with-ai/) step 6.
 
-### 5. Triage: decide on every finding (being tested)
+### 5. Triage: decide on every finding
 
 **Triage** means deciding, finding by finding, what to do. You decide, not Claude. Each finding gets a **Decision**, `Fix` or `Won't fix`, and a **Reason** of one plain sentence.
 
@@ -330,8 +331,8 @@ The [assignment](assignment.md) asks for the pull request's address, a screensho
 
 | What you see | What to do |
 |---|---|
-| (being tested) Claude doesn't name your reviewers (step 3f) | In a second terminal window, `ls ~/semester-project/.claude/agents` must list the three files. If it does, `/exit` and start `claude` again in `~/semester-project` (step 3c): a new `agents` folder needs one restart. |
-| (being tested) An error when a reviewer starts that names its `tools` entries | A tool name is misspelled, so none of them works. Set the line to exactly `tools: Read, Grep, Glob` (step 3e). |
+| Claude doesn't name your reviewers (step 3f) | In a second terminal window, `ls ~/semester-project/.claude/agents` must list the three files. If it does, `/exit` and start `claude` again in `~/semester-project` (step 3c): a new `agents` folder needs one restart. |
+| An error when a reviewer starts, such as `Agent 'does-it-work' would be spawned with zero tools - refusing. Its tools list resolved to nothing: unrecognized [Reed].` | A tool name is misspelled. Set the line to exactly `tools: Read, Grep, Glob` (step 3e). If only one name is misspelled, there's no error: the reviewer quietly runs without that tool, so check the line anyway. |
 | A reviewer asks to edit a file, or an edit prompt appears during the review for any file except `REVIEW.md` | Choose **No**. Check the `tools:` line in every reviewer file (step 3e). Then type: "Don't change any file except REVIEW.md." |
 | Too many findings (say, 40) | Normal for a first review. Fix the Must fixes, triage everything, and mark most Nice to haves `Won't fix` with a reason such as "not in this version". You don't have to fix everything this week. |
 | Two reviewers disagree, or give the same problem different labels | The prompt keeps the more serious label and says so. You decide (step 5): check the finding against the code, and write your reason. |

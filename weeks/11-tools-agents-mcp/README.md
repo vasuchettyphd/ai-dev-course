@@ -9,14 +9,14 @@
 - `anthropic` 1.13.0 and `claude-haiku-5-5`, with real calls from a container (the outputs below are from those runs).
 - The official MCP Python package `mcp` 2.3.0, in a container with Python 3.12, and Claude Code 2.1.296's `claude mcp add`, `list`, `get` and `remove` commands (not signed in).
 - The deal screener's new tool, agent and MCP server, with 184 tests.
-- **Being tested:** everything inside a signed-in Claude Code session (approving your MCP server, the `/mcp` screen, the permission prompt and Claude Code actually calling your tool), everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Everything inside a signed-in Claude Code session (approving the server, `/mcp`, the permission prompt, Claude Code calling the tool) was tested in Windows (WSL, Ubuntu 26.04, Claude Code 2.1.312) on 29 October 2026. **Being tested:** everything on GitHub, and every step on a Mac.
 
 ## Before you start
 
 You need:
 
 - Weeks 9 and 10 done: your Anthropic key in `.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, `~/first-call/.venv` (week 9 step 3), and the course repo's `example-project` set up as in week 10 step 4a (its own `.venv` and `.env`).
-- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12; on a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools).
+- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12 and 26.04 has 3.14; on a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
 **On the Gemini path** (no Anthropic credit, agreed with your instructor in week 9)? Use [week 11 on the Gemini path](gemini.md) alongside this page.
@@ -47,6 +47,8 @@ As in weeks 9 and 10: plain-English prompts, plain **Yes** for git, a branch fir
 | Read or print `.env`, or put a key in any file, including `.mcp.json` | **No** |
 | `git add`, `git commit`, `git push` on your `tool` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
 | Anything that changes `main`, or `reset --hard`, `--force`, `git clean`, `rm -rf` | **No** |
+
+At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay.
 
 ## Steps
 
@@ -189,7 +191,7 @@ Those are exactly the numbers the program gives in week 5, because the program w
 
 ### 4. Give your project one tool
 
-> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version was built and tested on 13 October 2026.
+> Tested in a signed-in session in Windows (WSL) on 29 October 2026: the plan prompt gave a 9-task plan with the fake-model tests, and subagent-driven-development built it (36 tests passing offline). The deal screener's version was built and tested on 13 October 2026.
 
 **a. Make the branch first.** In a **new** terminal window (no keys loaded), `cd ~/semester-project`, start `claude`, and in Claude Code:
 
@@ -213,13 +215,13 @@ Switch to main, pull the latest changes from GitHub, then create a new branch ca
 
 Then `/superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.` as in weeks 9 and 10. Answer as in the table at the top.
 
-**d. Try it.** In a second terminal window (not the Claude Code one): activate `.venv`, load the key, and ask your agent three questions: one it can answer with the tool, one with an input missing, and one with a bad input. Copy one run's printed output, with the tool calls and the cost line: you hand it in.
+**d. Try it.** In a second terminal window (not the Claude Code one): activate `.venv`, load the key, and ask your agent three questions: one it can answer with the tool, one with an input missing, and one with a bad input (Claude may ask you about it before calling the tool, or the tool may refuse it with an `is_error` result; either is fine, as long as it doesn't guess or crash). Copy one run's printed output, with the tool calls and the cost line: you hand it in.
 
 **e. Run the tests** with `.env` moved out of the folder, as in week 9 steps 5e and 5f: they must all pass.
 
 ### 5. Make your tool an MCP server
 
-> **Being tested:** everything inside a signed-in Claude Code session: approving the server, `/mcp`, the name Claude Code shows for your tool, the permission prompt, and Claude Code calling it. `claude mcp add`, `list`, `get` and `remove` were run for real (Claude Code 2.1.296, not signed in).
+> Tested signed in (Claude Code 2.1.312, Windows (WSL), 29 October 2026): Claude Code shows `New MCP server found in this project: dealscreener`, `/mcp` lists `✔ dealscreener 1 tool`, and the permission prompt is titled `dealscreener - Screen Listing Tool: (MCP)` with `1. Yes`, `2. Yes, and don't ask again ...`, `3. No`. `claude mcp add`, `list`, `get` and `remove` were also run for real (Claude Code 2.1.296, not signed in). **Being tested:** Mac and GitHub.
 
 **a. Trust first.** An MCP server is a program on your laptop that Claude Code will start and talk to. Claude Code's security page: "We encourage either writing your own MCP servers or using MCP servers from providers that you trust." Anthropic "does not security-audit or manage any MCP server" (<https://code.claude.com/docs/en/security#mcp-security>). And its MCP page: "Verify you trust each server before connecting it. Servers that fetch external content can expose you to prompt injection risk." (<https://code.claude.com/docs/en/mcp>). This week you connect only the one you write.
 
@@ -235,7 +237,7 @@ def screen_listing(...):
     ...the same checks and calculator as the agent's tool...
 ```
 
-Older tutorials call `MCPServer` by its old name, `FastMCP`; in version 2.3.0 that name no longer exists. To send a plain error sentence back to the client, the server raises `ToolError` (from `mcp.server.mcpserver.exceptions`).
+Older tutorials call `MCPServer` by its old name, `FastMCP`; in version 2.3.0 that name no longer exists. To send a plain error sentence back to the client, the server raises `ToolError` (from `mcp.server.mcpserver.exceptions`); the client sees `Error executing tool screen_listing: ` followed by your sentence.
 
 **c. Connect it to Claude Code.** Open a **new** terminal window with **no key loaded** (tool rule 6), `cd ~/ai-dev-course/example-project`, and check three things:
 
@@ -245,7 +247,7 @@ grep -c 'Read(./.env)' .claude/settings.json
 .venv/bin/python --version
 ```
 
-The first prints `clear` (no key loaded in this window). The second prints `1`: this folder holds your real `.env` from week 10, so the course repo comes with the week 9 deny rule in `example-project/.claude/settings.json`, which stops Claude Code reading it (being tested in a signed-in session). The third says 3.11 or newer. You can test the server on its own first, without Claude Code: `.venv/bin/python -m unittest tests.test_mcp_server -v` starts it, lists its tool and screens listing B. Then:
+The first prints `clear` (no key loaded in this window). The second prints `1`: this folder holds your real `.env` from week 10, so the course repo comes with the week 9 deny rule in `example-project/.claude/settings.json`, which stops Claude Code reading it: asked to show `.env`, it replied `I can't read .env. Your permission settings deny access to that file's directory, so the read was blocked.` If Claude Code suggests `! cat .env`, don't: the `!` runs the command and prints your key into the chat. The third says 3.11 or newer. You can test the server on its own first, without Claude Code: `.venv/bin/python -m unittest tests.test_mcp_server -v` starts it, lists its tool and screens listing B. Then:
 
 ```bash
 claude mcp add dealscreener --scope project -e PYTHONPATH="$PWD" -- "$PWD/.venv/bin/python" -m dealscreener.mcp_server
@@ -256,9 +258,9 @@ claude mcp list
 - `-e PYTHONPATH="$PWD"` tells Python where the `dealscreener` code is, wherever Claude Code starts the server from.
 - After `--` comes the command that starts the server. It uses the **full path** to the `.venv`'s Python, because Claude Code saves the command exactly as you typed it.
 
-`claude mcp list` should show ``dealscreener: ... ⏸ Pending approval (run `claude` to approve)``. A project's servers wait until you approve them, as a safety check. `.mcp.json` holds no key; open it and check.
+`claude mcp list` should show, among any other servers your account has, ``dealscreener: ... ⏸ Pending approval (run `claude` to approve)``. A project's servers wait until you approve them, as a safety check. `.mcp.json` holds no key; open it and check.
 
-**d. Use it.** In that same key-free window, start `claude`. Approve the `dealscreener` server when Claude Code asks, then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: price 150000, rent 1700 a month, property tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status. (All of this is being tested.) Take a screenshot of Claude Code calling your tool, with nothing secret on screen: you hand it in.
+**d. Use it.** In that same key-free window, start `claude`. Claude Code shows `New MCP server found in this project: dealscreener`. Use the arrow keys to pick **Use this MCP server** and press Enter (the highlighted default, `Continue without using this MCP server`, skips it). Then ask it something that needs the tool, for example "Use the dealscreener tool to check listing B: price 150000, rent 1700 a month, property tax 2400 a year, insurance 1200 a year, no HOA, 25% down, 7% interest, 30 years, closing costs 6000." Claude Code should ask permission to run the tool: plain **Yes**. Its answer should give the cash flow as $430.53. Type `/mcp` to see your server's status: `✔ dealscreener 1 tool`, and Enter on it shows `Status: ✔ connected` and its tool `screen_listing`. Take a screenshot of Claude Code calling your tool, with nothing secret on screen: you hand it in.
 
 **e. For your own project.** In Claude Code, on your `tool` branch:
 
@@ -303,7 +305,7 @@ The deal screener's week 11 changes are on this page (it works once week 11 is p
 | Error 400 mentioning `tool_use_id` or `tool_result` | Each `tool_result` must carry the `id` of the `tool_use` it answers, and the results must come first in your reply. |
 | Error 400 about thinking blocks | Claude's turn must go back into the conversation unchanged (`response.content`), not rebuilt by hand. |
 | `claude mcp list` shows the server as failed, or `No module named 'dealscreener'` | Test the server on its own first: `python3 -m unittest tests.test_mcp_server -v` in the project folder. Then: the `-e PYTHONPATH="$PWD"` part is missing, or you ran `claude mcp add` from another folder. `claude mcp remove dealscreener -s project`, `cd` into the project folder, and add it again (step 5c). |
-| `No module named 'mcp'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`, in the project folder, nothing added to the command) and make it again with 3.11 or newer: for example `python3.12 -m venv .venv` (if `python3.12 --version` works), then `source .venv/bin/activate` and `pip install -r requirements.txt`. |
+| `No module named 'mcp'` or `No module named 'pydantic'` | The `.venv` doesn't have it: `source .venv/bin/activate`, `python3 --version` (3.11 or newer), `pip install -r requirements.txt`. If the `.venv` was made with Python 3.10, delete only that `.venv` folder (`rm -r .venv`, in the project folder, nothing added to the command) and make it again with 3.11 or newer: for example `python3.12 -m venv .venv` (if `python3.12 --version` works), then `source .venv/bin/activate` and `pip install -r requirements.txt`. |
 | `cannot import name 'FastMCP'` | Version 2.3.0 calls it `MCPServer`: `from mcp.server import MCPServer`. |
 | "Pending approval" | Start `claude` in the project folder and approve the server (step 5d). |
 | Claude Code asks permission to run your tool | Plain **Yes** for your own read-or-calculate tool. **No** for any tool you didn't write. |

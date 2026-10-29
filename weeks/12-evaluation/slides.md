@@ -15,7 +15,7 @@ AI Development Course
 
 Evidence, not impressions
 
-<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real evaluation runs), 13 October 2026. Jev numbers from the course's advanced/jev tutorial. A signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real evaluation runs), 13 October 2026. Jev numbers from the course's advanced/jev tutorial. A signed-in session was tested in Windows (WSL); GitHub and Mac are being tested.</p>
 
 ---
 

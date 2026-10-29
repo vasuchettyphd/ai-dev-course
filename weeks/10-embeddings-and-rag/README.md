@@ -2,13 +2,13 @@
 
 **Goal:** make your program find information by **meaning**, not just matching words, and answer questions from **your own documents**, naming which documents it used. You'll get a Google AI key safely, turn sentences into embeddings and compare them, see each step of RAG on the deal screener's notes, and add RAG over your own course-safe documents to your project, merged through a pull request.
 
-**Time:** about 20 minutes before class to get the Google key (step 2), then plan for about 2 to 3 hours of your own time (an estimate). **Cost:** Google's pricing page lists embeddings as "Free of charge" on the free tier, so the course expects no Google charge for this week's use (being tested for the model this course uses); step 2c explains the catch: what you send may be read to improve Google's products. The answers come from Claude Haiku, paid from your week 9 API credit: a fraction of a cent per question.
+**Time:** about 20 minutes before class to get the Google key (step 2), then plan for about 2 to 3 hours of your own time (an estimate). **Cost:** Google's pricing page lists embeddings as "Free of charge" on the free tier, so the course expects no Google charge for this week's use (the pricing page lists `gemini-embedding-001` input as "Free of charge" on the free tier, checked 29 October 2026); step 2c explains the catch: what you send may be read to improve Google's products. The answers come from Claude Haiku, paid from your week 9 API credit: a fraction of a cent per question.
 
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
 - Google's official Python package `google-genai` 2.30.0 (released 13 October 2026; it needs Python 3.10 or newer) and the embedding model `gemini-embedding-001`, plus `anthropic` 1.13.0 and `claude-haiku-5-5` from week 9, in a container with Python 3.12.
 - Real calls on 13 October 2026, from a container: `embed.py` below, and the deal screener's `notes` command (index, three questions, its live test). The scores, answers and costs shown below are from those runs; yours will differ a little. Google's responses carried no token counts.
-- **Being tested:** every step in Google AI Studio, whether your school Google account can use AI Studio, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- **Being tested:** every step in Google AI Studio, whether your school Google account can use AI Studio, everything on GitHub, and every step on a Mac. Windows (WSL), 29 October 2026: steps 3, 4 and 6b, the Troubleshooting messages, and steps 5 and 6a in a signed-in Claude Code session (2.1.312) were run and matched this page.
 
 ## Before you start
 
@@ -47,6 +47,8 @@ The same as week 9: you ask Claude Code in plain English, and this page shows th
 | Commit the saved index file | **No**: it holds your documents' full text (step 5d) |
 | `git add`, `git commit`, `git push` on your `rag` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
 | Anything that changes `main`, or `reset --hard`, `--force`, `git clean`, `rm -rf` | **No** |
+
+At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay.
 
 ## Steps
 
@@ -191,7 +193,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`python3 --version` must show 3.10 or newer, as in week 9 step 3a. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env`. Check git ignores it: `git check-ignore .env` prints `.env`. Then check the Google line is in it: `grep -c '^GEMINI_API_KEY=' .env` prints `1`. If it prints `0` (an older `.env` from week 9 was already there, so `cp -n` left it alone), add the `GEMINI_API_KEY=` line to this `.env` with a text editor, as in step 2d.
+`python3 --version` must show 3.10 or newer, as in week 9 step 3a. If `python3 -m venv .venv` fails with "ensurepip is not available", do the fix in [week 9 step 3b](../09-calling-a-model/README.md#3-your-first-call) (`sudo apt install python3-venv`, then `rm -r .venv`) and run it again. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env` (newer Ubuntu prints `cp: warning: behavior of -n is non-portable ...`: that's harmless). Check git ignores it: `git check-ignore .env` prints `.env`. Then check the Google line is in it: `grep -c '^GEMINI_API_KEY=' .env` prints `1`. If it prints `0` (an older `.env` from week 9 was already there, so `cp -n` left it alone), add the `GEMINI_API_KEY=` line to this `.env` with a text editor, as in step 2d.
 
 **b. Chunk and index.** In the same window:
 
@@ -228,7 +230,7 @@ Retrieval still finds the 3 "closest" chunks (something is always closest), but 
 
 ### 5. Add RAG to your project
 
-> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version was built and tested offline on 13 October 2026.
+> Tested in a signed-in Claude Code session (2.1.312, Sonnet) in Windows (WSL) on 29 October 2026: the plan took about 4 minutes, and the build took about 26 minutes and about 90 Yes answers. Claude Code never opened `.env`. The deal screener's version was built and tested offline on 13 October 2026.
 
 **a. Make the branch first.** Open a **new** terminal window (no keys loaded in it), `cd ~/semester-project`, start `claude`, and in Claude Code:
 
@@ -258,7 +260,7 @@ The first prints `.env`; the second prints `1`. If either doesn't, redo week 9 s
 **d. Plan and build it, with the guardrails in the prompt.** In Claude Code (replace the parts in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan to add RAG to this project: answer questions about the documents in <folder> using <one sentence: what the questions are for>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-embedding-001 (task_type RETRIEVAL_DOCUMENT for the documents and RETRIEVAL_QUERY for questions, 768 dimensions), and Anthropic's anthropic package with claude-haiku-5-5 for the answers. Chunk the documents, embed each chunk once, save the embeddings in an index file, retrieve the 3 closest chunks by cosine similarity, and tell the model to answer only from them, name the files it used, and reply "My notes don't say." when they don't answer the question. Rules: the program reads GEMINI_API_KEY and ANTHROPIC_API_KEY only from the environment (it may load .env when it starts), and you, Claude, must never open, read, print or log .env or the keys; rebuild or refuse when the documents change after indexing; add the index file to .gitignore and .dockerignore; if a key is missing or a call fails, say what happened in one plain sentence and carry on as far as possible; print the cost of each Claude call; tests must use a fake embedder and a fake model and never call Google or Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no Google key"; update the Dockerfile and requirements; add GEMINI_API_KEY to .env.example with a fake value. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan to add RAG to this project: answer questions about the documents in <folder> using <one sentence: what the questions are for>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-embedding-001 (task_type RETRIEVAL_DOCUMENT for the documents and RETRIEVAL_QUERY for questions, 768 dimensions), and Anthropic's anthropic package with claude-haiku-5-5 for the answers. Chunk the documents, embed each chunk once, save the embeddings in an index file, retrieve the 3 closest chunks by cosine similarity, print the file name and similarity score of each of the 3 retrieved chunks before the answer, then tell the model to answer only from them, name the files it used after the word Sources:, and reply "My notes don't say." when they don't answer the question. Rules: the program reads GEMINI_API_KEY and ANTHROPIC_API_KEY only from the environment (it may load .env when it starts), and you, Claude, must never open, read, print or log .env or the keys; rebuild or refuse when the documents change after indexing; add the index file to .gitignore and .dockerignore; if a key is missing or a call fails, say what happened in one plain sentence and carry on as far as possible; print the cost of each Claude call; tests must use a fake embedder and a fake model and never call Google or Anthropic, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no Google key"; update the Dockerfile and requirements; add GEMINI_API_KEY to .env.example with a fake value. I'm not a programmer, so keep each task small.
 ```
 
 Then build it as in week 9:
@@ -267,7 +269,7 @@ Then build it as in week 9:
 /superpowers:subagent-driven-development Execute the plan docs/superpowers/plans/<your-plan-file>.md.
 ```
 
-Answer as in the table at the top. The official packages are `google-genai` (Google) and `anthropic` (Anthropic). For a Node.js project, Google's package is `@google/genai` (being tested; Google lists its libraries at <https://ai.google.dev/gemini-api/docs/libraries>) and Anthropic's is `@anthropic-ai/sdk`. Any other name: ask "Is this the official package?" before answering Yes.
+Answer as in the table at the top. The official packages are `google-genai` (Google) and `anthropic` (Anthropic). For a Node.js project, Google's package is `@google/genai` (Google lists it at <https://ai.google.dev/gemini-api/docs/libraries>; on npm its source is github.com/googleapis/js-genai) and Anthropic's is `@anthropic-ai/sdk`. Any other name: ask "Is this the official package?" before answering Yes.
 
 **e. Try it.** In your second terminal window (not the Claude Code one), in `~/semester-project`: activate `.venv` if it has one, load the keys with `set -a; . ./.env; set +a`, build the index, and ask your program three questions the way its README says, including **one your documents can't answer**. Write down, for each: the question, the documents it retrieved, and the answer. Take a screenshot of the index being built (check nothing secret is on screen). You hand these in.
 
