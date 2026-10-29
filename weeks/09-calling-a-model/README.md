@@ -9,7 +9,7 @@
 - The official Python package `anthropic` 1.13.0 (released 9 October 2026; it needs Python 3.10 or newer), installed in a virtual environment with Python 3.12.3 on Ubuntu 24.04 Linux (in a container).
 - The model `claude-haiku-5-5` (Claude Haiku 5.5), at $0.10 per million input tokens and $0.50 per million output tokens (<https://platform.claude.com/docs/en/about-claude/pricing>, read 12 October 2026). Model names and prices change: check that page on the day you start.
 - The deal screener example's new "paste the listing" step and its 92 offline tests, with Python 3.14.4 and, in a container, Python 3.12.
-- Real calls to `claude-haiku-5-5`, made on 12 October 2026 with a workspace key (step 2d), from Python 3.12 in a container: the first-call and structured-output programs below, and the deal screener's listing step. The replies, token counts and costs shown below are from those runs; yours will differ a little. **Being tested:** every step in the Claude Console, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Real calls to `claude-haiku-5-5`, made on 12 October 2026 with a workspace key (step 2d), from Python 3.12 in a container: the first-call and structured-output programs below, and the deal screener's listing step. The replies, token counts and costs shown below are from those runs; yours will differ a little. Steps 3 and 4, the deal screener and Docker were also run in Windows (WSL, Ubuntu 26.04, Python 3.14.4) on 29 October 2026, and step 5 in a signed-in Claude Code session there. **Being tested:** every step in the Claude Console, everything on GitHub (including step 5's pull request), and every step on a Mac.
 
 ## Before you start
 
@@ -119,7 +119,7 @@ You'll do this in the scratch folder `~/first-call` from step 2d, not in your pr
 **a. Check your Python.** In your terminal, type `python3 --version`. The `anthropic` package needs **Python 3.10 or newer**.
 
 - **Mac:** if it prints `Python 3.9` (Apple's own Python, from week 3) or lower, install a newer one from python.org exactly as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools), then close and reopen Terminal and check again (being tested). If you already use Homebrew, `brew install python` works too.
-- **Windows (Ubuntu window):** Ubuntu 24.04 comes with Python 3.12, which is fine.
+- **Windows (Ubuntu window):** Ubuntu 24.04 comes with Python 3.12 and Ubuntu 26.04 with Python 3.14; both are fine.
 
 **b. Make a virtual environment and install the package.** A **virtual environment** (a `.venv` folder) is a private box of Python packages for one folder, so installing a package can't break anything else on your laptop. In your terminal:
 
@@ -140,7 +140,7 @@ python -c "import anthropic; print(anthropic.__version__)"
 
 It prints `1.13.0`.
 
-**On Windows (Ubuntu), if `python3 -m venv .venv` fails** with a message starting "The virtual environment was not created successfully because ensurepip is not available", Ubuntu is missing one package. The failed attempt also leaves a broken `.venv` folder behind. In the Ubuntu window:
+**On Windows (Ubuntu), if `python3 -m venv .venv` fails** with a message starting "The virtual environment was not created successfully because ensurepip is not available", Ubuntu is missing one package. On a fresh Ubuntu 26.04 (Python 3.14) it fails this way, and the message suggests `sudo apt install python3.14-venv`. Installing `python3-venv`, as below, should fix it (being tested: it needs your password, so our test didn't run it). The failed attempt also leaves a broken `.venv` folder behind. In the Ubuntu window:
 
 ```bash
 sudo apt update
@@ -215,7 +215,7 @@ Each change below is a small edit to `first_call.py`. Make it in a text editor (
 for i in 1 2 3; do python first_call.py; done
 ```
 
-Compare the three answers. In the course's run, two of the three were almost the same and one was longer and worded differently (56, 75 and 58 output tokens): a model picks its words with some randomness. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 reject any non-default value (<https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/opus-5-5/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models (the Opus 5.5 guide). So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
+Compare the three answers. In the course's run, two of the three were almost the same and one was longer and worded differently (56, 75 and 58 output tokens): a model picks its words with some randomness. Yours may even come out identical three times (it happened in one test run); run it a few more times to see the differences. Older models let you turn that randomness down with a setting called **temperature**. The current models don't: on Haiku 5.5, "If a request includes `temperature`, it must be `1`", and Sonnet 5.5 and Opus 5.5 reject any non-default value (<https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide>, <https://platform.claude.com/docs/en/models/opus-5-5/migration-guide>). The Python package doesn't even accept it: adding `temperature=0` gives `TypeError: ... got an unexpected keyword argument 'temperature'` before anything is sent. And Anthropic notes that "`temperature = 0` ... never guaranteed identical outputs" even on older models (the Opus 5.5 guide). So you can't make a model give the same words every time. Instead, you make its answers **dependable** with the four settings below, and you **check** the answer in your code.
 
 **b. A system prompt.** The `system` setting holds instructions that apply to the whole conversation (Anthropic: "Use the top-level `system` field for instructions that apply from the start"). Add this line just below `max_tokens=1000,`:
 
@@ -275,13 +275,13 @@ The course's run printed `{'price': 189000, 'bedrooms': 3}`, with 330 input and 
 | Claude Sonnet 5.5 | `claude-sonnet-5-5` | $2 / $10 | fast | between the two in price and speed |
 | Claude Opus 5.5 | `claude-opus-5-5` | $4 / $20 | moderate | Anthropic's general default: "If you're unsure which model to use, start with Claude Opus 5.5 for most workloads" |
 
-Anthropic's own advice for keeping costs down: "1. Begin implementation with Claude Haiku 5.5. 2. Test your use case thoroughly. 3. Evaluate if performance meets your requirements. 4. Upgrade only if necessary for specific capability gaps." (<https://platform.claude.com/docs/en/about-claude/models/choosing-a-model>). That's what this course does. To try another model, change only the `model=` line; the same call costs 20 times more on Sonnet 5.5 and 40 times more on Opus 5.5.
+Anthropic's own advice for keeping costs down: "1. Begin implementation with Claude Haiku 5.5. 2. Test your use case thoroughly. 3. Evaluate if performance meets your requirements. 4. Upgrade only if necessary for specific capability gaps." (<https://platform.claude.com/docs/en/about-claude/models/choosing-a-model>). That's what this course does. To try another model, change only the `model=` line (the printed cost still uses Haiku's prices, so work out the real cost by hand); the same call costs 20 times more on Sonnet 5.5 and 40 times more on Opus 5.5.
 
 You may hear of **fine-tuning**: training a model further on your own examples. This course doesn't cover it, and projects like yours don't need it: a clear prompt, structured output and checks in your code go a long way.
 
 ### 5. Add one AI feature to your project
 
-> **Being tested:** this step needs a signed-in session and is being tested. The deal screener's version of it was built and tested offline on 12 October 2026 (see "The deal screener's version" below).
+> Step 5 was run in a signed-in session on 29 October 2026 (Windows (WSL), with a test project): the deny rule, plan and build worked and nothing tried to read `.env`. **Being tested:** the pull request part. The deal screener's version of it was built and tested offline on 12 October 2026 (see "The deal screener's version" below).
 
 **a. Make the branch first.** Open a **new** terminal window, `cd ~/semester-project`, then start `claude`. Always start Claude Code in a window where you have **not** loaded the key with `set -a`: a program started from that window, Claude Code included, would get your key. In Claude Code:
 
@@ -309,7 +309,7 @@ Create the file .claude/settings.json with exactly this content, keeping any set
 }
 ```
 
-Plain **Yes**. Then type `/exit` and start `claude` again, so the rule is loaded. Check it: ask "Show me what is in .env." Claude Code should say it can't (being tested; if it shows anything, stop and go to step 2f). The rule also covers commands like `cat .env`, but not a program that opens the file by itself, so never ask Claude to run code that prints the environment.
+Plain **Yes**. Then type `/exit` and start `claude` again, so the rule is loaded. Check it: ask "Show me what is in .env." Claude Code should say it can't. In the course's test (29 October 2026, WSL) it said: "I can't show you .env. The Read tool refused because your permission settings deny access to it." Asked to run `cat .env`, it said "The shell command was denied too". (If it shows anything, stop and go to step 2f.) If Claude Code suggests typing `! cat .env`, don't: the `!` runs the command and puts your key into the conversation. The rule also covers commands like `cat .env`, but not a program that opens the file by itself, so never ask Claude to run code that prints the environment.
 
 Only then copy the key file from step 2, without opening it:
 
@@ -318,7 +318,7 @@ cp -n ~/first-call/.env ~/semester-project/.env
 git status
 ```
 
-(`-n` means: don't overwrite a `.env` that's already there.) `git status` must **not** list `.env`. (If it does, don't commit anything: ask your instructor.)
+(`-n` means: don't overwrite a `.env` that's already there. On newer Ubuntu, `cp` may also print `warning: behavior of -n is non-portable...`: that's only a warning, the file was copied.) `git status` must **not** list `.env`. (If it does, don't commit anything: ask your instructor.)
 
 **c. Pick one small feature.** One call to the model, one clear job, and the program still works without it. Ideas for business projects:
 
@@ -331,7 +331,7 @@ Pick the one that fits your project, and keep it to one call.
 **d. Plan and build it with Superpowers, with the guardrails in the prompt.** In Claude Code (replace the part in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Anthropic's official package for this project's language, pinned to an exact version, with the model claude-haiku-5-5 and structured output (output_config with a JSON schema) if the answer must be read by the program. Rules: the program reads the key only from the ANTHROPIC_API_KEY environment variable (it may load .env into the environment when it starts), and you, Claude, must never open, read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; check stop_reason and check every value the model returns before using it; print the input tokens, output tokens and cost of each call; tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Anthropic's official package for this project's language, pinned to the version the course tested (for Python, anthropic==1.13.0), with the model claude-haiku-5-5 ($0.10 per million input tokens, $0.50 per million output tokens) and structured output (output_config with a JSON schema) if the answer must be read by the program. Rules: the program reads the key only from the ANTHROPIC_API_KEY environment variable (it may load .env into the environment when it starts), and you, Claude, must never open, read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; check stop_reason and check every value the model returns before using it; print the input tokens, output tokens and cost of each call; tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
 ```
 
 Then build it as in [week 5 step 5](../05-building-with-ai/README.md#5-build-with-subagent-driven-development):
@@ -349,7 +349,7 @@ Answer as in the table at the top. Watch especially for:
 
 **e. Try it.** When the build is done, in a **second** terminal window (not the one running Claude Code), in `~/semester-project`: activate the project's `.venv` if it has one (`source .venv/bin/activate`), load the key with `set -a; . ./.env; set +a`, and run your program the way its README says. Then try it **without** a key. Your program may read `.env` by itself, so move the file out of the folder for a moment: open a new terminal window (the key is only loaded in the old one), `cd ~/semester-project`, activate the `.venv` again if it has one (`source .venv/bin/activate`), `mv .env ~/semester-project-key.env`, run your program again, then put the file back with `mv ~/semester-project-key.env .env`, even if the run went wrong, and check `ls -a` shows `.env` again. It must say there's no key and carry on. Take a screenshot of each run for your assignment: check no key is visible in them first.
 
-**f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your key, run them once more yourself with `.env` moved out, as in step 5e (move it out, run the tests, move it back). Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log.
+**f. Run the tests, then the live test once.** In Claude Code: "Run all the tests." They must pass. To be sure they don't use your key, run them once more yourself with `.env` moved out, as in step 5e (move it out, run the tests, move it back). Then, in your terminal with the key loaded, run the live test once, the way Claude set it up (for a Python project, something like `RUN_LIVE_TESTS=1 python -m unittest`). Write down the tokens and cost each real call printed: you need three for your assignment's cost log. If the live test fails, paste its last lines into Claude Code and ask: "The live test fails with this message. Find out why without calling the real API, and fix the code, not the test." Then run it once more.
 
 **The deal screener's version** (run live on 12 October 2026). It got an optional "paste the listing" step: `python3 -m dealscreener --listing` asks you to paste a listing's text, sends it to `claude-haiku-5-5` with a schema for the five property numbers, then shows each number for you to confirm:
 

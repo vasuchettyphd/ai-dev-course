@@ -20,11 +20,11 @@ You must be **18 or older**: Google says "You must be 18 years of age or older t
 
 - Rule 5 (spend limit) becomes: never add billing for this course.
 - Rule 6 becomes: if a key leaks, **delete it in AI Studio first** (week 10 step 2e), then clean up.
-- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys usually start with `AIza`, being tested).
+- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys usually start with `AIza`; the course's test key did).
 
 The steps below are keyed to the README's step numbers. Where a step isn't listed, or says "as in the README", do it exactly as the README says.
 
-**Tested with** (28 October 2026): `google-genai` 2.30.0 with Python 3.12 and a free-tier key. The replies, token counts and errors below are from those real calls; yours will differ a little. Prices from <https://ai.google.dev/gemini-api/docs/pricing> (page last updated 27 October 2026). **Being tested:** every step in AI Studio, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+**Tested with** (28 October 2026): `google-genai` 2.30.0 with Python 3.12 and a free-tier key. The replies, token counts and errors below are from those real calls; yours will differ a little. Prices from <https://ai.google.dev/gemini-api/docs/pricing> (page last updated 27 October 2026). Steps 2 to 4 were also run in Windows (WSL, Ubuntu 26.04, Python 3.14.4) on 29 October 2026, with the same replies and token counts. **Being tested:** every step in AI Studio, everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac.
 
 ## Steps
 
@@ -194,7 +194,7 @@ EOF
 python structured.py
 ```
 
-The course's run printed `{'price': 189000, 'bedrooms': 3}`, then `Input tokens: 42 Output tokens: 23`. This run's token counts don't include thinking tokens (structured.py prints only the answer's tokens); your own program should add `thoughts_token_count`, as first_call.py does. Google's guide: <https://ai.google.dev/gemini-api/docs/structured-output> (its examples use the newer way of calling, so they look different). As in the README: structured output fixes the **shape** of the answer, not whether it's **right**.
+The course's run printed `{'price': 189000, 'bedrooms': 3}`, then `Input tokens: 42 Output tokens: 23`. If it seems to hang, wait: the package retries quietly when Google is busy (one test run took over 2 minutes). After a few minutes, press Ctrl+C and try again later. This run's token counts don't include thinking tokens (structured.py prints only the answer's tokens); your own program should add `thoughts_token_count`, as first_call.py does. Google's guide: <https://ai.google.dev/gemini-api/docs/structured-output> (its examples use the newer way of calling, so they look different). As in the README: structured output fixes the **shape** of the answer, not whether it's **right**.
 
 **e. Choosing a model.** You use `gemini-3.5-flash-lite` on the free tier. Google's models page (<https://ai.google.dev/gemini-api/docs/models>, read 28 October 2026) lists it as a current stable model and, for new projects, recommends "3.5 Flash-Lite or 3.8 Flash". Stay on Flash-Lite for this course. Read the README's table anyway: you're expected to understand the Claude choices too.
 
@@ -202,14 +202,14 @@ The course's run printed `{'price': 189000, 'bedrooms': 3}`, then `Input tokens:
 
 As in the README, except:
 
-- **5b.** Your `~/first-call/.env`, which you copy in, holds `GEMINI_API_KEY`. Everything else (`git check-ignore .env`, the deny rule) is the same.
+- **5b.** Your `~/first-call/.env`, which you copy in, holds `GEMINI_API_KEY`. Everything else (`git check-ignore .env`, the deny rule) is the same, including: if Claude Code suggests typing `! cat .env`, don't, because that puts your key into the conversation.
 - **5d.** Use this planning prompt instead (replace the part in angle brackets):
 
   ```text
   /superpowers:writing-plans Write an implementation plan to add one AI feature to this project: <one sentence: what the feature does>. Use Google's official google-genai package pinned to 2.30.0 with the model gemini-3.5-flash-lite and structured output (response_mime_type application/json with response_json_schema) if the answer must be read by the program. Rules: the program reads the key only from the GEMINI_API_KEY environment variable (it may load .env into the environment when it starts), and you, Claude, must never open, read, print or log .env or the key; never write a key in any file; the program must still work when there is no key, no internet or the call fails, saying what happened in one plain sentence and carrying on without the feature; if the call fails with a 429 or 503 error, say so in one plain sentence and carry on; check the finish reason and check every value the model returns before using it; print the input tokens and output tokens of each call, and the cost it would have on the paid tier ($0.30 per million input, $2.50 per million output tokens, counting thinking tokens as output); tests must use a fake model and never call the real API, plus one live test that runs only when I set RUN_LIVE_TESTS=1; include a test for "no key"; update the Dockerfile so it installs the package; add a .env.example with a fake key and say in the README how to set up .env. I'm not a programmer, so keep each task small.
   ```
 
-  When you watch the build: **No** to a key, or anything starting `sk-ant-` or `AIza`, in a file. Python's official package is `google-genai`, and a Node.js project uses `@google/genai` (being tested); for any other name, ask "Is this Google's official package?" before answering Yes.
+  When you watch the build: **No** to a key, or anything starting `sk-ant-` or `AIza`, in a file. Python's official package is `google-genai`, and a Node.js project uses `@google/genai` (npm shows it published from github.com/googleapis/js-genai); for any other name, ask "Is this Google's official package?" before answering Yes.
 - **5e and 5f.** As in the README. Remember everything you send is course-safe test data. For your cost log, write down the tokens each real call printed and what it would cost on the paid tier; real cost $0 (free tier).
 - **The deal screener's version** needs a Claude key, so don't run it: read the README's recorded output instead.
 

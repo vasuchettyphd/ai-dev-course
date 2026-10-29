@@ -15,7 +15,7 @@ AI Development Course
 
 Safe and fair to put in front of people
 
-<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real runs), 13 October 2026. A signed-in session, GitHub, and Mac and Windows laptops are being tested. Nothing here is legal advice.</p>
+<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real runs), 13 October 2026. A signed-in session was tested in Windows (WSL); GitHub and Mac are being tested. Nothing here is legal advice.</p>
 
 ---
 

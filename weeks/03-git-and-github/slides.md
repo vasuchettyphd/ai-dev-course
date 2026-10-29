@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Installs and git steps tested with git 2.43.0 and gh 2.102.0 on Ubuntu Linux (in a container), 12 October 2026. Everything that needs a GitHub account, and every Mac step, is being tested on real Mac and Windows laptops.</p>
+<p class="small">Installs and git steps tested with git 2.43.0 and gh 2.102.0 on Ubuntu Linux (in a container), 12 October 2026. Git steps and the <code>gh auth login</code> questions also tested on WSL 2 (Windows), 29 October 2026. Everything that needs a GitHub account, and every Mac step, is being tested on real Mac and Windows laptops.</p>
 
 ---
 
@@ -170,7 +170,7 @@ gh auth login
 | authenticate Git with your GitHub credentials | **Y** |
 | how to authenticate | **Login with a web browser** |
 
-Type the one-time code in the browser. WSL: open <https://github.com/login/device> yourself.
+Type the one-time code in the browser. WSL: the browser won't open; the code is already on your clipboard. Open <https://github.com/login/device> yourself and paste it.
 
 Then check: `gh auth status` shows **your** username. No tokens, ever.
 

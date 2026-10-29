@@ -81,7 +81,7 @@ The way out is to slow down at the start. Four steps, in this order:
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
-"If you haven't completed Phase 1, you cannot propose fixes." (The **root cause** is the real reason the bug happens, not just the place where you notice it.) The skill's description says to use it "when encountering any bug, test failure, or unexpected behavior, before proposing fixes", so it may start on its own when you describe a bug (being tested). This week you start it by name, to be sure (step 4a).
+"If you haven't completed Phase 1, you cannot propose fixes." (The **root cause** is the real reason the bug happens, not just the place where you notice it.) The skill's description says to use it "when encountering any bug, test failure, or unexpected behavior, before proposing fixes", so it may start on its own when you describe a bug (in our test it did, from a plain description that didn't name it). This week you start it by name, to be sure (step 4a).
 
 The skill doesn't write any files of its own. You see its work in the conversation, and in the test and the fix it makes.
 
@@ -148,7 +148,7 @@ It should say `nothing to commit, working tree clean`, or list only your `feedba
 Switch to main and pull the latest changes from GitHub. Then make a new branch called fix-<short-name> and switch to it.
 ```
 
-It will probably run `git switch main`, `git pull` and `git switch -c fix-<short-name>`. Plain **Yes**. Check: ask "What branch am I on?". (If that name is taken, add `-2`, here and everywhere this README says `fix-<short-name>`.)
+It will probably run `git switch main` (or `git checkout main`), `git pull` and `git switch -c fix-<short-name>` (or `git checkout -b`), maybe as one command. Plain **Yes**. Check: ask "What branch am I on?". (If that name is taken, Claude may say so and switch to the old branch instead. Choose No to that, and ask for `fix-<short-name>-2` instead, here and everywhere this README says `fix-<short-name>`.)
 
 **b. Reproduce each bug yourself.** Before you write a bug down, make it happen. In a **second terminal window**, in `~/semester-project`, run your program and type exactly what your classmate typed. Do you see what the form says happened? Try it three times, starting the program fresh each time: that answers "Does it happen every time?". If you can't make it happen, see Troubleshooting.
 
@@ -169,7 +169,7 @@ It will probably run `git switch main`, `git pull` and `git switch -c fix-<short
 You write `BUGS.md` from the form **your partner filled in about your project** (step 2c, their copy to you), not the one you filled in for them. In Claude Code, type this, then paste the "What broke" part of that form after it (type it in if it's on paper), and add what you saw in 3b:
 
 ```text
-Make a file called BUGS.md at the top of my project. Start it with "# Bugs" and the line "Bugs found in my project, one section each, newest last." Then add one section for each bug below, numbered from 1, using exactly this template: a heading "## Bug N: <short name>", then the lines Found by, What I did (exact input), What I expected, What happened, Does it happen every time?, Status and Cause. Copy the exact inputs and messages word for word. Status is Open and Cause is "(fill in once you know)" for every bug. Don't guess anything that isn't in my notes: write "Not sure" instead. Don't change any other file. Here are my notes:
+Make a file called BUGS.md at the top of my project. Start it with "# Bugs" and the line "Bugs found in my project, one section each, newest last." Then add one section for each bug below, numbered from 1, using exactly this template: a heading "## Bug N: <short name>", then the lines **Found by:**, **What I did (exact input):**, **What I expected:**, **What happened:**, **Does it happen every time?**, **Status:** and **Cause:**, each label in bold as in the template. Copy the exact inputs and messages word for word. Status is Open and Cause is "(fill in once you know)" for every bug. Don't guess anything that isn't in my notes: write "Not sure" instead. Don't change any other file. Here are my notes:
 ```
 
 Plain **Yes** to creating `BUGS.md`. Then read every section against your partner's form: the exact input must be exact (every number, in order, as typed). Fix anything wrong yourself, or tell Claude exactly what to change.
@@ -210,11 +210,11 @@ You stay on your `fix-<short-name>` branch. Keep the bottom line at `manual mode
 /superpowers:systematic-debugging Debug the bug from BUGS.md in my project that I paste below. First reproduce it and find the cause, and explain the cause to me in plain English before you change anything. Then add a test to my project's existing tests that fails because of this bug, using the exact input from BUGS.md and the answer I expected, run it, and show me it failing. Then stop. Don't change the code or fix anything yet. Don't change anything unrelated to this bug, and never delete or weaken a test. Here is the bug:
 ```
 
-The command must be at the very start of the message, so the skill starts straight away. If `/superpowers:systematic-debugging` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers systematic-debugging skill.` instead (being tested). A long paste may show as a short label such as `[Pasted text]` in the prompt box; that's normal (being tested).
+The command must be at the very start of the message, so the skill starts straight away. If `/superpowers:systematic-debugging` isn't in the list as you type, type `/reload-plugins` and try again, or start the prompt with `Use the superpowers systematic-debugging skill.` instead (that started the skill in our test). A long paste may show as a short label such as `[Pasted text #1 +9 lines]` in the prompt box; that's normal.
 
 The skill allows a "One-off test script if no framework", but this course wants a real test in your project's own tests: it stays in the project, and every time you run your tests it checks that this bug never comes back.
 
-**b. What you'll see, phase by phase** (being tested; its exact words will differ). Each phase below shows what the deal screener's run found.
+**b. What you'll see** (its exact words will differ). The skill works through four phases, but it may not name them, and it may ask to add the test before it explains the cause; that's fine, as long as it doesn't change the code. If it reaches the end without explaining the cause, ask: "Explain the cause in plain English before anything else." Each phase below shows what the deal screener's run found.
 
 1. **Root Cause Investigation.** It reads your code and the error message, if there is one, and asks to run your program or your tests with the bug's input (**Yes**). It traces where the wrong value first appears. *Deal screener:* no error message, the program finished normally, so the clue was in the numbers. The typed `0.07` went through `parse_answer` in `dealscreener/__main__.py`, which accepts any percentage from 0 to 100, so it came out as 0.07%. The calculator was right; the input check was where the meaning was lost.
 2. **Pattern Analysis.** It compares with something similar that works. *Deal screener:* the same listing with `7` gives $748.47, and the only difference is the typed rate. The down payment question goes through the same check, so `0.25` had the same problem.
@@ -243,7 +243,7 @@ Ran 47 tests in 0.004s
 FAILED (failures=5)
 ```
 
-(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**. In the first failure shown above, the program never asked "Did you mean 7%?" (it asked for the loan term twice, because the `y` meant for the question was read as the loan term). In the second one shown, the wrong answer sits next to the one expected: `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
+(`...` marks lines left out.) Each `.` is a test that passed and each `F` one that failed. Read the failure: it should show **your bug**. Also read the test itself: it must check the answer you expected (for example the exact number, $748.47), not just that some word or symbol appears somewhere. If it would pass for a reason other than the fix, ask: "Make the test check exactly the answer I expected. Don't touch the code." In the first failure shown above, the program never asked "Did you mean 7%?" (it asked for the loan term twice, because the `y` meant for the question was read as the loan term). In the second one shown, the wrong answer sits next to the one expected: `$315.80` where `$748.47` was expected. If it fails with an error about the test itself instead (such as `ImportError`, `NameError` or `SyntaxError`), the test is broken, not catching your bug: see Troubleshooting. Take a **screenshot** of the failing run: the assignment asks for it.
 
 The deal screener added 8 tests (`SmallPercentTest` in [`example-project/tests/test_main.py`](../../example-project/tests/test_main.py)). Five failed before the fix. The other three passed already, on purpose: they check answers that already worked and must keep working (a real `0` or `7` isn't questioned, `n` keeps 0.07%, and running out of input stops politely). That's fine. What matters is that at least one test fails because of the bug.
 
@@ -261,7 +261,7 @@ Plain **Yes**. Committing the test first keeps it safe if you need to undo a fix
 Now make one fix: the smallest change to the code that fixes the cause you found. Don't change the test, and don't change anything unrelated to this bug. Then run all my tests and show me the result.
 ```
 
-**Yes** to the edit if it's in the code file where the cause is. Check each edit before you answer, against the table under "How you'll work this week": **No** to anything unrelated, and **No** to any change to a test. *Deal screener:* one change in `dealscreener/__main__.py`. A percentage between 0 and 1 now gets one follow-up question:
+**Yes** to the edit if it's in the code file where the cause is. Check each edit before you answer. The change may come as a "Bash command" running a short script (for example `python3 - <<'EOF' ...`) instead of an "Edit file" box. Read which file it opens; if you can't tell, choose **No** and say "Make the change with your Edit tool so I can see the diff." Check it against the table under "How you'll work this week": **No** to anything unrelated, and **No** to any change to a test. *Deal screener:* one change in `dealscreener/__main__.py`. A percentage between 0 and 1 now gets one follow-up question:
 
 ```text
 You typed 0.07. Did you mean 7%? Type y for 7%, or n to keep 0.07%:
@@ -312,7 +312,7 @@ Read the answer. Does it make sense with what you saw? Ask about anything that d
 
 **c. Know the skill's own limit.** `systematic-debugging` stops at three: after a failed fix, "If < 3: Return to Phase 1, re-analyze with new information", and "DON'T attempt Fix #4 without architectural discussion" (its `SKILL.md`, Phase 4). Its next step is to "Discuss with your human partner before attempting more fixes": you're the human partner, which is why you ask for the cause. This course stops you at two, because each of your attempts costs you time and Claude usage. If a third attempt fails too, stop and bring your bug, your test and the conversation to office hours.
 
-(Claude Code also has `/rewind`, or `Esc` twice, to undo its own edits, but it doesn't undo changes made by commands, so this course uses git.)
+(Claude Code also has `/rewind`, or `Esc` twice, to undo its own edits, but it doesn't undo changes made by commands, so this course uses git. Claude sometimes edits files with a command, and `/rewind` doesn't undo those either.)
 
 ### 6. Finish
 
@@ -382,5 +382,5 @@ You're done when:
 | The tests pass on your laptop but not in Docker | First build again: `docker build -t semester-project .` (an old image doesn't have the fix). Still failing? Ask Claude: "My tests pass on my laptop but fail in the container with <paste the last 20 lines>. Explain why in plain English before changing anything." Common causes: a different language version in the image, or a file `.dockerignore` leaves out (week 7). |
 | `/superpowers:systematic-debugging` isn't in the list | Type `/reload-plugins`, then try again. Still missing? In a second terminal window, `claude plugin list`, and check `superpowers` is there and enabled; if not, do week 5 step 2 again. |
 | Two fixes haven't worked | Stop: step 5. |
-| `fatal: a branch named 'fix-...' already exists` | Add `-2` to the name (step 3a), here and everywhere this README says `fix-<short-name>`. |
+| `fatal: a branch named 'fix-...' already exists`, or Claude switches to an old branch with that name | Choose No to switching, and add `-2` to the name (step 3a), here and everywhere this README says `fix-<short-name>`. |
 | It committed to `main` | Say **No** to any push of `main`, and to `reset --hard` or `--force`. Then follow [week 5's "If it committed to `main`"](../05-building-with-ai/README.md#if-it-committed-to-main), using `rescue-fix-<short-name>` as the branch name. |

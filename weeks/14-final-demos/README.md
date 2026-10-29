@@ -7,7 +7,7 @@
 **Tested with** (13 October 2026; these are the versions tested, yours may be newer):
 
 - The deal screener's model `DEMO.md` and `FINAL.md`, with each live demo command run for real from a container, and the offline fallback run with the network switched off.
-- **Being tested:** everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- On 29 October 2026 in Windows (WSL, Ubuntu 26.04): the Claude Code steps (2a, 2b, 2d, 2e, 3a, 4a) in a signed-in session with Sonnet 5.5, the key checks, the Docker build, the offline tests and the deal screener's demo and fallback. **Being tested:** everything on GitHub, the timed rehearsals, and every step on a Mac.
 
 ## Before you start
 
@@ -77,7 +77,7 @@ Plain **Yes** to each git command. Check: "What branch am I on?" says `final`.
 In Claude Code:
 
 ```text
-Check this project against this list and tell me what's missing, as a table with the columns Check, Status and What's missing. Don't change any file. The list: the tests pass without any API key; REVIEW.md has a Decision and a Reason for every finding; the week 12 evaluation results and week 13 injection results are committed; the README says exactly how to run the program and the tests; the Dockerfile builds and runs the tests. Never read or print .env, and don't run anything that calls a real model.
+Check this project against this list and tell me what's missing, as a table with the columns Check, Status and What's missing. Don't change any file. The list: the tests pass without any API key; REVIEW.md has a Decision and a Reason for every finding; the week 12 evaluation results and week 13 injection results are committed; the README says exactly how to run the program and the tests; the Dockerfile builds and runs the tests (if you build the Docker image, call it semester-project). Never read or print .env, and don't run anything that calls a real model.
 ```
 
 Then do the key checks in the table yourself, in a second terminal window, in `~/semester-project`.
@@ -141,7 +141,7 @@ Read example-project/FINAL.md in the course repo at ~/ai-dev-course as a model. 
 - **During:** follow `DEMO.md`. If a step fails, say so in one sentence and switch to the fallback. Don't debug in front of the room.
 - **If a key ever shows on screen:** it's leaked. Pause and delete it in the Console first (week 9 step 2f; for a Google key, week 10 step 2e): it takes about 30 seconds. Then carry on with the fallback (the live steps won't work until you make a new key), and tell your instructor afterwards.
 
-The deal screener's week 14 changes are on this page (it works once week 14 is published): <https://github.com/vasuchettyphd/ai-dev-course/compare/week-13...week-14>.
+The deal screener's week 14 changes are on this page: <https://github.com/vasuchettyphd/ai-dev-course/compare/week-13...week-14>.
 
 ## Check it worked
 
@@ -156,9 +156,9 @@ The deal screener's week 14 changes are on this page (it works once week 14 is p
 | What you see | What to do |
 |---|---|
 | The demo runs over 3 minutes | Cut what `DEMO.md` says to cut first. Keep the AI step and the honest limit. Say less, don't talk faster. |
-| No internet, or a 429, on the day | Switch to the fallback: your offline tests and your committed results files. Say what the live run would show. |
+| No internet, a 429, or (on the Gemini path) a 503, on the day | Switch to the fallback: your offline tests and your committed results files. Say what the live run would show. |
 | A feature doesn't work yet | Demo what does work. Say plainly what doesn't and why, in the demo and in `FINAL.md`. |
-| A key appears on screen | Pause and delete the key in the Console first (week 9 step 2f), then carry on with the fallback, and tell your instructor afterwards. |
+| A key appears on screen | Pause and delete the key first (Anthropic: week 9 step 2f; Google: week 10 step 2e), then carry on with the fallback, and tell your instructor afterwards. |
 | The AI step says there's no key | Your program doesn't read `.env` itself: step 2d, or load the key before you share your screen (step 6). |
 | A number in `FINAL.md` has no file to link to | Leave it out, or run the thing again and commit the results first. |
 | `docker build` fails | See [week 7's Troubleshooting](../07-running-with-docker/README.md#troubleshooting). |

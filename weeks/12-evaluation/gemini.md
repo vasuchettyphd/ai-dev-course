@@ -2,7 +2,7 @@
 
 This page is for students on the **Gemini path**: no API credit, set up in week 9 (Google's free tier with `gemini-3.5-flash-lite`; see [week 9 on the Gemini path](../09-calling-a-model/gemini.md)). Your own AI feature already runs on Gemini, so almost all of week 12 is the same. Follow the [week 12 README](README.md) as written, with the changes below. Everything not mentioned here (the honesty rules, the Claude Code answers table, the branch, the merge commit) stays exactly as it is.
 
-**Tested with** (28 October 2026): `google-genai` 2.30.0 and `gemini-3.5-flash-lite` on the free tier, for single calls (week 9). **Being tested:** a full 20-case evaluation run on the free tier.
+**Tested with** (28 October 2026): `google-genai` 2.30.0 and `gemini-3.5-flash-lite` on the free tier, for single calls (week 9). A full 20-case run on the free tier was tested on 29 October 2026, with a stand-in script on the deal screener's 20 listings (not a student's own evaluation script): 20 calls one after another took about 9 minutes, no 429, and 2 cases failed with 503 UNAVAILABLE ("This model is currently experiencing high demand"), which the retry-once rule covers.
 
 ## Cost and limits
 
@@ -40,7 +40,7 @@ Everything else in the prompt stays: never change the test cases, dev cases by d
 
 **A note on timing.** Like any model, Gemini can answer the same case differently from one run to the next, and any model can answer differently from run to run (README step 3c shows it). So run your two dev runs, your change and your re-run close together, on the same day if you can. If your scores change between days, say so in your report rather than guessing why.
 
-**Step 7, review and finish:** the same, except the key searches. In **Files changed**, use the browser's Find for `GEMINI_API_KEY=` instead of `ANTHROPIC_API_KEY=` (it should show only the fake value in `.env.example`), and for both `sk-ant-` and `AIza` (Google keys usually start with `AIza`, being tested; an old Anthropic key could have been pasted in), including in the results files: only fake values are allowed. Merge with "Create a merge commit", as the README says.
+**Step 7, review and finish:** the same, except the key searches. In **Files changed**, use the browser's Find for `GEMINI_API_KEY=` instead of `ANTHROPIC_API_KEY=` (it should show only the fake value in `.env.example`), and for both `sk-ant-` and `AIza` (Google keys usually start with `AIza`; an old Anthropic key could have been pasted in), including in the results files: only fake values are allowed. Merge with "Create a merge commit", as the README says.
 
 ## Hand-in differences
 

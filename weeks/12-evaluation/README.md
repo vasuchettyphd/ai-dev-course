@@ -8,7 +8,7 @@
 
 - `anthropic` 1.13.0 and `claude-haiku-5-5`, with real evaluation runs from a container (the scores below are from those runs).
 - The deal screener's new evaluation and its tests.
-- **Being tested:** everything inside a signed-in Claude Code session, everything on GitHub, and every step on a Mac or in Windows (WSL).
+- Windows (WSL), 29 October 2026: the deal screener's runs (dev 75 of 75 twice, held out 25 of 25, Docker with `--user`) and steps 4 to 7a in a signed-in Claude Code session. **Being tested:** everything on GitHub, and every step on a Mac.
 
 ## Before you start
 
@@ -66,7 +66,7 @@ The course's advanced tutorial [Jev](../../advanced/jev/README.md) measured a mo
 
 **Small, easy tests look perfect.** On 8 easy support tickets, Jev picked the right team 8 times out of 8, all at confidence 1.00. On a refund policy with 8 cases it got 7 right, and the miss was a $100 refund requested on day 31: it answered "send to a manager" when the rule said deny, and it was 97% confident.
 
-**Errors cluster where the rules bite.** The author then generated 300 cases from a harder four-step refund policy (300 cases from 36 distinct customer messages, one run, with the messages and the right answers written by the author). Asked directly, Jev got 211 of 300 right (70%); with the facts prepared for it first, 236 of 300 (79%); and a hybrid, where code applied the rules and Jev only read the message, got 300 of 300 (the Jev README warns not to over-read this: the 300 cases came from 36 distinct messages, Jev read all 36 right, and plain code did the rest). But for cases within 3 days of a refund window's edge, Jev alone got only 63 of 129 right (49%). The largest single group of its misses (30 of 89) was defective items 366 to 400 days old, which the policy said to deny.
+**Errors cluster where the rules bite.** The author then generated 300 cases from a harder four-step refund policy (300 cases from 36 distinct customer messages, one run, with the messages and the right answers written by the author). Asked directly, Jev got 211 of 300 right (70%); with the facts prepared for it first, 236 of 300 (79%); and a hybrid, where code applied the rules and Jev only read the message, got 300 of 300 (the Jev README warns not to over-read this: the 300 cases came from 36 distinct messages, Jev read all 36 right, and plain code did the rest). But for cases within 3 days of a refund window's edge, Jev alone got only 63 of 129 right (49%). The largest single group of its misses (30 of 89) was defective items 366 to 400 days old, which the policy said to deny (counted from the run's saved results, [`refund_stress_test_seed7.json`](../../advanced/jev/experiments/results/refund_stress_test_seed7.json); the Jev README sums this up as "a defective item a few days past 365 being refunded anyway").
 
 **Confidence isn't correctness.** When the prepared answers were kept only if Jev was at least 90% confident, 174 of 179 were right (97%): better, but 5 confident wrong answers remained.
 
@@ -108,7 +108,7 @@ The `--all` run includes the 5 held-out cases, so they ran a second time; that i
 
 ### 4. Build your own test set
 
-> **Being tested:** steps 4 to 7 need a signed-in session and are being tested. The deal screener's version was built and run on 13 October 2026.
+> Steps 4 to 7a were tested in a signed-in session on Windows (WSL) on 29 October 2026; the GitHub part of 7b and the Mac are being tested. The deal screener's version was built and run on 13 October 2026.
 
 **a. Make the branch first.** In a **new** terminal window (no key loaded), `cd ~/semester-project`, start `claude`, and in Claude Code:
 
@@ -145,7 +145,7 @@ The first prints `.env`; the second prints `1`. If either doesn't, redo week 9 s
 
 - **numbers:** right if within a tolerance you choose (say why);
 - **categories or labels:** right if exactly equal;
-- **free text** (a RAG answer, a summary): a short checklist per case ("names the right document", "says the price", "doesn't invent a number"), graded by you. Anthropic's guide lists three ways to grade: code ("Fastest and most reliable"), a person ("Avoid if possible", because it's slow), or another model ("Test to ensure reliability first then scale"). For 20 cases, code or you is fine.
+- **free text** (a RAG answer, a summary): a short checklist per case ("names the right document", "says the price", "doesn't invent a number"), graded by you. Anthropic's guide lists three ways to grade: code ("Fastest and most reliable"), a person ("Avoid if possible", because it's slow), or another model ("Test to ensure reliability first, then scale"). For 20 cases, code or you is fine.
 
 **g. Commit them alone, first.** In Claude Code:
 
@@ -158,10 +158,10 @@ Commit only the test cases, the expected answers and the scoring rule, with the 
 In Claude Code (replace the parts in angle brackets):
 
 ```text
-/superpowers:writing-plans Write an implementation plan for an evaluation script for <my feature>: read the test cases and expected answers I just committed, run my feature on each case, score each answer with my scoring rule in <file>, and print one line per case, the score, the misses and the cost. Rules: never change the test cases or the expected answers; run the 15 dev cases by default and the 5 held-out cases only with --held-out (print a reminder to run them once); if a call fails, record that case as an error with a plain sentence and carry on; stop before the first case if there's no API key; save each run's results (date, model, score, misses, cost) to a file, never a key; read the key only from the environment and never read or print .env; include offline tests with a fake model, including a miss, an error and the held-out flag, and never call the real API in the tests. I'm not a programmer, so keep each task small.
+/superpowers:writing-plans Write an implementation plan for an evaluation script for <my feature>: read the test cases and expected answers I just committed, run my feature on each case, score each answer with my scoring rule in <file>, and print one line per case, the score, the misses and the cost. Rules: never change the test cases or the expected answers; run the 15 dev cases by default and the 5 held-out cases only with --held-out (print a reminder to run them once); if a call fails, record that case as an error with a plain sentence and carry on; stop before the first case if there's no API key; save each run's results (date, model, score, misses, cost) to its own new file in evals/results/, never a key; read the key only from the environment and never read or print .env; include offline tests with a fake model, including a miss, an error and the held-out flag, and never call the real API in the tests. I'm not a programmer, so keep each task small.
 ```
 
-Then build it with `/superpowers:subagent-driven-development` as in weeks 9 to 11. Answer as in the table at the top.
+Then build it with `/superpowers:subagent-driven-development` as in weeks 9 to 11. Answer as in the table at the top. At the end it may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`): answer No as the table says; the folder is git-ignored and can stay.
 
 ### 6. Run it, read the misses, make one change, test the held-out cases
 
