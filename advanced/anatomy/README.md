@@ -31,7 +31,7 @@ At startup Claude reads only the short description at the top of each `SKILL.md`
 
 ## Setup
 
-You need git, Node.js 22, and [Claude Code](https://claude.com/claude-code). On Windows, use WSL. Chrome or Chromium is optional: the skill uses it to screenshot and check its own work, and skips those checks (with an error you can ignore) if it can't find one.
+You need git, Node.js 20.10 or later (22.20 or later for the `npx skills` installer below; `demo/setup.sh` uses git instead), and [Claude Code](https://claude.com/claude-code). On Windows, use WSL. Chrome or Chromium is optional: the skill uses it to screenshot and check its own work, and skips those checks (with an error you can ignore) if it can't find one.
 
 ### The normal install (what upstream recommends)
 
