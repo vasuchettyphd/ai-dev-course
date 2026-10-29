@@ -140,7 +140,7 @@ python -c "import anthropic; print(anthropic.__version__)"
 
 It prints `1.13.0`.
 
-**On Windows (Ubuntu), if `python3 -m venv .venv` fails** with a message starting "The virtual environment was not created successfully because ensurepip is not available", Ubuntu is missing one package. (The message may name a versioned package such as `python3.14-venv`; `sudo apt install python3-venv` installs it for you.) The failed attempt also leaves a broken `.venv` folder behind. In the Ubuntu window:
+**On Windows (Ubuntu), if `python3 -m venv .venv` fails** with a message starting "The virtual environment was not created successfully because ensurepip is not available", Ubuntu is missing one package. On a fresh Ubuntu 26.04 (Python 3.14) it fails this way, and the message suggests `sudo apt install python3.14-venv`. Installing `python3-venv`, as below, should fix it (being tested: it needs your password, so our test didn't run it). The failed attempt also leaves a broken `.venv` folder behind. In the Ubuntu window:
 
 ```bash
 sudo apt update

@@ -79,7 +79,7 @@ When you try it in 5e, the cost line should show the token counts, real cost $0 
 Do them as written. Two small differences:
 
 - **6b (Docker):** the deal screener's `ask` in Docker shows the matching notes and the no-answer message, as in step 4. For your project, `--env-file .env` hands the container your one key.
-- **7b (key searches):** use the browser's Find for `GEMINI_API_KEY=` (it should show only the fake value in `.env.example`), and for both `sk-ant-` and `AIza` (the usual starts of the two kinds of key; being tested for Google): only fake values are allowed. You have no Anthropic key, so you can skip the `ANTHROPIC_API_KEY=` search, but still search for `sk-ant-`: an old key could have been pasted in. If a real key is there, don't merge: delete it first (README step 2e), then make a new one.
+- **7b (key searches):** use the browser's Find for `GEMINI_API_KEY=` (it should show only the fake value in `.env.example`), and for both `sk-ant-` and `AIza` (Anthropic keys start with `sk-ant-`; Google keys usually start with `AIza`): only fake values are allowed. You have no Anthropic key, so you can skip the `ANTHROPIC_API_KEY=` search, but still search for `sk-ant-`: an old key could have been pasted in. If a real key is there, don't merge: delete it first (README step 2e), then make a new one.
 
 ## Hand-in differences
 

@@ -4,7 +4,7 @@
 
 **Time:** plan for about 2 hours of your own time (an estimate), spread over more than one day: the build runs for a while by itself, and it can pause at a usage limit (step 6). **Start early in the week.** **Cost:** nothing beyond your Claude plan. Superpowers is free, and so are Python and Node.js.
 
-**Tested with:** Claude Code 2.1.296, `superpowers` 6.4.1 and Python 3.12.3, on Ubuntu 24.04 Linux (in a container), 12 October 2026. The newest installers on the official sites that day were Python 3.15.0 (python.org) and Node.js 24.21.0 LTS (nodejs.org). These are the versions tested; yours may be newer. We tested, without signing in to Claude: installing Claude Code, installing and listing Superpowers from the terminal, reading the Superpowers instructions this week uses, installing Python with `apt` and running a test with it, and the deal screener example's tests and program (with Python 3.9 and newer). We also tested signed in, on Windows (WSL, Ubuntu 26.04) with Claude Code 2.1.312, Superpowers 7.0.0 and Python 3.14.4, 29 October 2026 (on a Claude Max plan): the `/plugin` screen, choosing tools, installing Node.js with nvm, writing the plan, the build, `/usage` and the finishing menu. Everything on GitHub, and every step on a Mac, follow the official docs and are being tested.
+**Tested with:** Claude Code 2.1.296, `superpowers` 6.4.1 and Python 3.12.3, on Ubuntu 24.04 Linux (in a container), 12 October 2026. The newest installers on the official sites that day were Python 3.15.0 (python.org) and Node.js 24.21.0 LTS (nodejs.org). These are the versions tested; yours may be newer. We tested, without signing in to Claude: installing Claude Code, installing and listing Superpowers from the terminal, reading the Superpowers instructions this week uses, installing Python with `apt` and running a test with it, and the deal screener example's tests and program (with Python 3.9 and newer). We also tested signed in, on Windows (WSL, Ubuntu 26.04) with Claude Code 2.1.312, Superpowers 7.0.0 and Python 3.14.4, 29 October 2026, on a Claude Max plan (the starting mode and `/usage` may differ on Pro; being tested): the `/plugin` screen, choosing tools, installing Node.js with nvm, writing the plan, the build, `/usage` and the finishing menu. Everything on GitHub, and every step on a Mac, follow the official docs and are being tested.
 
 ## Before you start
 
@@ -64,7 +64,7 @@ At the end of week 4 you removed Superpowers. Install it again, the same way. It
 cd ~/semester-project && claude
 ```
 
-If it asks "Is this a project you created or one you trust?", press the down arrow to **Yes, I trust this folder** and Enter. Check the bottom line. If it says `auto mode on` (it did in our WSL test; may differ on Pro, being tested), press `Shift + Tab` until it says `manual mode on`.
+If it asks "Is this a project you created or one you trust?", press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits). Then check the bottom line and press `Shift + Tab` until it says `manual mode on` (on our test it started in `auto mode on`).
 
 **b. Install it.** In Claude Code, type:
 
@@ -151,7 +151,7 @@ Also say **No** to anything with `--force`, `rm -rf`, `--break-system-packages` 
   sudo apt update && sudo apt install -y python3 python3-venv
   ```
 
-  In our test (Ubuntu 24.04) this installed Python 3.12.3, and `python3 --version` then printed `Python 3.12.3`. A newer WSL Ubuntu (26.04) already has Python 3.14 but not pip or venv: if the plan needs extra Python packages, install `python3-venv` this way (the error may name `python3.14-venv`; installing it on 26.04 is being tested).
+  In our test (Ubuntu 24.04) this installed Python 3.12.3, and `python3 --version` then printed `Python 3.12.3`. A newer WSL Ubuntu (26.04) already has Python 3.14 but not pip or venv. There, `python3 -m venv` fails, and the error suggests `sudo apt install python3.14-venv`. If the plan needs extra Python packages, installing that (or `python3-venv`) should fix it (being tested: it needs your password, so our test didn't run it).
 
 **Extra Python packages.** If the plan needs packages from outside Python (installed with `pip`), ask Claude to put them in a **virtual environment** in your project: "Use a virtual environment in .venv for any Python packages." In WSL (Ubuntu 24.04) and with Homebrew's Python on a Mac, plain `pip install` outside one is blocked (an `externally-managed-environment` error, or on Ubuntu 26.04 `No module named pip`), so say **No** to `--break-system-packages`. In WSL, a virtual environment needs `python3-venv` (above). The deal screener needs no extra packages at all.
 
@@ -189,7 +189,7 @@ Each prints a version number. `command not found`? Do "After an install" (step 3
 
 ### 4. Plan the first three steps
 
-> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026: it announced "I'm using the writing-plans skill to create the implementation plan.", took about a minute, and saved a plan with exactly three tasks.
+> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026: it announced "I'm using the writing-plans skill to create the implementation plan." and saved a plan with exactly three tasks.
 
 **a. Keep tool folders out of git.** Some tools make big folders inside your project (`.venv/` for a Python virtual environment, `node_modules/` for Node.js, `__pycache__/` for Python's own scratch files, `.claude/worktrees/` for the extra folders Claude Code can make). They must never go to GitHub. Still on `build-first-steps`, in Claude Code, type:
 
@@ -254,7 +254,7 @@ Subagent-driven. Before you start building, commit the plan file on this branch 
 
 ### 5. Build with `subagent-driven-development`
 
-> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026: three tasks built in about 7 minutes, with about 20 prompts and no fix rounds.
+> **Tested** on WSL with Superpowers 7.0.0, 29 October 2026. It can take several minutes and ask many questions.
 
 Your answer starts the build. Keep the bottom line at `manual mode on`.
 
@@ -296,7 +296,7 @@ Its first line is `# SDD ledger`, followed by the plan's path, and it gets a lin
 | Anything that **changes** `main` (`git switch main`, `git checkout main`, `git merge` into main, `git push origin main`, `git branch -f main`) | **No** |
 | Read-only git commands that only mention `main` (`git diff`, `git log`, `git merge-base`, `git status`) | **Yes** |
 | `git push` during the build | **No**: you push in step 7 |
-| Run a Superpowers script or update its ledger (the command mentions `superpowers/.../scripts/` or `.superpowers/sdd/`), or a subagent ("from the general-purpose agent") running tests | plain **Yes**, unless it includes `rm -rf`, `git push` or anything on the No list |
+| Run a Superpowers script or update its ledger (the command mentions `superpowers/.../scripts/` or `.superpowers/sdd/`), or a subagent ("from the general-purpose agent") that only runs the tests | plain **Yes**, unless it includes `rm -rf`, `git push` or anything on the No list |
 | `--force`, `reset --hard`, `git clean`, `rm -rf` | **No** |
 | At the very end, a command that includes `rm -rf .superpowers/sdd/...` (its title may say "delete workspace", and it may be bundled with other commands) | **No** is fine. That folder is git-ignored and harmless. Type `Carry on without deleting it.` |
 | Change files outside your project folder | **No** |
@@ -324,7 +324,7 @@ It reads the ledger, skips the tasks marked complete, and carries on from the fi
 
 ### 6. Usage limits
 
-> **Partly tested:** `/usage` was tested on WSL on a Claude Max plan (may differ on Pro; being tested). The limit messages below are from Claude Code's docs, <https://code.claude.com/docs/en/errors>, and are being tested.
+> **Partly tested:** `/usage` was tested on WSL. The limit messages below are from Claude Code's docs, <https://code.claude.com/docs/en/errors>, and are being tested.
 
 Your Claude Pro plan has a **five-hour session limit** and a **weekly limit**, and Claude and Claude Code share them: chatting on claude.ai uses the same allowance (Claude's help article, <https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan>). Anthropic doesn't publish a fixed number of messages, so this README doesn't give one.
 
@@ -336,7 +336,7 @@ Your Claude Pro plan has a **five-hour session limit** and a **weekly limit**, a
 /usage
 ```
 
-It opens a panel (tabs Settings, Status, Config, Usage, Stats) with "Current session" and "Current week" bars, their reset times, and "What's contributing to your usage?" with shares for skills, plugins and subagents (<https://code.claude.com/docs/en/costs>). Press `d` or `w` for the last day or week. (Claude's help article names `/status`; in our test `/status` opened the same panel on the Status tab, with no usage bars, so use `/usage`. Seen on a Max plan; may differ on Pro, being tested.) Check it before you start the build, and again after: the assignment asks roughly how much of your usage the build took.
+It opens a panel (tabs Settings, Status, Config, Usage, Stats) with "Current session" and "Current week" bars, their reset times, and "What's contributing to your usage?" with shares for skills, plugins and subagents (<https://code.claude.com/docs/en/costs>). Press `d` or `w` for the last day or week. (Claude's help article names `/status`; in our test `/status` opened the same panel on the Status tab, with no usage bars, so use `/usage`.) Check it before you start the build, and again after: the assignment asks roughly how much of your usage the build took.
 
 **b. What happens at the limit.** You'll see warnings as you get close. At the limit, Claude Code shows a message like `You've hit your session limit · resets 3:45pm` (or `weekly limit`, with a day), and stops sending requests until that time. Switching models doesn't help: the limits cover all models.
 

@@ -16,7 +16,7 @@
 You need:
 
 - Weeks 9 and 10 done: your Anthropic key in `.env`, the `Read(./.env)` deny rule in `.claude/settings.json`, `~/first-call/.venv` (week 9 step 3), and the course repo's `example-project` set up as in week 10 step 4a (its own `.venv` and `.env`).
-- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12 and 26.04 has 3.14; on a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools).
+- **Python 3.11 or newer** for the MCP part (step 5): `python3 --version`. Ubuntu 24.04 has 3.12 and 26.04 has 3.14. On a Mac, if `python3 --version` says 3.10 or lower, install a newer one from python.org as in [week 5 step 3c](../05-building-with-ai/README.md#3-pick-your-tools). On a fresh Ubuntu 26.04, `python3 -m venv` fails and the error suggests `sudo apt install python3.14-venv`. Doing [week 9 step 3b](../09-calling-a-model/README.md#3-your-first-call) should fix it (being tested: it needs your password, so our test didn't run it).
 - `gh` signed in to **your** GitHub account, and Claude Code signed in with your Claude Pro account.
 
 **On the Gemini path** (no Anthropic credit, agreed with your instructor in week 9)? Use [week 11 on the Gemini path](gemini.md) alongside this page.
@@ -48,7 +48,7 @@ As in weeks 9 and 10: plain-English prompts, plain **Yes** for git, a branch fir
 | `git add`, `git commit`, `git push` on your `tool` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
 | Anything that changes `main`, or `reset --hard`, `--force`, `git clean`, `rm -rf` | **No** |
 
-At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay.
+At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay. Then type `Carry on without deleting it.`
 
 ## Steps
 

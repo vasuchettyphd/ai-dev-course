@@ -88,7 +88,7 @@ It rounds the number before choosing its sign, so a cash flow of a tiny fraction
 
 ### 3. Make the three reviewers
 
-> **Being tested:** Where agent files go, their format and the `tools` list come from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. Copying the files, and everything inside a signed-in session, was tested in Windows (WSL) with Claude Code 2.1.312.
+> **Tested on WSL:** Copying the files, and everything inside a signed-in session, was tested in Windows (WSL) with Claude Code 2.1.312. Where agent files go, their format and the `tools` list come from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>.
 
 **a. Start Claude Code and make the branch, before Claude writes anything.** In your terminal:
 
@@ -195,7 +195,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 ### 4. Run all three
 
-> **Being tested:** Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>. The deal screener's review used these reviewer instructions and these combining rules. Running this one prompt was tested in a signed-in session (Windows WSL): the three reviewers ran at the same time in the background, and the whole review took under two minutes for the deal screener.
+> **Tested on WSL:** Running this one prompt was tested in a signed-in session (Windows WSL): the three reviewers ran at the same time in the background. The deal screener's review used these reviewer instructions and these combining rules. Running subagents in parallel ("in parallel using separate subagents") and how their results come back are from Claude Code's docs, <https://code.claude.com/docs/en/sub-agents>.
 
 **a. Check your usage first.** In Claude Code, type `/usage` and write down what it shows. Keep these numbers; you'll compare them in step 4e, and bring them to next week's class.
 

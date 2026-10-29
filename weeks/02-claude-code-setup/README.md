@@ -4,7 +4,7 @@
 
 **Time:** plan for about 90 minutes, plus a restart on Windows; your first install may take longer. **Cost:** a Claude Pro subscription, about $20/month (see step 1).
 
-**Tested with:** Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026. Steps 3e-6 tested in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026. The Mac steps and the Windows steps that turn on WSL (3a-3d) are being tested on real laptops.
+**Tested with:** Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026. Steps 3e-6 tested in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026, on a Max plan, except finishing sign-in (4d). The Mac steps, the Windows steps that turn on WSL (3a-3d), sign-in, and anything that may differ on Pro (the starting mode, the `/usage` screen) are being tested on real laptops.
 
 ## Before you start
 
@@ -191,7 +191,7 @@ The dot means "the folder I'm in now". A normal File Explorer window opens on th
 
 ### 4. Your first session
 
-> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312. The Mac check is still being done; if something looks different, tell your instructor.
+> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312, except finishing sign-in (4d), which is being tested. The Mac check is still being done; if something looks different, tell your instructor.
 
 From here on, Mac and Windows are the same. "Your terminal" means **Terminal** on a Mac and the **Ubuntu window** on Windows.
 
@@ -221,9 +221,9 @@ It's already highlighted, so press Enter.
 
 When it works, the terminal shows `Login successful`. Press Enter. You only need to sign in once on this laptop.
 
-**e. Trust the folder.** Claude Code asks "Quick safety check: Is this a project you created or one you trust?". The highlighted choice is **No, exit**, so don't just press Enter: press the down arrow to **Yes, I trust this folder**, then press Enter. It's your own new, empty practice folder, so that's safe. (For a folder someone else gave you, think first.)
+**e. Trust the folder.** Claude Code asks "Quick safety check: Is this a project you created or one you trust?". Press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits). It's your own new, empty practice folder, so that's safe. (For a folder someone else gave you, think first.)
 
-**f. Look at the bottom of the screen.** You now see the Claude Code prompt, where you type. At the bottom, a short line shows the **permission mode**, for example `auto mode on`. Read what yours says; don't assume. Recent versions often start in **auto** mode, which asks you fewer questions. (On WSL with a Max plan it started in `auto mode on`; this may differ on Pro, being tested.)
+**f. Look at the bottom of the screen.** You now see the Claude Code prompt, where you type. At the bottom, a short line shows the **permission mode**, for example `auto mode on`. Read what yours says; don't assume. Recent versions often start in **auto** mode, which asks you fewer questions.
 
 **g. Switch to manual mode.** For this exercise you want Claude Code to ask before every change. Press `Shift + Tab` and watch the bottom line change. Keep pressing until it says `manual mode on`. The order is:
 
@@ -323,7 +323,7 @@ The answer should follow your preferences: plain English and short. If it doesn'
 
 ### 6. Cost and safety
 
-> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312, on a Max plan (the `/usage` screen may differ on Pro; being tested). The Mac check is still being done; if something looks different, tell your instructor.
+> **Tested on Windows (WSL):** These screens were checked in Ubuntu on WSL 2 with Claude Code 2.1.312. The Mac check is still being done; if something looks different, tell your instructor.
 
 **Cost.** Claude Pro covers Claude Code. To see how much of your plan you've used: in your terminal, in `~/my-first-project`, type `claude` to start a session, then type:
 

@@ -19,7 +19,7 @@ Four optional parts use AI, and each is switched on only when you ask for it:
 - **The agent (week 11).** You ask in plain English; Claude calls the calculator as a tool rather than doing the sums, with at most 5 calls to Claude per question ([`README.md`](README.md#how-to-ask-the-agent)). The same tool is offered to Claude Code as an MCP server (a small program that lets Claude Code use the tool).
 - **The evaluation and injection test (weeks 12 and 13)** run the listing step on made-up listings and score it ([`evals/README.md`](evals/README.md), [`evals/injection/README.md`](evals/injection/README.md)).
 
-The tests use a fake model, so they need no key and no internet. All 236 pass, with 4 skipped, the live tests ([`DEMO.md`](DEMO.md#if-it-fails), run with `python3 -m unittest`).
+The tests use a fake model, so they need no key and no internet. All 236 pass, with 4 skipped ([`DEMO.md`](DEMO.md#if-it-fails), run with `python3 -m unittest`). The 4 skipped are the live tests, which run only when you ask for them.
 
 ## 3. What I measured
 

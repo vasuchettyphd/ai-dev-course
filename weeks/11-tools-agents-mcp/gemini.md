@@ -13,7 +13,7 @@ Two reminders from week 9:
 
 ## Before you start
 
-The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path; Google keys start with `AIza`), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
+The README's list, with one change: instead of an Anthropic key, you need **your Google key** in `~/first-call/.env` as `GEMINI_API_KEY=AIza...` (week 9 on the Gemini path; Google keys usually start with `AIza`), and `google-genai` 2.30.0 in `~/first-call/.venv`. Check it in your terminal, in `~/first-call` with `(.venv)` showing:
 
 ```bash
 python -c "from google import genai; print(genai.__version__)"

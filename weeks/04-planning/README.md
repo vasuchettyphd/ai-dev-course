@@ -101,7 +101,7 @@ Your project gets its **own new private repo**. `my-first-project` from week 3 s
 cd ~ && mkdir semester-project && cd semester-project && claude
 ```
 
-Claude Code asks `Quick safety check: Is this a project you created or one you trust?`. It's your own new, empty folder: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits). Then check the bottom line: it probably starts in `auto mode on`. Press `Shift + Tab` until it says `manual mode on` (from auto mode, one press). Every new session starts in auto mode again, so check the bottom line each time you start `claude`.
+Claude Code asks `Quick safety check: Is this a project you created or one you trust?`. It's your own new, empty folder: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits). Then check the bottom line, and press `Shift + Tab` until it says `manual mode on`. On our test it started in `auto mode on`, so one press was enough; yours may differ (for example on Pro). Check the bottom line each time you start `claude`.
 
 **b. The prompt.** In Claude Code, type this, with your own one-sentence idea in place of the example:
 
@@ -156,10 +156,10 @@ I want to build this for my semester project: "A tool that turns my weekly sales
 
 **What Claude Code will probably do:** read the folder, maybe ask you a question or two, then show a plan and ask how to proceed.
 
-**c. Don't approve it for building.** Claude Code shows the plan and asks `Would you like to proceed?` with `1. Yes, and use auto mode`, `2. Yes, manually approve edits` and `3. Tell Claude what to change`. Both Yes options mean "start building now": the docs say "approving a plan exits plan mode ... so Claude starts editing". You're not building this week. So:
+**c. Don't approve it for building.** Claude Code shows the plan and asks `Would you like to proceed?`. On our test the choices were `1. Yes, and use auto mode`, `2. Yes, manually approve edits` and `3. Tell Claude what to change`. Your labels may differ (for example on Pro, which may have no auto mode). The Yes options mean "start building now": the docs say "approving a plan exits plan mode ... so Claude starts editing". You're not building this week. So:
 
-- To change something: choose **3. Tell Claude what to change**, type what to change, and press Enter. It updates the plan and asks again.
-- When the plan looks reasonable: press `Esc`. The question closes and the bottom line still says `plan mode on`. Then press `Shift + Tab` until it says `manual mode on` (two presses: `auto mode on`, then `manual mode on`).
+- To change something: choose **Tell Claude what to change**, type what to change, and press Enter. It updates the plan and asks again.
+- When the plan looks reasonable: press `Esc`. The question closes and the bottom line still says `plan mode on`. Then press `Shift + Tab` until it says `manual mode on` (on our test, two presses: `auto mode on`, then `manual mode on`).
 - Don't press `Shift + Tab` while the question is on screen: there it means "approve with this feedback".
 
 Optional: press `Ctrl + G` while the plan is shown to open it in a text editor and change it yourself.
@@ -271,7 +271,7 @@ See the instructor's worked example: [`example-project/PLAN.md`](../../example-p
 Make a new branch called add-plan. On it, write PLAN.md from our grilling session, with a title line "# Plan: <my project's name>" and exactly these seven headings, in this order: Goal, Who it's for, Must-haves, Not in this version, Data it uses, First three build steps, Open questions. Use my answers, not your own ideas. Be specific: numbers, names and examples. Keep it to about one page. Show it to me before you commit.
 ```
 
-If you closed Claude Code since the grilling, paste your summary before this prompt. (A new session starts in `auto mode on` again: press `Shift + Tab` once first.)
+If you closed Claude Code since the grilling, paste your summary before this prompt. (In a new session, check the bottom line and press `Shift + Tab` until it says `manual mode on`.)
 
 **What Claude Code will probably do:** `git switch -c add-plan` (or `git checkout -b add-plan`), then create `PLAN.md` (an edit prompt). Choose plain **Yes**.
 
@@ -323,7 +323,7 @@ Both Superpowers and AI-DLC are made for building software, and both write many 
 mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 ```
 
-It asks the trust question again: press the down arrow to **Yes, I trust this folder**, then Enter.
+It asks the trust question again: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits).
 
 **b. Install it,** the same way as `mattpocock-skills` (choose **Install for you (user scope)**, then `/reload-plugins` if asked). In Claude Code:
 

@@ -20,7 +20,7 @@ You must be **18 or older**: Google says "You must be 18 years of age or older t
 
 - Rule 5 (spend limit) becomes: never add billing for this course.
 - Rule 6 becomes: if a key leaks, **delete it in AI Studio first** (week 10 step 2e), then clean up.
-- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys start with `AIza`; the course's test key did).
+- Wherever the README says "anything starting `sk-ant-`", read "anything starting `sk-ant-` or `AIza`" (Google keys usually start with `AIza`; the course's test key did).
 
 The steps below are keyed to the README's step numbers. Where a step isn't listed, or says "as in the README", do it exactly as the README says.
 

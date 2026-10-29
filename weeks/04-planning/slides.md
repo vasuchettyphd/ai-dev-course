@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296, mattpocock-skills 1.2.3, superpowers 6.4.1 and AI-DLC 2.11.0 on Ubuntu Linux (in a container), 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, or on a Mac or in Windows (WSL) is being tested on real Mac and Windows laptops. Plan mode, the /plugin screen, /grill-me and Superpowers were since tested on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026.</p>
+<p class="small">Tested on Ubuntu Linux (12 October 2026) and, signed in, on Windows (WSL) with Claude Code 2.1.312 (29 October 2026). GitHub steps, AI-DLC runs and the Mac are being tested.</p>
 
 ---
 
@@ -103,7 +103,7 @@ In your terminal:
 cd ~ && mkdir semester-project && cd semester-project && claude
 ```
 
-Trust question: **No, exit** is highlighted. Press the down arrow to **Yes, I trust this folder**, then Enter.
+Trust question: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits).
 
 `Shift + Tab` until `manual mode on`. Then ask Claude Code to create `README.md` with your idea, commit it, and:
 
@@ -151,7 +151,7 @@ out, what data it uses, and the first three build steps.
 
 ## Don't approve it for building
 
-Claude shows the plan and asks `Would you like to proceed?`:
+Claude shows the plan and asks `Would you like to proceed?`. On our test (labels may differ, for example on Pro):
 
 | Choice | Means |
 |---|---|
@@ -282,7 +282,7 @@ Only **after your `PLAN.md` PR is merged**, in a **throwaway folder**:
 mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 ```
 
-**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. User scope means it's on in **every** folder, so remove it afterwards, in your terminal: `claude plugin uninstall superpowers@claude-plugins-official` (or `/plugin uninstall superpowers@claude-plugins-official` in Claude Code, then `Esc`). If Claude Code is open, type `/reload-plugins`.
+**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. It's on in **every** folder, so remove it afterwards: `claude plugin uninstall superpowers@claude-plugins-official`, then `/reload-plugins`.
 
 **AI-DLC** (Windows: the Ubuntu window). It gives Claude a very broad edit permission (exact reach being tested). Use its own folder:
 

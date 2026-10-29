@@ -2,7 +2,7 @@
 
 This page is for students on the **Gemini path**: no API credit, set up in week 9 (Google's free tier with `gemini-3.5-flash-lite`; see [week 9 on the Gemini path](../09-calling-a-model/gemini.md)). Your own AI feature already runs on Gemini, so almost all of week 12 is the same. Follow the [week 12 README](README.md) as written, with the changes below. Everything not mentioned here (the honesty rules, the Claude Code answers table, the branch, the merge commit) stays exactly as it is.
 
-**Tested with** (28 October 2026): `google-genai` 2.30.0 and `gemini-3.5-flash-lite` on the free tier, for single calls (week 9). A full 20-case run on the free tier was tested on 29 October 2026: 20 calls one after another took about 9 minutes, no 429, and 2 cases failed with 503 UNAVAILABLE ("This model is currently experiencing high demand"), which the retry-once rule covers.
+**Tested with** (28 October 2026): `google-genai` 2.30.0 and `gemini-3.5-flash-lite` on the free tier, for single calls (week 9). A full 20-case run on the free tier was tested on 29 October 2026, with a stand-in script on the deal screener's 20 listings (not a student's own evaluation script): 20 calls one after another took about 9 minutes, no 429, and 2 cases failed with 503 UNAVAILABLE ("This model is currently experiencing high demand"), which the retry-once rule covers.
 
 ## Cost and limits
 

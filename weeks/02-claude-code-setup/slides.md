@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026. Steps 3e-6 tested in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026. The Mac steps and the Windows steps that turn on WSL (3a-3d) are being tested on real laptops.</p>
+<p class="small">Install and first screens tested with Claude Code 2.1.296 on Ubuntu Linux (in a container), 10 October 2026. Steps 3e-6 (except finishing sign-in) tested in Ubuntu on WSL 2 (Windows) with Claude Code 2.1.312, 29 October 2026. The Mac steps and the Windows steps that turn on WSL (3a-3d) are being tested on real laptops.</p>
 
 ---
 
@@ -145,7 +145,7 @@ mkdir my-first-project && cd my-first-project && claude
 2. "Select login method": **1. Claude account with subscription**
 3. Sign in in the browser
 4. `Login successful`, press Enter
-5. Trust question: **No, exit** is highlighted. Press the down arrow to **Yes, I trust this folder**, then Enter
+5. Trust question: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits)
 
 ---
 

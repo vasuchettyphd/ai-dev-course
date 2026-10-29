@@ -240,7 +240,7 @@ It asks a few questions. Use the arrow keys and Enter, and choose:
 
 Then it shows a **one-time code** and asks you to press Enter to open github.com in your browser. Press Enter, sign in to GitHub in the browser if asked, type the code, and approve.
 
-- **On Windows (WSL):** the browser does not open by itself. `gh` copies the code to your Windows clipboard and then prints `! Failed opening a web browser at https://github.com/login/device`. That's expected. Open <https://github.com/login/device> in your normal Windows browser and paste (or type) the code there.
+- **On Windows (WSL):** the browser may not open by itself (it did not on our Ubuntu 26.04 test). `gh` copies the code to your Windows clipboard and may print `! Failed opening a web browser at https://github.com/login/device`. If no browser opens, that's fine: go to <https://github.com/login/device> in your normal Windows browser and paste (or type) the code there.
 - **On Windows (WSL), being tested:** `gh` may say it saved your sign-in in a plain-text file, because Ubuntu here has no credential store. That's expected here; carry on.
 - Never create, copy or paste a "personal access token" for this course. The browser sign-in is all you need.
 

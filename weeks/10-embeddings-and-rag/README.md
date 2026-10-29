@@ -8,7 +8,7 @@
 
 - Google's official Python package `google-genai` 2.30.0 (released 13 October 2026; it needs Python 3.10 or newer) and the embedding model `gemini-embedding-001`, plus `anthropic` 1.13.0 and `claude-haiku-5-5` from week 9, in a container with Python 3.12.
 - Real calls on 13 October 2026, from a container: `embed.py` below, and the deal screener's `notes` command (index, three questions, its live test). The scores, answers and costs shown below are from those runs; yours will differ a little. Google's responses carried no token counts.
-- **Being tested:** every step in Google AI Studio, whether your school Google account can use AI Studio, everything on GitHub, and every step on a Mac. Windows (WSL), 29 October 2026: steps 3, 4 and 6b, the Troubleshooting messages, and steps 5 and 6a in a signed-in Claude Code session (2.1.312) were run and matched this page.
+- **Being tested:** every step in Google AI Studio, whether your school Google account can use AI Studio, everything on GitHub, and every step on a Mac. Windows (WSL), 29 October 2026: steps 3 and 4, the deal screener in Docker (6b) and the Troubleshooting messages matched this page. Steps 5 and 6a (the review, not its triage) were run in a signed-in Claude Code session (2.1.312). Step 6b for your own project was not checked.
 
 ## Before you start
 
@@ -48,7 +48,7 @@ The same as week 9: you ask Claude Code in plain English, and this page shows th
 | `git add`, `git commit`, `git push` on your `rag` branch, `gh pr create` | plain **Yes**, after `git status` shows no `.env` |
 | Anything that changes `main`, or `reset --hard`, `--force`, `git clean`, `rm -rf` | **No** |
 
-At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay.
+At the end of the build, Superpowers may ask to `rm -rf` its own scratch folder (`.superpowers/sdd/...`). Answering **No** is safe: the folder is ignored by git and can stay. Then type `Carry on without deleting it.`
 
 ## Steps
 
@@ -78,7 +78,7 @@ The model answers from your documents instead of from memory, and you can check 
 - Try your **UVU** Google account first. Whether UVU has AI Studio switched on is **being tested: check with your instructor**.
 - If you see "We are sorry, but you do not have access to Google AI Studio. Please contact your Organization Administrator for access.", use a **personal** Google account instead (you must be 18 or older).
 
-**b. Create the key.** Go to Google AI Studio's API keys page (<https://aistudio.google.com/apikey>, being tested; Google's key page is <https://ai.google.dev/gemini-api/docs/api-key>), sign in, and click **Create API key**. Copy it (Google keys usually start with `AIza`, being tested). Don't paste it anywhere except your `.env` file, next.
+**b. Create the key.** Go to Google AI Studio's API keys page (<https://aistudio.google.com/apikey>, being tested; Google's key page is <https://ai.google.dev/gemini-api/docs/api-key>), sign in, and click **Create API key**. Copy it (Google keys usually start with `AIza`). Don't paste it anywhere except your `.env` file, next.
 
 **c. Know what the free tier does with what you send.** The free tier should cost you nothing (being tested), but Google's terms (<https://ai.google.dev/gemini-api/terms>, read 13 October 2026) say:
 
@@ -193,7 +193,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`python3 --version` must show 3.10 or newer, as in week 9 step 3a. If `python3 -m venv .venv` fails with "ensurepip is not available", do the fix in [week 9 step 3b](../09-calling-a-model/README.md#3-your-first-call) (`sudo apt install python3-venv`, then `rm -r .venv`) and run it again. Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env` (newer Ubuntu prints `cp: warning: behavior of -n is non-portable ...`: that's harmless). Check git ignores it: `git check-ignore .env` prints `.env`. Then check the Google line is in it: `grep -c '^GEMINI_API_KEY=' .env` prints `1`. If it prints `0` (an older `.env` from week 9 was already there, so `cp -n` left it alone), add the `GEMINI_API_KEY=` line to this `.env` with a text editor, as in step 2d.
+`python3 --version` must show 3.10 or newer, as in week 9 step 3a. If `python3 -m venv .venv` fails with "ensurepip is not available" (it does on a fresh Ubuntu 26.04), do the fix in [week 9 step 3b](../09-calling-a-model/README.md#3-your-first-call) (`sudo apt install python3-venv`, then `rm -r .venv`) and run it again. That should fix it (being tested: it needs your password, so our test didn't run it). Then copy your keys file in, without opening it: `cp -n ~/first-call/.env .env` (newer Ubuntu prints `cp: warning: behavior of -n is non-portable ...`: that's harmless). Check git ignores it: `git check-ignore .env` prints `.env`. Then check the Google line is in it: `grep -c '^GEMINI_API_KEY=' .env` prints `1`. If it prints `0` (an older `.env` from week 9 was already there, so `cp -n` left it alone), add the `GEMINI_API_KEY=` line to this `.env` with a text editor, as in step 2d.
 
 **b. Chunk and index.** In the same window:
 
@@ -230,7 +230,7 @@ Retrieval still finds the 3 "closest" chunks (something is always closest), but 
 
 ### 5. Add RAG to your project
 
-> Tested in a signed-in Claude Code session (2.1.312, Sonnet) in Windows (WSL) on 29 October 2026: the plan took about 4 minutes, and the build took about 26 minutes and about 90 Yes answers. Claude Code never opened `.env`. The deal screener's version was built and tested offline on 13 October 2026.
+> Tested in a signed-in Claude Code session (2.1.312, Sonnet) in Windows (WSL) on 29 October 2026: Claude Code never opened `.env`. It can take several minutes and ask many questions (about 90 Yes answers in our test): read each one before you answer. The deal screener's version was built and tested offline on 13 October 2026.
 
 **a. Make the branch first.** Open a **new** terminal window (no keys loaded in it), `cd ~/semester-project`, start `claude`, and in Claude Code:
 
@@ -306,7 +306,7 @@ Push the rag branch to GitHub and open a pull request into main titled "Add RAG 
 
 Plain **Yes**, after `git status` shows no `.env` and no index file.
 
-**b. Read Files changed yourself.** You should see your code and tests, the documents folder (course-safe documents only), the requirements and Dockerfile, `.env.example` with **fake** keys, `.gitignore` and `.dockerignore` listing the index file, your README and `REVIEW.md`. **No `.env`, no real key, no index file.** Use the browser's Find for `ANTHROPIC_API_KEY=` and `GEMINI_API_KEY=` (each should show only the fake value in `.env.example`), and for `sk-ant-` and `AIza` (the usual starts of the two kinds of key; being tested for Google): only fake values are allowed. If a real key is there, don't merge: delete it first (week 9 step 2f, or step 2e here).
+**b. Read Files changed yourself.** You should see your code and tests, the documents folder (course-safe documents only), the requirements and Dockerfile, `.env.example` with **fake** keys, `.gitignore` and `.dockerignore` listing the index file, your README and `REVIEW.md`. **No `.env`, no real key, no index file.** Use the browser's Find for `ANTHROPIC_API_KEY=` and `GEMINI_API_KEY=` (each should show only the fake value in `.env.example`), and for `sk-ant-` and `AIza` (Anthropic keys start with `sk-ant-`; Google keys usually start with `AIza`): only fake values are allowed. If a real key is there, don't merge: delete it first (week 9 step 2f, or step 2e here).
 
 **c. Merge on GitHub, then pull,** as in week 9. Check: "What branch am I on, and do all the tests pass?" says `main`, and yes.
 

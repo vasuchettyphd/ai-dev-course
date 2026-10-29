@@ -174,7 +174,7 @@ then a blank line, then **`Hello from Docker!`** and "This message shows that yo
 
 ### 3. Containerize your project
 
-> Tested in a signed-in session on Windows (WSL 2) on 29 October 2026. Claude's exact words will differ. A Mac and a Pro plan are being tested.
+> Tested in a signed-in session on Windows (WSL 2) on 29 October 2026. Claude's exact words will differ.
 
 **a. Start Claude Code and make the branch, before Claude writes anything.** In your terminal:
 
@@ -205,7 +205,7 @@ cp ~/ai-dev-course/example-project/Dockerfile ~/ai-dev-course/example-project/.d
 ls -a
 ```
 
-`ls -a` should now list `Dockerfile` and `.dockerignore` among your files (`ls` alone hides names starting with a dot). If you already have a `Dockerfile` or `.dockerignore`, stop and ask Claude to compare them first; don't overwrite. If `cp` says `cannot stat`, the course repo is older than week 7 or in another folder: run `git pull` in it and check the path.
+`ls -a` should now list `Dockerfile` and `.dockerignore` among your files (`ls` alone hides names starting with a dot). If you already have a `Dockerfile` or `.dockerignore`, stop and ask Claude to compare them first; don't overwrite. If `cp` says `cannot stat`, the course repo is older than week 7 or in another folder: run `git pull` in it and check the path. The copy on `main` now has extra lines for later weeks (a package install and more comments). Unless your project needs packages, Claude should keep only the five lines step 1 describes.
 
 **c. Make them fit your project.** The copied `Dockerfile` runs the deal screener, not your program. In Claude Code (the first window), type:
 
@@ -327,7 +327,7 @@ Plain **Yes** to `git add` and `git commit`.
 
 ### 5. Review it with `safe-and-private`
 
-> **Being tested:** The deal screener's Dockerfile review was run with these reviewer instructions on 12 October 2026. It was also run in a signed-in session on Windows (WSL 2) on 29 October 2026: three Nice to have findings, in about a minute.
+> **Being tested:** The deal screener's Dockerfile review was run with these reviewer instructions on 12 October 2026. It was also run in a signed-in session on Windows (WSL 2) on 29 October 2026: three Nice to have findings.
 
 A `Dockerfile` decides what goes into an image, so it's exactly what your week 6 `safe-and-private` reviewer is for. This time you run only that one reviewer, on the two new files.
 
