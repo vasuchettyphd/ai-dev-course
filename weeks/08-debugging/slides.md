@@ -63,7 +63,7 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 | Test | 4. Implementation, step 1: "Create Failing Test Case", "MUST have before fixing" |
 | Fix | 4, steps 2 and 3: "ONE change at a time", then verify |
 
-<p class="small">Quotes from skills/systematic-debugging/SKILL.md, Superpowers 6.4.1. It may start on its own when you describe a bug (being tested); this week you start it by name.</p>
+<p class="small">Quotes from skills/systematic-debugging/SKILL.md, Superpowers 6.4.1. It started on its own in our test when we described a bug; this week you start it by name, to be sure.</p>
 
 ---
 
@@ -197,7 +197,7 @@ unrelated to this bug, and never delete or weaken a test. Here is the bug:
 
 <style scoped>section { font-size: 24px; }</style>
 
-## What you'll see, phase by phase (being tested)
+## What you'll see (it may not name the phases)
 
 1. **Root Cause Investigation.** *Deal screener:* no error, so the clue was the numbers. `parse_answer` accepts any percentage from 0 to 100, so `0.07` stayed 0.07%. The calculator was right
 2. **Pattern Analysis.** *Deal screener:* `7` gives $748.47; the only difference is the typed rate. The down payment question had the same problem

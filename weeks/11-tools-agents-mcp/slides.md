@@ -15,7 +15,7 @@ AI Development Course
 
 Let the model use your code instead of guessing
 
-<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real calls), mcp 2.3.0 with Python 3.12, and Claude Code 2.1.296's claude mcp commands (not signed in), 13 October 2026. A signed-in Claude Code session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with anthropic 1.13.0 and claude-haiku-5-5 (real calls), mcp 2.3.0 with Python 3.12, and Claude Code 2.1.296's claude mcp commands (not signed in), 13 October 2026. A signed-in Claude Code session was tested in Windows (WSL) on 29 October 2026; GitHub and Macs are being tested.</p>
 
 ---
 
@@ -105,7 +105,7 @@ The model can send anything. `screen_listing` checks every field:
 |---|---|
 | a missing field, words, a negative | refused, with the field named |
 | a 250% rate, 30.5 years | refused |
-| an interest rate of `0.07` | refused: "percentages are written as 7 for 7%" |
+| an interest rate of `0.07` | refused if sent ("percentages are written as 7 for 7%"); in our runs Claude sent 7 |
 
 Refusals go back as `is_error: true`, so the model can fix it or ask you.
 
@@ -175,7 +175,7 @@ claude mcp list
 - `--scope project`: saved in `.mcp.json`, this project only
 - `-e PYTHONPATH="$PWD"`: Python can find your code from anywhere
 - Full path to the `.venv`'s Python: saved exactly as typed
-- "Pending approval": approve it when you start `claude` (being tested)
+- "Pending approval": approve it when you start `claude` (pick "Use this MCP server")
 
 ---
 

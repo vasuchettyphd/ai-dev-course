@@ -15,7 +15,7 @@ AI Development Course
 
 Show what you built
 
-<p class="small">The deal screener's DEMO.md was run for real on 13 October 2026, and its fallback with the network off. A signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">The deal screener's DEMO.md was run for real on 13 October 2026, and its fallback with the network off. A signed-in session was tested in Windows (WSL); GitHub, the timed rehearsals and Mac are being tested.</p>
 
 ---
 

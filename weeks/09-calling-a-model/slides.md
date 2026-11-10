@@ -15,7 +15,7 @@ AI Development Course
 
 Your program asks a model, and you keep the key safe
 
-<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container), real calls to claude-haiku-5-5, and the deal screener's 92 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). The Console, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with the anthropic package 1.13.0 (Python 3.12.3 on Ubuntu 24.04, in a container), real calls to claude-haiku-5-5, and the deal screener's 92 offline tests, 12 October 2026. Prices: $0.10 / $0.50 per million tokens (Anthropic's pricing page that day). Steps 3 to 5 were also run in Windows (WSL) on 29 October 2026, in a signed-in session. The Console, GitHub and Macs are being tested.</p>
 
 ---
 
@@ -251,7 +251,7 @@ Each one, then: "For now, type the numbers yourself." Never the key, never a tra
 4. `cp -n ~/first-call/.env .`
 5. Pick one small job: pull fields out of text, sort into categories, or a one-sentence summary
 6. `/superpowers:writing-plans` with the guardrails in the prompt, then `/superpowers:subagent-driven-development`
-7. **No** to printing `.env`, keys in files, tests that call the real API
+7. **No** to printing `.env`, keys in files, tests that call the real API. Never type `! cat .env`, even if Claude Code suggests it
 
 ---
 

@@ -15,7 +15,7 @@ AI Development Course
 
 Search by meaning, and answers from your own documents
 
-<p class="small">Tested with google-genai 2.30.0 and gemini-embedding-001, anthropic 1.13.0 and claude-haiku-5-5, the deal screener's offline tests and real calls, 13 October 2026. AI Studio, school accounts, a signed-in session, GitHub, and Mac and Windows laptops are being tested.</p>
+<p class="small">Tested with google-genai 2.30.0 and gemini-embedding-001, anthropic 1.13.0 and claude-haiku-5-5, the deal screener's offline tests and real calls, 13 October 2026. AI Studio, school accounts, GitHub and Macs are being tested; the terminal steps and a signed-in session were run in Windows (WSL) on 29 October 2026.</p>
 
 ---
 

@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296 on Ubuntu Linux (in a container) and the deal screener with Python 3.14.4 and 3.9.25, 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, or on a Mac or in Windows (WSL) is being tested on real Mac and Windows laptops. Nothing new to install: the same steps on every laptop.</p>
+<p class="small">Tested with Claude Code 2.1.296 on Ubuntu Linux (in a container) and the deal screener with Python 3.14.4 and 3.9.25, 12 October 2026, without signing in. Signed in on Windows (WSL) with Claude Code 2.1.312, 29 October 2026: steps 3 to 6. GitHub and the Mac are being tested. Nothing new to install: the same steps on every laptop.</p>
 
 ---
 
@@ -88,7 +88,7 @@ Explain this change in plain English: <paste>
 
 In your terminal: `cd ~/semester-project && claude`, then `manual mode on`.
 
-`Show me git status.` must say `nothing to commit, working tree clean`. Then:
+`Show me git status.` must say `nothing to commit, working tree clean` (only `__pycache__/` folders listed is fine). Then:
 
 ```text
 Switch to main and pull the latest changes from GitHub. Then make a
@@ -183,13 +183,13 @@ tools: Read, Grep, Glob
 - **No `tools` line** = every tool, including editing
 - **No `Bash`**: a command can still change or delete files
 
-Wrong? "Set the tools line in every file in .claude/agents/ to exactly: tools: Read, Grep, Glob. Change nothing else."
+Wrong or missing? "Make sure every file in .claude/agents/ has a tools line, right after the description line, that says exactly: tools: Read, Grep, Glob. Add it where it is missing. Change nothing else."
 
 <p class="small">code.claude.com/docs/en/sub-agents</p>
 
 ---
 
-## Check Claude can use them (being tested)
+## Check Claude can use them
 
 <style scoped>section { font-size: 24px; } pre { font-size: 18px; }</style>
 
@@ -209,7 +209,7 @@ Just tell me what the subagent said.
 
 It should say it can't. But its instructions say never to edit, and the `tools:` line is what really stops it: a refusal alone proves nothing. An edit prompt? **No**, then check `tools:` again.
 
-Optional: "Ask the does-it-work subagent which tools it has. Just tell me what it said." (Read, Grep, Glob; being tested)
+Optional: "Ask the does-it-work subagent which tools it has. Just tell me what it said." (Read, Grep, Glob)
 
 Then: "Commit the three files in .claude/agents/ on this branch ..."
 
@@ -217,7 +217,7 @@ Then: "Commit the three files in .claude/agents/ on this branch ..."
 
 <style scoped>section { font-size: 24px; } pre { font-size: 18px; }</style>
 
-## Run all three (being tested)
+## Run all three
 
 `/usage` first: write it down and keep it. Then one prompt:
 
@@ -243,7 +243,7 @@ After the table, list in a few words the areas where a reviewer said
 
 ## While it runs
 
-Three subagents read your files at once. Each report comes back in the chat or as a notification. **Wait for all three**, then Claude writes `REVIEW.md`.
+Three subagents read your files at once. Each runs in the background; a line like `Agent "..." finished` appears when it's done. **Wait for all three**, then Claude writes `REVIEW.md`.
 
 | Claude asks to | Choose |
 |---|---|
@@ -268,7 +268,7 @@ Then read `REVIEW.md`, and commit it: "Review of the week 5 build".
 
 ---
 
-## Triage: you decide (being tested)
+## Triage: you decide
 
 Every finding gets a **Decision** (`Fix` or `Won't fix`) and a **Reason**.
 

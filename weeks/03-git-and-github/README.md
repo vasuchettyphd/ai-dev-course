@@ -4,7 +4,7 @@
 
 **Time:** plan for about 90 minutes (an estimate); installing Homebrew on a Mac can make it longer. **Cost:** nothing beyond your Claude plan. A GitHub account is free.
 
-**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step that runs on your own computer, using a stand-in for GitHub: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push. Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's, Homebrew's and Apple's docs and is being tested on real Mac and Windows laptops.
+**Tested with:** git 2.43.0 and GitHub CLI (`gh`) 2.102.0 on Ubuntu 24.04 Linux (in a container), 12 October 2026. We tested installing git and `gh`, and every git step that runs on your own computer, using a stand-in for GitHub: creating a repository, saving snapshots, a branch, comparing versions, discarding a change, reverting a commit and a rejected push. Everything that needs a real GitHub account, and every step on a Mac, follows GitHub's, Homebrew's and Apple's docs and is being tested on real Mac and Windows laptops. The git steps and the `gh auth login` questions were also tested in Ubuntu on WSL 2 (Windows) with git 2.53.0 and `gh` 2.102.0, 29 October 2026, again with a stand-in for GitHub.
 
 ## Before you start
 
@@ -219,7 +219,7 @@ https://github.com/cli/cli/releases/tag/v2.102.0
 
 ### 4. Sign in to GitHub with `gh`
 
-> **Being tested:** Signing in needs a real GitHub account. The exact questions and their wording are being tested. If something looks different, tell your instructor.
+> **Being tested:** Signing in needs a real GitHub account, so the browser sign-in is being tested. The questions below were checked on Windows (WSL) with `gh` 2.102.0. If something looks different, tell your instructor.
 
 In your terminal, type:
 
@@ -236,9 +236,11 @@ It asks a few questions. Use the arrow keys and Enter, and choose:
 | whether to authenticate Git with your GitHub credentials | **Y** (yes) |
 | how to authenticate | **Login with a web browser** |
 
+(If `gh` has been set up before, it may skip the question about authenticating Git.)
+
 Then it shows a **one-time code** and asks you to press Enter to open github.com in your browser. Press Enter, sign in to GitHub in the browser if asked, type the code, and approve.
 
-- **On Windows (WSL):** the browser may not open by itself. Copy the code from the Ubuntu window, then open <https://github.com/login/device> in your normal Windows browser and type the code there.
+- **On Windows (WSL):** the browser may not open by itself (it did not on our Ubuntu 26.04 test). `gh` copies the code to your Windows clipboard and may print `! Failed opening a web browser at https://github.com/login/device`. If no browser opens, that's fine: go to <https://github.com/login/device> in your normal Windows browser and paste (or type) the code there.
 - **On Windows (WSL), being tested:** `gh` may say it saved your sign-in in a plain-text file, because Ubuntu here has no credential store. That's expected here; carry on.
 - Never create, copy or paste a "personal access token" for this course. The browser sign-in is all you need.
 
@@ -248,7 +250,7 @@ Then it shows a **one-time code** and asks you to press Enter to open github.com
 gh auth status
 ```
 
-It should show that you're logged in to github.com, with **your** GitHub username. (The exact wording when signed in is being tested.) If you're not signed in, you'll see:
+It should show that you're logged in to github.com, with **your** GitHub username, in a line like `✓ Logged in to github.com account yourusername`. (The rest of that line after a browser sign-in is being tested.) If you're not signed in, you'll see:
 
 ```text
 You are not logged into any GitHub hosts. To log in, run: gh auth login
@@ -258,7 +260,7 @@ If it shows someone else's username (for example on a shared laptop), type `gh a
 
 ### 5. Make `my-first-project` a git repository
 
-> **Being tested:** Claude Code's exact words and prompts are being tested on real Mac and Windows laptops. The git output below is from our test.
+> **Being tested:** Claude Code's prompts below were checked on Windows (WSL); the Mac check is still being done. The git output below is from our test.
 
 **a. Start Claude Code in your folder.** In your terminal, type:
 
@@ -281,6 +283,8 @@ Make this folder a git repository with the branch name main. Then save a first s
 
 Each of these shows a permission prompt. Read it: the command should start with `git`, and it should stay in your `my-first-project` folder. Choose **Yes**.
 
+Claude Code may also add a line like `Co-Authored-By: Claude ...` to each commit message. That's normal: it records that Claude helped.
+
 For git commands, always pick plain **Yes**. Never pick "Yes, and don't ask again" or "Yes, and switch to auto mode" for git, so you see every push. (Claude Code's permissions page, <https://code.claude.com/docs/en/permissions>, lists these options; "don't ask again" for a command is saved for this repo for good.)
 
 Why `main`: plain `git init` names the first branch `master` and prints a long `hint:` about branch names. GitHub calls its main branch `main`, so you want `main` from the start.
@@ -291,7 +295,7 @@ Why `main`: plain `git init` names the first branch `master` and prints a long `
 Show me the git history and the current branch.
 ```
 
-It will probably run `git log --oneline` and `git branch --show-current`. You should see one line of history: a short code, then your message. The code is different for everyone. In our test, a first commit looked like this:
+It will probably run `git log` (maybe `git log --oneline`) and `git branch --show-current`, and may describe the history in its own words instead of showing the raw lines. You should see one commit in the history: a code, then your message. The code is different for everyone. In our test, a first commit looked like this:
 
 ```text
 74659dd Add README
@@ -438,7 +442,7 @@ Approve the edit, the commit and the push. Now undo it:
 Undo my last commit with git revert, so the history keeps a record. Don't use reset. Then push main to GitHub.
 ```
 
-It will probably run `git revert HEAD --no-edit`, then `git push`. In our test, a revert printed:
+It will probably run `git revert HEAD --no-edit` (or `git revert --no-commit HEAD` followed by a `git commit`), then `git push`. In our test, a revert printed:
 
 ```text
 [main 9fe6f0b] Revert "Add intro line"
@@ -495,12 +499,12 @@ The [assignment](assignment.md) asks for the repo's address, the merged PR's add
 | The branch is called `master`, not `main` (for example `git switch main` says `fatal: invalid reference: main`) | Ask Claude Code: "Rename this branch to main with `git branch -M main`." Do this before you push to GitHub. |
 | `fatal: No configured push destination.` | This folder isn't connected to GitHub yet. Do step 6. |
 | `! [rejected]        main -> main (fetch first)` with `Updates were rejected because the remote contains work that you do not have locally` | GitHub has commits your laptop doesn't, usually because you merged a PR. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." Say **No** to any prompt that contains `--force` or `reset --hard`. |
-| (being tested) `Need to specify how to reconcile divergent branches` | Same cause and same fix. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
+| `Need to specify how to reconcile divergent branches` | Same cause and same fix. Ask Claude Code: "Pull the latest changes from GitHub as a merge (git pull --no-rebase --no-edit), then push again. Don't reset or force-push." |
 | The repo is public | (being tested) On github.com, open the repo, then **Settings**. In the **Danger Zone** at the bottom, click **Change visibility**, choose private, and follow the confirmation steps until you click **Make this repository private**. |
 | `gh auth status` shows the wrong username | (being tested) Type `gh auth logout` and answer the questions it asks (which account, and to confirm). Before signing in again, sign out of github.com in your browser (or use a private window), then sign in there with your own account. Then type `gh auth login`. |
 | `You are not logged into any GitHub hosts. To log in, run: gh auth login` | Do step 4. |
 | A push is refused with a message about exposing your private email | (being tested) Your commits use your personal email. Do step 1b and "Tell git who you are" in step 2 with your `noreply` address, then ask Claude Code: "Change the author email on my commits that are not on GitHub yet to my noreply address, without losing any files. Don't force-push and don't use reset --hard." Say **No** to any prompt that contains `--force` or `reset --hard`. If you're unsure, stop and ask in office hours. |
-| The browser doesn't open during `gh auth login` (WSL) | (being tested) Copy the one-time code from the Ubuntu window, open <https://github.com/login/device> in your Windows browser and type the code. |
+| `! Failed opening a web browser at https://github.com/login/device` during `gh auth login` (WSL) | Expected in WSL. The code is already on your clipboard. Open <https://github.com/login/device> in your Windows browser and paste the code. |
 | (being tested) `gh repo create` says the repository name already exists (for example after a first try that failed) | The repo was already made on GitHub. First open `https://github.com/yourusername/my-first-project` in your browser and check it says **Private** (if not, see "The repo is public"). Then ask Claude Code: "Connect this folder to my existing private GitHub repository my-first-project as origin and push main, instead of creating a new one. Don't force-push." Say **No** to any prompt that contains `--force`. Or choose a new name. |
 | `gh: command not found` (or `brew: command not found` on a Mac) | Apple-chip Mac: run the "Next steps" lines the Homebrew installer printed (step 3b), close and reopen Terminal, then `brew --version`; still not found? Come to office hours. Intel Mac: close and reopen Terminal; still not found? Come to office hours. Windows: make sure you're in the **Ubuntu** window, not PowerShell, then redo step 3. |
 | (being tested) A Mac window asks to install "command line developer tools" (on any Mac, for example on your first `git --version`) | Click Install, wait for it to finish, then run the command again. |

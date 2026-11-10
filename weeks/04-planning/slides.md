@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Claude Code 2.1.296, mattpocock-skills 1.2.3, superpowers 6.4.1 and AI-DLC 2.11.0 on Ubuntu Linux (in a container), 12 October 2026, without signing in. Everything inside a signed-in session, on GitHub, or on a Mac or in Windows (WSL) is being tested on real Mac and Windows laptops.</p>
+<p class="small">Tested on Ubuntu Linux (12 October 2026) and, signed in, on Windows (WSL) with Claude Code 2.1.312 (29 October 2026). GitHub steps, AI-DLC runs and the Mac are being tested.</p>
 
 ---
 
@@ -103,6 +103,8 @@ In your terminal:
 cd ~ && mkdir semester-project && cd semester-project && claude
 ```
 
+Trust question: press the down arrow to choose **Yes, I trust this folder**, then press Enter (Enter alone picks **No, exit**, which quits).
+
 `Shift + Tab` until `manual mode on`. Then ask Claude Code to create `README.md` with your idea, commit it, and:
 
 ```bash
@@ -128,7 +130,7 @@ On github.com, as in week 3:
 
 ---
 
-## Plan mode (being tested)
+## Plan mode
 
 `Shift + Tab` until the bottom line says `plan mode on`:
 
@@ -136,7 +138,7 @@ On github.com, as in week 3:
 auto mode on -> manual mode on -> accept edits on -> plan mode on
 ```
 
-Or type `/plan` before one prompt.
+Or type `/plan` before your prompt (plan mode then stays on).
 
 ```text
 I want to build this for my semester project: "...". I'm not a
@@ -149,21 +151,21 @@ out, what data it uses, and the first three build steps.
 
 ## Don't approve it for building
 
-Claude shows the plan and asks how to proceed. Labels vary:
+Claude shows the plan and asks `Would you like to proceed?`. On our test (labels may differ, for example on Pro):
 
 | Choice | Means |
 |---|---|
-| "Yes, and use auto mode" / "Yes, auto-accept edits" | **start building** |
+| "Yes, and use auto mode" | **start building** |
 | "Yes, manually approve edits" | **start building** |
-| **"No, keep planning"** | stay in plan mode, tell Claude what to change |
+| **"Tell Claude what to change"** | stay in plan mode, type what to change |
 
-This week: **No, keep planning**. Happy with it? Then `Shift + Tab` until `manual mode on`.
+This week: never Yes. Happy with it? Press `Esc`, then `Shift + Tab` until `manual mode on`. (`Shift + Tab` on the question itself approves.)
 
 <p class="small">Claude Code keeps its own copy in ~/.claude/plans/. Your PLAN.md goes in your repo (step 6).</p>
 
 ---
 
-## Install `/grill-me` (mattpocock-skills) (being tested)
+## Install `/grill-me` (mattpocock-skills)
 
 In Claude Code:
 
@@ -182,11 +184,11 @@ $ claude plugin install mattpocock-skills@claude-plugins-official
 
 "Not found in marketplace"? Add the official marketplace first (README, step 5a).
 
-Check: type `/grill` and look for `/grill-me`.
+Check: type `/grill` and look for `/mattpocock-skills:grill-me (grill-me)`.
 
 ---
 
-## Get grilled (being tested)
+## Get grilled
 
 ```text
 /grill-me Grill me on the plan you just proposed for my semester project.
@@ -280,7 +282,7 @@ Only **after your `PLAN.md` PR is merged**, in a **throwaway folder**:
 mkdir -p ~/planning-sandbox && cd ~/planning-sandbox && git init && claude
 ```
 
-**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. User scope means it's on in **every** folder, so remove it afterwards, in your terminal: `claude plugin uninstall superpowers@claude-plugins-official` (or `/plugin uninstall superpowers@claude-plugins-official` in Claude Code, being tested). If Claude Code is open, type `/reload-plugins`.
+**Superpowers:** `/plugin install superpowers@claude-plugins-official`, then `/superpowers:brainstorming ...`. It's on in **every** folder, so remove it afterwards: `claude plugin uninstall superpowers@claude-plugins-official`, then `/reload-plugins`.
 
 **AI-DLC** (Windows: the Ubuntu window). It gives Claude a very broad edit permission (exact reach being tested). Use its own folder:
 

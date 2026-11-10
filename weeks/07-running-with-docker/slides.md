@@ -13,7 +13,7 @@ style: |
 
 AI Development Course
 
-<p class="small">Tested with Docker Engine 29.8.0 on Linux (WSL 2, Intel/AMD chip), not Docker Desktop, and the official python:3.12-slim image (Python 3.12.15), 12 October 2026. Installing and running Docker Desktop on a Mac or Windows, Windows Home, typing into a program in a real terminal, everything inside a signed-in session and on GitHub are being tested on real Mac and Windows laptops.</p>
+<p class="small">Tested with Docker Engine 29.8.0 on Linux (WSL 2, Intel/AMD chip), not Docker Desktop, and the official python:3.12-slim image (Python 3.12.15), 12 October 2026. Also tested signed in on Windows (WSL 2) with Docker Desktop 4.97.0, 29 October 2026. Installing Docker Desktop, the Mac, Windows Home and GitHub are being tested.</p>
 
 ---
 
@@ -255,7 +255,7 @@ docker run -it --rm semester-project
 
 Type your **week 5 hand-worked example**: same answer? **Screenshot.** Not typed into? Use the run command from step 4b with your example as input (a web page: a screenshot of the page in your browser).
 
-<p class="small">The build ends "naming to docker.io/library/semester-project:latest done": that latest is your own image's label, fine.</p>
+<p class="small">Near the end it prints "naming to docker.io/library/semester-project:latest" (Docker Desktop adds an "unpacking to" line): that latest is your own image's label, fine.</p>
 
 ---
 
@@ -293,7 +293,7 @@ No `.env`, `.git`, `.venv`, `.claude`, `__pycache__`. Then commit: "Run the proj
 
 <style scoped>section { font-size: 23px; } pre { font-size: 16px; }</style>
 
-## Review it with `safe-and-private` (being tested)
+## Review it with `safe-and-private`
 
 ```text
 Run the safe-and-private reviewer as a subagent on Dockerfile and .dockerignore
@@ -308,7 +308,7 @@ any file except REVIEW.md. After the table, list in a few words the areas where
 the reviewer said "Nothing found".
 ```
 
-**Yes** to `REVIEW.md`, **No** to any other file. Commit: "Review of the Dockerfile".
+**Yes** to `REVIEW.md` (an edit, or a `cat >> REVIEW.md` command), **No** to any other file. Commit: "Review of the Dockerfile".
 
 ---
 
