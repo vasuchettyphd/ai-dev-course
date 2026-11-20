@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Art by Code and Cursor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column; demos break out wider. Each section = one way of making pictures. */
+:root {
+  --bg: #f3f4f7; --surface: #ffffff; --ink: #161a2b; --muted: #5b6178; --line: #d9dce6;
+  --accent: #2a46d6; --warm: #a8421c; --code-bg: #eceef4; --ok: #2f7a4a;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1220; --surface: #171b2e; --ink: #e7e9f3; --muted: #9aa1bb; --line: #2a3049;
+  --accent: #8197ff; --warm: #ff8a5c; --code-bg: #12162a; --ok: #6cc98e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1220; --surface: #171b2e; --ink: #e7e9f3; --muted: #9aa1bb; --line: #2a3049;
+  --accent: #8197ff; --warm: #ff8a5c; --code-bg: #12162a; --ok: #6cc98e; color-scheme: dark }
+
+* { box-sizing: border-box }
+html { color-scheme: light dark }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 48px 96px; display: grid; gap: 72px }
+.prose { max-width: 68ch; display: grid; gap: 14px; min-width: 0 }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1 }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 800; letter-spacing: -0.02em }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 800; letter-spacing: -0.01em }
+h3 { font-size: 1.2rem; font-weight: 600 }
+p, ul, ol { margin: 0 }
+ul, ol { padding-left: 1.3em; display: grid; gap: 6px }
+a { color: var(--accent) }
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px }
+.kicker { font-family: var(--mono); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--warm) }
+.lede { font-size: 1.2rem; color: var(--muted); max-width: 60ch }
+.toc { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--mono); font-size: .9rem }
+.toc a { text-decoration: none; border-bottom: 1px solid var(--line) }
+.toc a:hover { border-color: var(--accent) }
+section { display: grid; gap: 28px; scroll-margin-top: 24px }
+.head { display: grid; gap: 8px }
+.demo { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 16px; min-width: 0 }
+.demo-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 820px) { .demo-grid { grid-template-columns: 1fr } }
+canvas { display: block; width: 100%; height: auto; border-radius: 6px; background: #05060c }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; font-size: .92rem }
+.controls label { display: flex; gap: 8px; align-items: center }
+.controls input[type=range] { width: 140px; accent-color: var(--accent) }
+button { font: 500 .9rem var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer }
+button:hover { border-color: var(--accent) }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px }
+pre { margin: 0; font: 12.5px/1.5 var(--mono); background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; max-height: 360px; overflow-y: auto }
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 620px) { .stat-row { grid-template-columns: 1fr } }
+.stat { border-top: 3px solid var(--line); padding-top: 8px; display: grid; gap: 2px }
+.stat b { font: 600 1.5rem var(--display); font-variant-numeric: tabular-nums }
+.stat span { color: var(--muted); font-size: .88rem }
+.stat.hot { border-color: var(--accent) }
+.note { font-size: .9rem; color: var(--muted) }
+.steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; counter-reset: s }
+.steps li { counter-increment: s; border-left: 2px solid var(--accent); padding: 4px 0 4px 14px; display: grid; gap: 4px }
+.steps li::before { content: "Step " counter(s); font: 500 .75rem var(--mono); color: var(--accent); letter-spacing: .06em; text-transform: uppercase }
+.starter { border-left: 3px solid var(--accent); }
+.steps strong { font-family: var(--display); font-weight: 600 }
+.loop { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: stretch }
+@media (max-width: 700px) { .loop { grid-template-columns: 1fr 1fr } }
+.loop div { padding: 12px 14px; border: 1px solid var(--line); margin: -1px 0 0 -1px; display: grid; gap: 4px; font-size: .9rem }
+.loop div b { font-family: var(--display); font-size: 1rem }
+.loop div code { font-size: .78rem }
+.log { font: 12.5px/1.5 var(--mono); display: block; max-height: 300px; overflow-y: auto; background: var(--code-bg); border-radius: 6px; padding: 10px }
+.log div { display: block; margin-bottom: 2px; padding: 2px 6px; border-radius: 4px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.log div.now { background: var(--surface); color: var(--ink); outline: 1px solid var(--accent) }
+.log div.done { color: var(--ink) }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr } }
+.prompt { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 10px 0 }
+.prompt span { min-width: 0; overflow-wrap: anywhere }
+.demo > * { min-width: 0 }
+.prompt button { flex-shrink: 0; font-size: .8rem; padding: 4px 10px }
+table { border-collapse: collapse; width: 100%; font-size: .92rem }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-family: var(--mono); font-weight: 500; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.table-scroll { overflow-x: auto }
+svg text { fill: var(--muted); font: 12px var(--mono) }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header style="display:grid;gap:18px">
+    <span class="kicker">Workshop · making pictures with Claude</span>
+    <h1>Art by Code and Cursor</h1>
+    <p class="lede">Claude can't hold a brush, so every picture it makes comes from one of three routes: writing code that draws, writing code the graphics card runs, or driving a paint program with a mouse it can only see through screenshots. This page walks through each route, why it works, and then asks whether a skill can make the results less predictable.</p>
+    <nav class="toc" aria-label="Sections">
+      <a href="#process">The build loop</a>
+      <a href="#seed">Seeds and loops</a>
+      <a href="#tiny">Why 3D is so small</a>
+      <a href="#cursor">Painting by cursor</a>
+      <a href="#taste">Can a skill fix taste?</a>
+      <a href="#exercise">Class exercise</a>
+    </nav>
+  </header>
+
+  <!-- 1. Process -->
+  <section id="process">
+    <div class="head"><span class="kicker">Route 1 and 2 · code that draws</span><h2>The build loop</h2></div>
+    <div class="prose">
+      <p>Nobody types the art in. You describe a scene and its rules, Claude writes a program, and the program paints every frame. The useful part is what happens next: Claude opens the result in a headless browser (a real browser with no window, driven by a script), takes screenshots, looks at them, and fixes what looks wrong. Without that last step it is coding blind.</p>
+    </div>
+    <ol class="steps">
+      <li><strong>Set the rules</strong><span>For example: "No image files. Every motion loops every two minutes. Several looks you can switch live." Constraints like these shape the code more than the subject does.</span></li>
+      <li><strong>Pick the engine</strong><span>Pixel art: a tiny canvas, say 480×270, drawn pixel by pixel in JavaScript and scaled up 4× to fill a 1080p screen. 3D: a shader, a small program the graphics card runs once for every pixel.</span></li>
+      <li><strong>Render frozen frames</strong><span>A script opens the page in headless Chromium and saves screenshots of each look. A setting in the address such as <code>?t=30</code> freezes the animation at second 30, so every screenshot is repeatable.</span></li>
+      <li><strong>Look and fix</strong><span>Claude reads its own screenshots and names problems a person would: edges look jagged, a colour is too dull, small details are too faint to see. Then it edits and renders again.</span></li>
+      <li><strong>Check the seam</strong><span>Compare the last frame of the loop with the first. If the jump is no bigger than between ordinary neighbouring frames, the loop is seamless.</span></li>
+    </ol>
+    <div class="demo starter">
+      <h3>A starter prompt to try</h3>
+      <div class="prompt"><span>Make a single HTML page that draws an animated night harbour with canvas code only, no image files. Every motion must loop seamlessly every 60 seconds. Make each frame depend only on the time t, and add a ?t= setting to the page address that freezes the scene at that second. Then open it with Playwright in headless Chromium, take screenshots at t=0, 20, 40 and 60, look at them, and fix anything that looks wrong. The t=60 shot should match t=0 if the loop is seamless. Repeat until you're happy, and tell me what you changed.</span><button type="button" data-copy="Make a single HTML page that draws an animated night harbour with canvas code only, no image files. Every motion must loop seamlessly every 60 seconds. Make each frame depend only on the time t, and add a ?t= setting to the page address that freezes the scene at that second. Then open it with Playwright in headless Chromium, take screenshots at t=0, 20, 40 and 60, look at them, and fix anything that looks wrong. The t=60 shot should match t=0 if the loop is seamless. Repeat until you're happy, and tell me what you changed.">Copy</button></div>
+      <p class="note">Playwright is a library for controlling a browser from code. Claude Code can install and run it itself. The ?t= setting lets Claude jump straight to any moment instead of waiting in real time. The last two sentences are what turn one attempt into a loop. When we tested this prompt, Claude noticed after the first round that the lighthouse beam pointed the same way in every screenshot, because it turned exactly once every 10 seconds, and fixed it.</p>
+    </div>
+    <p class="note prose">The point for students: the model's eyes are screenshots. Anything you want it to judge, it has to be able to render and look at.</p>
+  </section>
+
+  <!-- 3. Seeds and loops -->
+  <section id="seed">
+    <div class="head"><span class="kicker">Route 1 · code that draws</span><h2>Seeds and loops</h2></div>
+    <div class="prose">
+      <p>Generative art leans on two ideas. A <b>seed</b> makes randomness repeatable: the same seed gives the same picture every time, a new seed gives a sibling. A <b>whole-number loop</b> makes animation seamless: if every moving thing finishes an exact number of cycles per loop, frame zero and the final frame match. The planet in the next section lets you break that rule: pick "1.37 turns" and press "Jump to the loop seam" to see the snap.</p>
+    </div>
+    <div class="demo">
+      <div class="demo-grid">
+        <canvas id="ridge" width="640" height="360" aria-label="Seeded ridgeline landscape"></canvas>
+        <div style="display:grid;gap:12px;min-width:0">
+          <div class="controls">
+            <label for="seedv">Seed <input id="seedv" type="range" min="1" max="500" step="1" value="42"></label>
+            <b id="seedn" style="font-family:var(--mono);font-variant-numeric:tabular-nums">42</b>
+            <button id="seedr" type="button">Random seed</button>
+          </div>
+          <pre>const r = rng(42);   // same seed in, same numbers out
+
+const sunX   = r() * width;    // always the same
+const ridges = 7 + r() * 6;    // for seed 42,
+const hue    = r() * 360;      // in the same order</pre>
+          <p class="note">Drag the seed back to 42 and the exact same landscape returns. That is how an artist can share "seed 42" instead of a file.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Tiny -->
+  <section id="tiny">
+    <div class="head"><span class="kicker">Route 2 · the GPU</span><h2>Why a whole 3D scene is smaller than a photo</h2></div>
+    <div class="prose">
+      <p>A video stores the answer: the colour of every pixel in every frame. A shader stores the question: given this pixel and this moment, what colour should it be? The graphics card asks that question for all two million pixels of a 1080p screen, sixty times a second, in parallel. Nothing is stored because everything is recomputed. The other half of the trick is that the heavy machinery is already on the student's computer: the browser and the graphics card are the rendering engine. The file only has to describe the scene. It trades storage for computation.</p>
+      <p>The planet below is drawn by the program printed next to it. There are no models and no textures. The size counter measures the shader's source text as it runs on this page. The few lines of JavaScript that hand it to the graphics card are not counted.</p>
+    </div>
+    <div class="demo">
+      <div class="demo-grid">
+        <div style="display:grid;gap:12px;min-width:0">
+          <canvas id="gl" width="640" height="400" aria-label="A shader-drawn banded planet spinning against stars"></canvas>
+          <div class="controls">
+            <label for="bands">Bands <input id="bands" type="range" min="4" max="40" step="1" value="16"></label>
+            <label for="hue">Colour <input id="hue" type="range" min="0" max="360" step="1" value="28"></label>
+            <label for="spin">Turns per loop <select id="spin"><option value="1">1</option><option value="2">2</option><option value="1.37">1.37 (breaks the loop)</option></select></label>
+            <button id="seam" type="button">Jump to the loop seam</button>
+          </div>
+          <p id="glmsg" class="note" hidden>This browser could not start WebGL, so the demo can't run here. The code on the right still shows the idea.</p>
+        </div>
+        <div style="display:grid;gap:10px;min-width:0">
+          <pre id="src" aria-label="Shader source"></pre>
+          <p class="note">This shader is <b id="bytes">…</b> bytes. The loop clock reads <b id="clock" style="font-variant-numeric:tabular-nums">0.0</b> of 10 s.</p>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat hot"><b id="srcsize">…</b><span>this shader, as text</span></div>
+        <div class="stat"><b>8.3 MB</b><span>one 1080p frame stored as raw pixels (1920 × 1080 × 4 bytes)</span></div>
+        <div class="stat"><b>≈ 120 MB</b><span>two minutes of 1080p as a typical streaming-quality video (about 8 Mbit/s)</span></div>
+      </div>
+    </div>
+    <div class="prose">
+      <h3>Three tricks that keep it small</h3>
+      <ul>
+        <li><b>Ray tracing a sphere is one formula.</b> For each pixel, imagine a ray from the camera through that pixel and ask whether it hits the ball. That is a school quadratic equation: the ray hits when <code>b² − c &gt; 0</code>. No mesh (the triangles 3D models are usually made of) is needed.</li>
+        <li><b>Detail comes from noise, not images.</b> The swirls in the bands come from a hash: a scrambling formula that turns a position into a number that looks random but is always the same for that position. Nothing needs saving because it can be recomputed.</li>
+        <li><b>Looks are mostly numbers.</b> A different look is a different set of uniforms, the knobs the page passes into the shader: colours, band counts, light direction. Very different looks, such as an ink drawing or 8-bit pixels, add a short extra branch to the shader. Five looks cost a few kilobytes, not five copies of the art.</li>
+      </ul>
+      <p class="note">A fuller scene built this way, with rings, a moon, a gas cloud and five looks, comes to about 25 KB: roughly 15 KB of shader, 8 KB of code that sets up the graphics card and 3 KB of settings for the looks. It is the same idea, just more questions asked per pixel.</p>
+    </div>
+  </section>
+
+  <!-- 4. Cursor -->
+  <section id="cursor">
+    <div class="head"><span class="kicker">Route 3 · computer use</span><h2>Painting by cursor</h2></div>
+    <div class="prose">
+      <p>The third route skips code for the picture entirely. Claude is put in front of JS Paint, a browser copy of MS Paint, and told to make a masterpiece. It only gets what a person would: a screen, a mouse and a keyboard. This is called computer use. Every click or stroke is a tool call (a structured request the model sends out for a program to carry out), and when Claude wants to see the result it asks for a screenshot.</p>
+    </div>
+    <div class="loop" role="list" aria-label="The computer use loop">
+      <div role="listitem"><b>Claude looks</b><span>Asks for a screenshot (1024×640) or a zoomed-in view of part of the screen.</span></div>
+      <div role="listitem"><b>Claude acts</b><span>Returns a tool call such as <code>left_click_drag</code> with start and end coordinates.</span></div>
+      <div role="listitem"><b>Driver moves</b><span>A small Python program turns that into real mouse input with Playwright, inside Docker (a sealed mini-computer, or container).</span></div>
+      <div role="listitem"><b>Result returns</b><span>A stroke returns just "OK". Claude chains several strokes, then looks again. The loop repeats until it says it's finished.</span></div>
+    </div>
+    <div class="demo">
+      <div class="demo-grid">
+        <div style="display:grid;gap:12px;min-width:0">
+          <canvas id="paint" width="640" height="400" aria-label="Replay of computer use actions on a paint program mock-up"></canvas>
+          <div class="controls">
+            <button id="pplay" type="button">Play</button>
+            <button id="pstep" type="button">Step</button>
+            <button id="preset" type="button">Reset</button>
+            <span class="note" id="pcount">0 of 0 actions</span>
+          </div>
+        </div>
+        <div style="display:grid;gap:10px;min-width:0">
+          <div class="log" id="plog" aria-live="polite"></div>
+          <pre id="pjson" aria-label="Current tool call"></pre>
+        </div>
+      </div>
+      <p class="note">A made-up sample run, replayed on a scaled-down mock-up of the screen. The calls have the same shape as the real computer use toolset, with the coordinates shrunk to fit. Notice what the sample paints: a sunset over hills, the same safe subject the section on taste is about.</p>
+    </div>
+    <div class="two">
+      <div class="prose">
+        <h3>What made it work</h3>
+        <ul>
+          <li><b>A locked box.</b> The paint program runs in Docker with no network, as a user with no special permissions. Shortcuts that would close or reload the page are refused by the driver.</li>
+          <li><b>A spending cap.</b> Every screenshot costs tokens, the units the API bills by. The loop counts dollars from each reply, tells Claude to wrap up near the limit and stops before it can go over.</li>
+          <li><b>Notes instead of memory.</b> After about 30 screenshots the conversation gets heavy, so Claude writes notes to itself and a fresh conversation starts from them with the canvas kept.</li>
+          <li><b>A timelapse for free.</b> The canvas is saved after every stroke, which doubles as a resume point and the frames of a timelapse.</li>
+        </ul>
+      </div>
+      <div class="prose">
+        <h3>What students should notice</h3>
+        <ul>
+          <li>The picture is slow and expensive compared with code. Real runs took tens to hundreds of strokes, 7 to 26 minutes and from under $1 to about $4.</li>
+          <li>The limits of the tool shape the art. Flat colours and hard edges push the model toward bands, silhouettes and simple shapes.</li>
+          <li>Asked for a masterpiece with no other direction, separate runs on different models chose the same subject: a sunset over a mountain lake. That is the "average pick" the next section is about.</li>
+          <li>At the end Claude writes an artist's statement, including what it thinks is weak. Compare its self-critique with yours.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Taste -->
+  <section id="taste">
+    <div class="head"><span class="kicker">Steering the choices</span><h2>Can a skill fix taste?</h2></div>
+    <div class="demo-grid" style="align-items:center">
+      <div class="prose">
+        <p>A language model tends to produce what is most likely, given everything it has read. For a creative request, "most likely" means the middle of everything already made: the synthwave sunset poster, the mountain lake, the coffee shop called Daily Grind. It feels right because it's familiar.</p>
+        <p><a href="https://github.com/mankidev/antialgorithm">antialgorithm</a> is a community-made Claude Code skill that tries to push the model off that peak. It doesn't add talent. It adds a procedure:</p>
+        <ol>
+          <li><b>Name the default.</b> "The default here is X." Then avoid X unless the brief demands it.</li>
+          <li><b>Start from outside.</b> If the request is thin, roll a random starting point (a method, a palette, a setting, a verb) with <code>seed.py</code>. It is the same seed idea from earlier, used to pick ideas instead of pixels, so two people with the same prompt start in different places.</li>
+          <li><b>Give every choice a reason.</b> One sentence, using a fact about this project. Odd for its own sake doesn't count.</li>
+          <li><b>Check the work.</b> <code>check.py</code> renders an SVG and flags text that's cut off, covered, too small or low in contrast.</li>
+          <li><b>Watch your own habits.</b> <code>moves.py</code> logs each main move, so last time's escape doesn't become this time's default.</li>
+        </ol>
+      </div>
+      <div class="demo" style="gap:8px">
+        <svg id="curve" viewBox="0 0 420 230" role="img" aria-label="Bell curve of how often a choice gets picked, with the first pick at the peak"></svg>
+        <p class="note">Where a model's first answer tends to land. The skill's job is to move the answer out of the shaded middle on purpose, for a reason.</p>
+      </div>
+    </div>
+    <div class="prose">
+      <h3>One comparison we ran</h3>
+      <p>Same prompt to two fresh agents: "Design a poster for a music festival as a 400×600 SVG." Without the skill: a purple-to-orange gradient, a striped synthwave sun, a giant centred title, a stacked lineup. With the skill, the agent first wrote down that default, rolled a seed (string and pins, very pale colours, a back yard in Croatia, a lantern), and made the lineup into name tags pegged on washing lines, one line per back yard of one town. <code>check.py</code> caught overlapping tags, which it fixed, but one tag still ended up partly covered.</p>
+      <p class="note">One pair proves very little. The skill's own showcase images were picked from about a dozen runs, and the skill itself warns that its favourite escape (an old, hand-made, printed look) can turn into a new default. That's why the class exercise below runs several prompts.</p>
+    </div>
+  </section>
+
+  <!-- 6. Exercise -->
+  <section id="exercise">
+    <div class="head"><span class="kicker">Hands on · about 50 minutes</span><h2>Class exercise: with and without</h2></div>
+    <div class="prose">
+      <p>Work in pairs. One person is <b>Plain</b>: a normal Claude Code session with no extra skills. The other is <b>Skill</b>: a session with antialgorithm installed. You both give the same prompts, then put the results side by side, labelled, and judge them together. This is not a blind test, so each pair also writes down which side they expect to win before seeing anything; that shows the class its own bias.</p>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Time</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>Before class</td><td>The instructor reads the skill's files and checks it runs on a test machine. Every laptop runs the setup script (below).</td></tr>
+        <tr><td>5 min</td><td>Pairs pick two prompts and write down a predicted winner for each.</td></tr>
+        <tr><td>20 min</td><td>Both partners run both prompts. Then each partner runs one of the two prompts twice more.</td></tr>
+        <tr><td>10 min</td><td>Judge each pair of results with the table, scoring before reading Claude's explanations.</td></tr>
+        <tr><td>15 min</td><td>Pool the tallies on the board and discuss.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="two">
+      <div class="demo">
+        <h3>1. Make the two folders</h3>
+        <p class="note">From <code>advanced/art-with-code/demo</code>, run the setup script. It makes <code>practice/plain</code> with no skill, and <code>practice/with-skill</code> with antialgorithm installed for that folder only, so the two never mix. Plain starts Claude Code in the first folder, Skill in the second.</p>
+        <div class="prompt"><span><code>./setup.sh</code></span><button type="button" data-copy="./setup.sh">Copy</button></div>
+        <p class="note">In each folder, ask "Which skills do you have available?" Only with-skill should list antialgorithm. If a run there doesn't seem to use it, add "Use the antialgorithm skill." to the prompt. It runs small Python scripts from a community repository: it needs Python 3, and for posters also numpy, Pillow and <code>rsvg-convert</code> (or the cairosvg package).</p>
+        <h3>2. Pick two prompts</h3>
+        <div id="prompts"></div>
+        <p class="note">The poster prompt is the slowest, because the skill checks its own render. Pick at most one poster per pair.</p>
+      </div>
+      <div class="demo">
+        <h3>3. Judge each pair</h3>
+        <p class="note">Every row is "yes = good". Answer before reading what Claude says about its own choices: the skill side always writes down its reasons, which would tilt the third row.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Question</th><th>Plain</th><th>Skill</th></tr></thead>
+          <tbody>
+            <tr><td>Is it specific to this brief, so it couldn't be pasted into another project unchanged?</td><td>yes / no</td><td>yes / no</td></tr>
+            <tr><td>Is it something most people would <em>not</em> make first?</td><td>yes / no</td><td>yes / no</td></tr>
+            <tr><td>Can you name, in one sentence, a reason its main choice fits this brief?</td><td>yes / no</td><td>yes / no</td></tr>
+            <tr><td>Does it do its job: readable, usable, on brief? (1–5)</td><td>score</td><td>score</td></tr>
+            <tr><td>How surprising is it? (1–5)</td><td>score</td><td>score</td></tr>
+            <tr><td>Which one would you actually use?</td><td colspan="2">pick one</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note">Rows 1 and 2 and the surprise score only measure "different". "Does it do its job" and "which would you use" measure "better". Look for results that score high on both.</p>
+        <h3>4. Run it again</h3>
+        <ul>
+          <li><b>Plain:</b> run one prompt two more times. Do the three results look alike? That repetition is the "average pick".</li>
+          <li><b>Skill:</b> run the same prompt two more times. Do the results share a move, such as the same paper texture or hand-drawn look? The skill calls that its own new default.</li>
+        </ul>
+        <h3>5. Hand in</h3>
+        <p>Add to the class tally on the board: for each prompt, Plain or Skill for "would actually use", the two job scores, and whether your prediction was right.</p>
+        <h3>6. Discuss</h3>
+        <ul>
+          <li>Did the skill make the work better, or only different?</li>
+          <li>Where did the plain version win?</li>
+          <li>How often did the predictions come true, and does that change how you read the tally?</li>
+          <li>The skill asks for a real fact to build on. What happened when the prompt had none?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const dark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  /* ---------- 1. WebGL planet ---------- */
+  const FRAG = `precision highp float;
+uniform vec2 res;      // canvas size in pixels
+uniform float t;       // time inside the loop
+uniform float L;       // loop length (10 s)
+uniform float turns;   // spins per loop
+uniform float bands;
+uniform vec3 tint;
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {  // smooth "random" values, same every time
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x),
+             mix(hash(i + vec2(0, 1)), hash(i + 1.0), f.x), f.y);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * res) / res.y;
+  // Background: a few stars from the same hash.
+  vec3 col = vec3(0.01, 0.012, 0.03)
+           + vec3(step(0.996, hash(floor(gl_FragCoord.xy / 2.0))));
+
+  // Shoot a ray from the camera through this pixel.
+  vec3 ro = vec3(0.0, 0.0, -3.0);
+  vec3 rd = normalize(vec3(uv, 1.2));
+  float b = dot(ro, rd), c = dot(ro, ro) - 1.0, d = b * b - c;
+
+  if (d > 0.0) {                          // the ray hits the planet
+    vec3 p = ro + rd * (-b - sqrt(d));    // the point it hits
+    float a = 6.2831853 * turns * t / L;  // spin angle
+    vec2 q = vec2(p.x * cos(a) - p.z * sin(a), p.x * sin(a) + p.z * cos(a));
+    float swirl = noise(q * 2.5 + p.y * 3.0);
+    float band = 0.5 + 0.5 * sin(p.y * bands + swirl * 4.0);
+    vec3 albedo = mix(tint, tint * 0.4 + 0.12, band);
+    // A storm spot that turns with the planet, so the spin is easy to see.
+    float storm = smoothstep(0.32, 0.1, length(vec3(q.x, p.y, q.y) - vec3(0.6, 0.25, -0.76)));
+    albedo = mix(albedo, vec3(0.75, 0.25, 0.12), storm);
+    float light = max(dot(p, normalize(vec3(-0.7, 0.4, -0.6))), 0.0);
+    float rim = pow(1.0 - max(dot(p, -rd), 0.0), 3.0);
+    col = albedo * (0.03 + light) + vec3(0.3, 0.5, 1.0) * rim * light * 0.6;
+  }
+  gl_FragColor = vec4(pow(col, vec3(0.4545)), 1.0);
+}`;
+  const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}';
+  document.getElementById('src').textContent = FRAG;
+  const size = new Blob([FRAG]).size;
+  document.getElementById('bytes').textContent = size.toLocaleString();
+  document.getElementById('srcsize').textContent = (size / 1024).toFixed(1) + ' KB';
+
+  const glc = document.getElementById('gl');
+  const gl = glc.getContext('webgl', { preserveDrawingBuffer: true });
+  const LOOP = 10;
+  let offset = 0; // seconds added to the clock by the seam button
+  if (!gl) { document.getElementById('glmsg').hidden = false; }
+  else {
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog); gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const U = (n) => gl.getUniformLocation(prog, n);
+    const uRes = U('res'), uT = U('t'), uL = U('L'), uTurns = U('turns'), uBands = U('bands'), uTint = U('tint');
+    const bands = document.getElementById('bands'), hue = document.getElementById('hue'), spin = document.getElementById('spin');
+    const clock = document.getElementById('clock');
+    const hsl = (h) => { // hue to a soft RGB tint
+      const f = (n) => { const k = (n + h / 30) % 12; return 0.62 - 0.32 * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
+      return [f(0), f(8), f(4)];
+    };
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start = performance.now();
+    const frame = (now) => {
+      const t = (((now - start) / 1000 + offset) % LOOP + LOOP) % LOOP;
+      gl.viewport(0, 0, glc.width, glc.height);
+      gl.uniform2f(uRes, glc.width, glc.height);
+      gl.uniform1f(uT, t); gl.uniform1f(uL, LOOP);
+      gl.uniform1f(uTurns, parseFloat(spin.value));
+      gl.uniform1f(uBands, parseFloat(bands.value));
+      gl.uniform3fv(uTint, hsl(parseFloat(hue.value)));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      clock.textContent = (Math.floor(Math.max(0, t) * 10) / 10).toFixed(1);
+      if (!reduce) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    if (reduce) [bands, hue, spin].forEach((el) => el.addEventListener('input', () => requestAnimationFrame(frame)));
+    document.getElementById('seam').addEventListener('click', () => {
+      const t = ((performance.now() - start) / 1000 + offset) % LOOP;
+      offset += (LOOP - 1.5) - t; // land 1.5 s before the loop wraps
+      if (reduce) requestAnimationFrame(frame);
+    });
+  }
+
+  /* ---------- 2. Seeded ridgelines ---------- */
+  const rng = (seed) => () => {
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+  const rc = document.getElementById('ridge'), rx = rc.getContext('2d');
+  const seedv = document.getElementById('seedv'), seedn = document.getElementById('seedn');
+  const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+  const drawRidge = (seed) => {
+    const r = rng(seed), W = rc.width, H = rc.height;
+    const hueA = r() * 360, hueB = (hueA + 140 + r() * 80) % 360;
+    const sky = rx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, `hsl(${hueA} 45% 18%)`); sky.addColorStop(1, `hsl(${hueB} 55% 72%)`);
+    rx.fillStyle = sky; rx.fillRect(0, 0, W, H);
+    const sx = 80 + r() * (W - 160), sy = 60 + r() * 110, sr = 22 + r() * 30;
+    rx.fillStyle = `hsl(${hueB} 80% 88%)`; rx.beginPath(); rx.arc(sx, sy, sr, 0, Math.PI * 2); rx.fill();
+    const rows = 7 + Math.floor(r() * 6);
+    const near = [18, 20, 30], far = [200, 200, 220];
+    for (let i = 0; i < rows; i++) {
+      const k = i / (rows - 1), base = H * (0.38 + 0.55 * k);
+      const waves = [0, 1, 2].map(() => ({ f: 0.004 + r() * 0.02, a: 8 + r() * 40 * (1 - k * 0.5), p: r() * 6.28 }));
+      rx.beginPath(); rx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 4) {
+        let y = base; for (const w of waves) y -= w.a * Math.sin(x * w.f + w.p);
+        rx.lineTo(x, y);
+      }
+      rx.lineTo(W, H); rx.closePath();
+      const c = mix(far, near, Math.pow(k, 0.8));
+      rx.fillStyle = `color-mix(in oklab, rgb(${c}) 82%, hsl(${hueA} 50% 30%))`;
+      rx.fill();
+    }
+  };
+  const setSeed = (s) => { seedv.value = s; seedn.textContent = s; drawRidge(+s); };
+  seedv.addEventListener('input', () => setSeed(seedv.value));
+  document.getElementById('seedr').addEventListener('click', () => setSeed(1 + Math.floor(Math.random() * 500)));
+  setSeed(42);
+
+  /* ---------- 3. Computer use replay ---------- */
+  const pc = document.getElementById('paint'), px = pc.getContext('2d');
+  const S = pc.width / 480; // actions use a 480x300 screen
+  const PAL = ['#1d2a5c', '#4a3a8a', '#b8507a', '#e0704a', '#f2b04a', '#fff1b0', '#2f5a3a', '#14261b', '#6b4a2e', '#ffffff'];
+  const palXY = (i) => [70 + i * 22, 279];
+  const actions = [
+    { name: 'screenshot', input: {}, say: 'look at the empty canvas' },
+    { name: 'left_click', input: { coordinate: palXY(0) }, say: 'pick deep blue', pick: 0 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 30], coordinate: [460, 30] }, say: 'sky band' },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 50], coordinate: [460, 50] } },
+    { name: 'left_click', input: { coordinate: palXY(1) }, say: 'pick violet', pick: 1 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 72], coordinate: [460, 72] } },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 92], coordinate: [460, 92] } },
+    { name: 'left_click', input: { coordinate: palXY(2) }, say: 'pick rose', pick: 2 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 112], coordinate: [460, 112] } },
+    { name: 'left_click', input: { coordinate: palXY(3) }, say: 'pick orange', pick: 3 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 132], coordinate: [460, 132] } },
+    { name: 'left_click', input: { coordinate: palXY(4) }, say: 'pick gold', pick: 4 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 150], coordinate: [460, 150] } },
+    { name: 'screenshot', input: {}, say: 'check the sky' },
+    { name: 'left_click', input: { coordinate: palXY(5) }, say: 'pick pale yellow', pick: 5 },
+    { name: 'left_click_drag', input: { start_coordinate: [300, 130], coordinate: [340, 130] }, say: 'sun' },
+    { name: 'left_click_drag', input: { start_coordinate: [296, 142], coordinate: [344, 142] } },
+    { name: 'left_click_drag', input: { start_coordinate: [302, 120], coordinate: [338, 120] } },
+    { name: 'left_click', input: { coordinate: palXY(6) }, say: 'pick green', pick: 6 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 200], coordinate: [250, 170] }, say: 'far hill' },
+    { name: 'left_click_drag', input: { start_coordinate: [250, 170], coordinate: [460, 205] } },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 215], coordinate: [460, 215] } },
+    { name: 'left_click', input: { coordinate: palXY(7) }, say: 'pick dark green', pick: 7 },
+    { name: 'left_click_drag', input: { start_coordinate: [60, 235], coordinate: [460, 228] }, say: 'foreground' },
+    { name: 'left_click_drag', input: { start_coordinate: [110, 230], coordinate: [110, 180] }, say: 'tree' },
+    { name: 'left_click_drag', input: { start_coordinate: [96, 215], coordinate: [124, 215] } },
+    { name: 'left_click_drag', input: { start_coordinate: [100, 200], coordinate: [120, 200] } },
+    { name: 'zoom', input: { region: [60, 160, 200, 240] }, say: 'zoom in to inspect the tree' },
+    { name: 'screenshot', input: {}, say: 'decide whether it is finished' },
+  ];
+  const log = document.getElementById('plog'), json = document.getElementById('pjson'), count = document.getElementById('pcount');
+  actions.forEach((a, i) => {
+    const d = document.createElement('div');
+    d.textContent = `${String(i + 1).padStart(2, '0')}  ${a.name}${a.say ? '  · ' + a.say : ''}`;
+    log.appendChild(d);
+  });
+  let idx = 0, color = 0, timer = 0, zoomBox = null;
+  const ui = () => {
+    px.setTransform(1, 0, 0, 1, 0, 0);
+    px.fillStyle = '#c0c0c0'; px.fillRect(0, 0, pc.width, pc.height);
+    px.setTransform(S, 0, 0, S, 0, 0);
+    px.fillStyle = '#808080'; px.fillRect(48, 6, 426, 252);
+    for (let i = 0; i < 8; i++) { // toolbar
+      px.fillStyle = i === 3 ? '#e6e6e6' : '#d4d4d4';
+      px.fillRect(8 + (i % 2) * 18, 10 + Math.floor(i / 2) * 18, 16, 16);
+      px.strokeStyle = '#7a7a7a'; px.strokeRect(8.5 + (i % 2) * 18, 10.5 + Math.floor(i / 2) * 18, 15, 15);
+    }
+        PAL.forEach((c, i) => { const [x, y] = palXY(i); px.fillStyle = c; px.fillRect(x - 9, y - 9, 18, 18); px.strokeStyle = '#555'; px.strokeRect(x - 8.5, y - 8.5, 17, 17); });
+    px.fillStyle = PAL[color]; px.fillRect(18, 268, 24, 22); px.strokeStyle = '#333'; px.strokeRect(18.5, 268.5, 23, 21);
+  };
+  const canvasLayer = document.createElement('canvas'); canvasLayer.width = 420; canvasLayer.height = 246;
+  const cl = canvasLayer.getContext('2d');
+  const compose = (cursor) => {
+    ui();
+    px.drawImage(canvasLayer, 50, 8);
+    if (zoomBox) { px.strokeStyle = '#2a46d6'; px.lineWidth = 2; px.strokeRect(zoomBox[0], zoomBox[1], zoomBox[2] - zoomBox[0], zoomBox[3] - zoomBox[1]); px.lineWidth = 1; }
+    if (cursor) { // arrow cursor
+      const [x, y] = cursor; px.fillStyle = '#fff'; px.strokeStyle = '#000';
+      px.beginPath(); px.moveTo(x, y); px.lineTo(x, y + 14); px.lineTo(x + 4, y + 10); px.lineTo(x + 9, y + 12); px.closePath(); px.fill(); px.stroke();
+    }
+  };
+  const resetPaint = () => {
+    clearInterval(timer); timer = 0; document.getElementById('pplay').textContent = 'Play';
+    idx = 0; color = 0; zoomBox = null;
+    cl.fillStyle = '#ffffff'; cl.fillRect(0, 0, 420, 246);
+    [...log.children].forEach((d) => { d.className = ''; });
+    json.textContent = '// press Play or Step';
+    count.textContent = `0 of ${actions.length} actions`;
+    compose(null);
+  };
+  const step = () => {
+    if (idx >= actions.length) { clearInterval(timer); timer = 0; document.getElementById('pplay').textContent = 'Play'; return; }
+    const a = actions[idx]; zoomBox = null; let cursor = null;
+    if (a.name === 'left_click') { if (a.pick !== undefined) color = a.pick; cursor = a.input.coordinate; }
+    if (a.name === 'left_click_drag') {
+      const [x0, y0] = a.input.start_coordinate, [x1, y1] = a.input.coordinate;
+      cl.strokeStyle = PAL[color]; cl.lineWidth = 16; cl.lineCap = 'round';
+      cl.beginPath(); cl.moveTo(x0 - 50, y0 - 8); cl.lineTo(x1 - 50, y1 - 8); cl.stroke();
+      cursor = [x1, y1];
+    }
+    if (a.name === 'zoom') zoomBox = a.input.region;
+    compose(cursor);
+    [...log.children].forEach((d, i) => { d.className = i < idx ? 'done' : i === idx ? 'now' : ''; });
+    { const row = log.children[idx]; const top = row.offsetTop - log.offsetTop; if (top < log.scrollTop || top + row.offsetHeight > log.scrollTop + log.clientHeight) log.scrollTop = top - log.clientHeight / 2; }
+    const call = { type: 'tool_use', name: a.name, input: a.input };
+    const reply = a.name === 'screenshot' || a.name === 'zoom' ? '// result: an image of the screen' : '// result: "OK" (no picture until Claude asks for one)';
+    json.textContent = JSON.stringify(call, null, 2) + '\n' + reply;
+    idx++;
+    count.textContent = `${idx} of ${actions.length} actions`;
+  };
+  document.getElementById('pstep').addEventListener('click', () => { clearInterval(timer); timer = 0; document.getElementById('pplay').textContent = 'Play'; if (idx >= actions.length) resetPaint(); step(); });
+  document.getElementById('preset').addEventListener('click', resetPaint);
+  document.getElementById('pplay').addEventListener('click', (e) => {
+    if (timer) { clearInterval(timer); timer = 0; e.target.textContent = 'Play'; return; }
+    if (idx >= actions.length) resetPaint();
+    e.target.textContent = 'Pause'; step(); timer = setInterval(step, 650);
+  });
+  resetPaint();
+
+  /* ---------- 4. Bell curve ---------- */
+  const svg = document.getElementById('curve');
+  const drawCurve = () => {
+    const W = 420, H = 230, x0 = 20, x1 = 400, base = 190, top = 24;
+    const f = (z) => Math.exp(-z * z / 2);
+    const X = (z) => x0 + (z + 3) / 6 * (x1 - x0), Y = (v) => base - v * (base - top);
+    let line = '', shade = `M${X(-0.6)},${base}`;
+    for (let z = -3; z <= 3.0001; z += 0.05) {
+      line += (line ? 'L' : 'M') + X(z).toFixed(1) + ',' + Y(f(z)).toFixed(1);
+      if (z >= -0.6 && z <= 0.6) shade += `L${X(z).toFixed(1)},${Y(f(z)).toFixed(1)}`;
+    }
+    shade += `L${X(0.6)},${base}Z`;
+    const accent = css('--accent'), warm = css('--warm'), muted = css('--muted');
+    svg.innerHTML = `
+      <path d="${shade}" fill="${accent}" fill-opacity="0.18"/>
+      <path d="${line}" fill="none" stroke="${accent}" stroke-width="2.5"/>
+      <line x1="${x0}" y1="${base}" x2="${x1}" y2="${base}" stroke="${muted}" stroke-width="1"/>
+      <circle cx="${X(0)}" cy="${Y(1)}" r="5" fill="${warm}"/>
+      <text x="${X(0) + 10}" y="${Y(1) - 6}">first pick</text>
+      <circle cx="${X(1.9)}" cy="${Y(f(1.9))}" r="5" fill="none" stroke="${warm}" stroke-width="2"/>
+      <text x="${x1}" y="${base + 18}" text-anchor="end">moved, with a reason</text>
+      <text x="${X(0) - 36}" y="${base + 18}">familiar</text>
+      <text x="${x0}" y="${base + 18}">rare</text>
+`;
+  };
+  drawCurve();
+  dark.addEventListener('change', drawCurve);
+  new MutationObserver(drawCurve).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  /* ---------- 5. Prompts with copy buttons ---------- */
+  const prompts = [
+    'Design a poster for a music festival as a 400x600 SVG. Save it as final.svg.',
+    'Suggest a name and a one-line slogan for a new coffee shop.',
+    'Write the opening paragraph of a short story set on a night bus.',
+    'Invent one core mechanic for a small puzzle game about gardening.',
+    'Design the home screen of a habit tracker app as a single HTML file.',
+  ];
+  const box = document.getElementById('prompts');
+  prompts.forEach((p) => {
+    const row = document.createElement('div'); row.className = 'prompt';
+    const s = document.createElement('span'); s.textContent = p;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Copy'; b.dataset.copy = p;
+    row.append(s, b); box.appendChild(row);
+  });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const done = () => { b.textContent = 'Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); };
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = 'Selected'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); };
+    try { navigator.clipboard.writeText(b.dataset.copy).then(done, fallback); } catch { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>

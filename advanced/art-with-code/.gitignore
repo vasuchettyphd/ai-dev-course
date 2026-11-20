@@ -1,0 +1,7 @@
+# Practice folders made by demo/setup.sh
+demo/practice/
+# Usual suspects
+.env
+node_modules/
+__pycache__/
+.venv/
