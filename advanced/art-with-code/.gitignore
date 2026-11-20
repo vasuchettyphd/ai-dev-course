@@ -1,0 +1,9 @@
+# Practice folders made in this lesson
+demo/practice/
+demo/harbour/
+demo/.venv/
+# Usual suspects
+.env
+node_modules/
+__pycache__/
+.venv/
