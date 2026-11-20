@@ -73,7 +73,7 @@ Each one stands alone. Sessions 11 and 12 teach the seven add-ins tour, the Word
 | [Wordle agent](advanced/wordle-agent/) | Build an agent with one tool and a validator it can't fake | Python 3.10+, an Anthropic or OpenAI API key (no cost figure given, check your provider's usage page after a game) |
 | [`/grill-me` and Superpowers in depth](advanced/grill-me-superpowers/) | The full rental deal screener walkthrough | Claude Code |
 | [Beads](advanced/beads/) | Keep an agent's task list across sessions (optional in week 5) | Python 3.10+, git, Claude Code (about $1-2 of model usage) |
-| [Art with code](advanced/art-with-code/) | How Claude makes pictures with code, shaders and a mouse, and whether the antialgorithm skill makes it more creative | A browser, git, Python 3, Claude Code (a few cents a prompt; a poster costs more) |
+| [Art with code](advanced/art-with-code/) | How Claude makes pictures with code, shaders and a mouse, and whether the antialgorithm skill makes it more creative | A browser, git, Python 3, Node.js (for one step), Claude Code (about $1-2 per pair for the class exercise) |
 
 ### Seven add-ins tour
 

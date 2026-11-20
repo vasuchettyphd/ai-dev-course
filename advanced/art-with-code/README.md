@@ -21,7 +21,7 @@ Everything here was run for real on **2026-11-20** with:
 
 `demo/setup.sh` installs exactly that tested commit, `766e304`. The replies quoted below are the real ones from those runs. Yours will not be identical: Claude words things differently each time, and the skill rolls a random starting point on purpose.
 
-**Time:** about 60-90 minutes for the whole topic, or about 50 minutes for the class exercise alone. **Cost:** the two coffee shop runs cost $0.08 (plain) and $0.13 (with the skill). See [What it cost](#what-it-cost).
+**Time:** about 60-90 minutes for the whole topic, or about 50 minutes for the class exercise alone. **Cost:** a short prompt costs about $0.08 to $0.15 of Claude usage, a little more with the skill. Posters and the Step 2 harbour cost more; we didn't measure those. See [What it cost](#what-it-cost).
 
 ## The idea in one paragraph
 
@@ -33,9 +33,23 @@ You need:
 
 - Claude Code, working and logged in.
 - **A browser.** Any recent Chrome, Edge, Firefox or Safari opens the interactive page.
-- **git.** Check with `git --version`.
-- **Python 3** for the skill's scripts. Check with `python3 --version`. For the poster prompt the skill also wants numpy, Pillow and either `rsvg-convert` or the cairosvg package: `python3 -m pip install numpy pillow cairosvg`.
-- **Node.js** if you want to run the starter prompt in Part 1, because Claude uses Playwright, a library for controlling a browser from code, to take its screenshots. Check with `node --version`. Claude Code can install Playwright itself when it needs it.
+- **git**, **Python 3** and, for Step 2, **Node.js**. Check all three:
+
+```bash
+git --version
+python3 --version
+node --version
+```
+
+Expected output (your version numbers may be higher):
+
+```
+git version 2.43.0
+Python 3.13.18
+v22.23.5
+```
+
+If one is missing: git is set up in [week 3](../../weeks/03-git-and-github/), and Node.js in [week 5, step 3d](../../weeks/05-building-with-ai/#3-pick-your-tools). Node.js is only needed for Step 2, where Claude uses Playwright, a library for controlling a browser from code, to take its screenshots. Claude Code can install Playwright itself when it needs it.
 
 On Windows, use WSL.
 
@@ -48,7 +62,15 @@ git clone https://github.com/vasuchettyphd/ai-dev-course.git
 cd ai-dev-course/advanced/art-with-code
 ```
 
-Then open `demo/art-by-code.html` in your browser (double-click it, or drag it into a browser window). On WSL, run `explorer.exe demo/art-by-code.html` to open it in your Windows browser.
+Expected output:
+
+```
+Cloning into 'ai-dev-course'...
+```
+
+(If you already cloned the course earlier in the semester, run `git pull` inside it instead, then `cd advanced/art-with-code`.)
+
+Then open `demo/art-by-code.html` in your browser (double-click it, or drag it into a browser window). On WSL, run `explorer.exe demo/art-by-code.html` to open it in your Windows browser; it prints nothing, and the page opens in your default browser.
 
 It works offline. The only thing it fetches is its fonts; without a connection it falls back to your system fonts. The planet needs WebGL, which every current browser has. If your browser has it turned off, the page says so and the rest still works.
 
@@ -56,13 +78,15 @@ It works offline. The only thing it fetches is its fonts; without a connection i
 
 Nobody types the art in. You describe a scene and its rules, Claude writes a program, and the program paints every frame. The important part is what comes next: Claude opens the page in a *headless* browser (a real browser with no window, driven by a script), takes screenshots, looks at them and fixes what's wrong. Without that, it is coding blind.
 
-Try it. Make a folder and start Claude Code there:
+Try it. From `advanced/art-with-code`, make a folder and start Claude Code there:
 
 ```bash
-mkdir -p demo/practice/harbour
-cd demo/practice/harbour
+mkdir -p demo/harbour
+cd demo/harbour
 claude
 ```
+
+(`demo/harbour/` is ignored by git, so your harbour stays out of the course repo.)
 
 Then paste this prompt:
 
@@ -81,7 +105,15 @@ What happened in our run, which took two rounds:
 - **Round 1:** no errors, and the t=60 screenshot matched t=0 byte for byte, so the loop was seamless. But two things looked frozen. The lighthouse beam turned exactly 6 times a minute, once every 10 seconds, so it pointed the same way at 0, 20 and 40 seconds. The clouds were spaced a third of the screen apart and moved a third every 20 seconds, so they looked the same too. Claude changed the beam to 5 turns a minute and spaced the clouds unevenly.
 - **Round 2:** the beam and clouds now differ between shots, and the loop check still passed.
 
-The result is in `sample-output/harbour/`: the page (`harbour.html`, about 10 KB), the screenshot script Claude wrote (`shoot.js`), and the screenshots at t=0, 20, 40 and 60. Notice that `t0.png` and `t60.png` are the same picture. Your harbour will look different.
+The result is in `sample-output/harbour/`: the page (`harbour.html`, about 10 KB), the screenshot script Claude wrote (`shoot.js`, tidied so it runs from any folder), and the four 960 × 540 screenshots it saves, `t0.png`, `t20.png`, `t40.png` and `t60.png`. Notice that `t0.png` and `t60.png` are the same picture. Your harbour will look different.
+
+When you're done, type `/exit` to leave Claude Code, then go back to the lesson folder:
+
+```bash
+cd ../..
+```
+
+You are now in `advanced/art-with-code` again.
 
 ## Step 3: seeds and loops
 
@@ -136,11 +168,11 @@ What made the real runs work, and what they cost:
 - **A locked box.** The paint program ran in Docker with no network, as a user with no special permissions. Shortcuts that would close or reload the page were refused by the driver.
 - **A spending cap.** Every screenshot costs *tokens*, the units the API bills by. The loop counted dollars from each reply and stopped before a set limit.
 - **Notes instead of memory.** After about 30 screenshots the conversation gets heavy, so Claude wrote notes to itself and a fresh conversation started from them, with the canvas kept.
-- **The numbers.** Real runs took 58 to 707 strokes, 7 to 26 minutes and $0.46 to $4.07.
+- **The numbers.** Three runs of the instructor's own JS Paint project (not part of this course) took 58 to 707 strokes, 7 to 26 minutes and $0.46 to $4.07.
 
 You don't run this one: it needs an Anthropic API key with credit, Docker and a custom driver. The point is to see a different way of working. Code is fast and cheap but needs a program; computer use is slow and costly but works with any app a person can use.
 
-One more thing to notice. Asked for a masterpiece with no other direction, separate runs on different models all painted the same subject: a sunset over a mountain lake. The sample replay paints one too. That is the "average pick" the next step is about.
+One more thing to notice. Asked for a masterpiece with no other direction, those runs, on two different Claude models, all painted the same subject: a sunset over a mountain lake. The sample replay paints a sunset too. That is the "average pick" the next step is about.
 
 ## Step 6: the antialgorithm skill, with and without
 
@@ -156,7 +188,7 @@ A language model tends to produce what is most likely, given everything it has r
 
 ### Setup
 
-The setup script makes two empty practice folders and installs the skill into one of them only:
+The setup script makes two empty practice folders and installs the skill into one of them only. From `advanced/art-with-code`:
 
 ```bash
 cd demo
@@ -171,12 +203,24 @@ Ready:
   /home/you/ai-dev-course/advanced/art-with-code/demo/practice/with-skill   (antialgorithm 766e304 in .claude/skills/antialgorithm/)
 ```
 
-A skill in a folder's `.claude/skills/` is only visible to Claude Code sessions started in that folder, so `plain/` never sees it. Upstream's own install command, `git clone https://github.com/mankidev/antialgorithm ~/.claude/skills/antialgorithm`, puts it in your user-wide skills folder instead, where every session on your computer would get it, plain ones included. Don't use that for this exercise.
+The script downloads the exact tested commit and checks it before installing anything; if the download fails, it stops and leaves nothing behind. A skill in a folder's `.claude/skills/` is only visible to Claude Code sessions started in that folder, so `plain/` never sees it. Upstream's own install command, `git clone https://github.com/mankidev/antialgorithm ~/.claude/skills/antialgorithm`, puts it in your user-wide skills folder instead, where every session on your computer would get it, plain ones included. Don't use that for this exercise.
 
 **Read the skill before you use it.** It runs Python scripts on your computer, so look first:
 
 ```bash
 cat practice/with-skill/.claude/skills/antialgorithm/SKILL.md
+```
+
+The first lines (the rest is about 100 lines of plain English):
+
+```
+---
+name: antialgorithm
+description: 'Stops the safe, average, comfortable pick that AI reaches for first. ...
+---
+```
+
+```bash
 ls practice/with-skill/.claude/skills/antialgorithm/scripts
 ```
 
@@ -184,15 +228,54 @@ ls practice/with-skill/.claude/skills/antialgorithm/scripts
 check.py  history.py  moves.py  rough.py  seed.py
 ```
 
-We read all five scripts. They only read and write files inside the skill's own folder and a temporary folder, render SVGs, and make no network calls.
+We read all five scripts. They make no network calls and nothing runs until Claude calls them. `seed.py` and `moves.py` keep a small `history.jsonl` inside the skill's folder; `check.py` renders SVGs into your system's temporary folder (under `antialgorithm_check/`) and calls the `rsvg-convert` program if you have it.
 
-**Check that it loaded.** Start Claude Code in each folder and ask:
+**For the poster prompt only**, `check.py` also needs numpy, Pillow and `rsvg-convert`. Install them in a virtual environment (a private Python folder for this lesson) so nothing changes system-wide. From `demo/`, on WSL or Ubuntu:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install numpy pillow
+sudo apt update && sudo apt install -y librsvg2-bin
+```
+
+On a Mac, use `brew install librsvg` for the last line (we did not test the Mac route). Check it worked:
+
+```bash
+python3 -c "import numpy, PIL; print('ok')"
+rsvg-convert --version
+```
+
+```
+ok
+rsvg-convert version 2.58.0
+```
+
+Run `. .venv/bin/activate` again in any new terminal before you start `claude` for a poster, so Claude's `python3` finds those packages.
+
+**Check that it loaded.** From `demo/`, start Claude Code in the skill folder:
+
+```bash
+cd practice/with-skill
+claude
+```
+
+Ask:
 
 ```
 Which skills do you have available? List their names only, one per line.
 ```
 
-In `practice/with-skill`, the list includes `antialgorithm`. In `practice/plain`, it does not. (Both lists also show the skills that come with Claude Code.)
+The list includes `antialgorithm`, along with any other skills you already have. Type `/exit`, then try the plain folder:
+
+```bash
+cd ../plain
+claude
+```
+
+Ask the same question. This time `antialgorithm` is not in the list. Type `/exit` and go back with `cd ../..` (you are in `demo/` again).
+
+**Expect a permission question.** In `with-skill`, Claude will ask to run the skill's scripts, for example `python3 .claude/skills/antialgorithm/scripts/seed.py visual`. You read those scripts above, so choose to allow it. If you say no, the skill still works but makes up its own starting point instead of rolling one.
 
 ### One run, for real
 
@@ -224,7 +307,7 @@ The skill's procedure is visible in the reply: it named the default it was avoid
 
 ### The class exercise (about 50 minutes)
 
-Work in pairs. One person is **Plain** and works in `practice/plain`; the other is **Skill** and works in `practice/with-skill`. You both give the same prompts, then put the results side by side, labelled, and judge them together. This is not a blind test, so each pair first writes down which side they expect to win; that shows the class its own bias.
+Work in pairs. One person is **Plain** and starts `claude` in `demo/practice/plain`; the other is **Skill** and starts `claude` in `demo/practice/with-skill`. Both run `./setup.sh` on their own laptop first. You both give the same prompts, then put the results side by side, labelled, and judge them together. This is not a blind test, so each pair first writes down which side they expect to win; that shows the class its own bias.
 
 | Time | What happens |
 |---|---|
@@ -292,7 +375,7 @@ Rows 1 and 2 and the surprise score only measure "different". "Does it do its jo
 | Coffee shop, plain | $0.08 | 3 s |
 | Coffee shop, with the skill | $0.13 | 10 s |
 
-The skill run cost more because it reads its instructions and runs its seed script before answering. Posters cost more on both sides, and the skill side most, because it renders and checks the SVG. We did not measure the starter prompt in Step 2 with Claude Code's cost counter: type `/cost` in your session afterwards to see yours. The class exercise is about 10 to 14 runs per pair.
+A student re-running the same two prompts got $0.08 and $0.15. The skill run costs more because it reads its instructions and runs its seed script before answering. Posters cost more on both sides, and the skill side most, because it renders and checks the SVG; we did not measure those, or the Step 2 harbour, with Claude Code's cost counter. Type `/cost` in your session afterwards to see yours. The class exercise is about 10 to 14 runs per pair, so with short prompts expect roughly $1 to $2 per pair, more if one prompt is a poster.
 
 ## Limits and caveats
 
@@ -304,9 +387,10 @@ The skill run cost more because it reads its instructions and runs its seed scri
 
 ## Troubleshooting
 
-- **`setup.sh` says `practice already has plain/ or with-skill/`.** You ran it before. Delete the old folders with `rm -rf practice` (from `demo/`) and run it again.
+- **`setup.sh` says `.../demo/practice already has plain/ or with-skill/. Delete them first: rm -rf ...`.** You ran it before. Run the `rm -rf` command it prints (it deletes only those two folders), then run `./setup.sh` again.
+- **`setup.sh` says `Could not download antialgorithm commit 766e304`.** Check your internet connection and try again. If it keeps failing, tell your instructor: the commit may have been removed upstream.
 - **`with-skill` doesn't list antialgorithm.** Make sure you started `claude` inside `demo/practice/with-skill`, not a parent folder, and that `.claude/skills/antialgorithm/SKILL.md` exists there.
-- **The poster run fails at `check.py`.** Install the Python packages: `python3 -m pip install numpy pillow cairosvg`.
+- **The poster run fails at `check.py`.** Set up the virtual environment from Step 6 and run `. .venv/bin/activate` before starting `claude`. If `pip install` said `externally-managed-environment`, you skipped the `python3 -m venv .venv` line.
 - **The planet on the page says WebGL isn't available.** Turn on hardware acceleration in your browser's settings, or try another browser. The rest of the page works without it.
 - **Claude says it can't take screenshots in Step 2.** Let it install Playwright when it asks (`npm install playwright` and `npx playwright install chromium`).
 
@@ -315,10 +399,10 @@ The skill run cost more because it reads its instructions and runs its seed scri
 From `demo/`:
 
 ```bash
-rm -rf practice
+rm -rf practice harbour .venv
 ```
 
-That removes both practice folders and the skill copy inside `with-skill`. Nothing was installed anywhere else.
+That removes both practice folders with the skill copy inside `with-skill`, your Step 2 harbour (copy it somewhere else first if you want to keep it) and the Python virtual environment. Three things live outside this folder: the renders `check.py` left in your temporary folder (under `antialgorithm_check/`, cleared when your computer restarts), the `librsvg2-bin` package if you installed it (`sudo apt remove librsvg2-bin`), and Playwright's browser if Claude installed it in Step 2.
 
 ## Files
 
@@ -326,7 +410,7 @@ That removes both practice folders and the skill copy inside `with-skill`. Nothi
 |---|---|
 | `demo/art-by-code.html` | The interactive page: build loop, seeds, the shader planet, the computer use replay and the exercise |
 | `demo/setup.sh` | Makes `practice/plain` and `practice/with-skill` and installs antialgorithm `766e304` into the second only |
-| `sample-output/harbour/` | The starter prompt's result: `harbour.html`, Claude's screenshot script `shoot.js`, and screenshots at t=0, 20, 40 and 60 |
+| `sample-output/harbour/` | The starter prompt's result: `harbour.html`, its screenshot script `shoot.js` (run `node shoot.js` to retake them), and the 960 × 540 screenshots `t0.png`, `t20.png`, `t40.png` and `t60.png` |
 | `sample-output/poster/` | The festival poster with and without the skill, and a side-by-side image |
 
 ## Where to read more

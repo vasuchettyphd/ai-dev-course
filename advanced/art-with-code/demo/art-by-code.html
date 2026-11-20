@@ -115,7 +115,7 @@ svg text { fill: var(--muted); font: 12px var(--mono) }
       <p>Nobody types the art in. You describe a scene and its rules, Claude writes a program, and the program paints every frame. The useful part is what happens next: Claude opens the result in a headless browser (a real browser with no window, driven by a script), takes screenshots, looks at them, and fixes what looks wrong. Without that last step it is coding blind.</p>
     </div>
     <ol class="steps">
-      <li><strong>Set the rules</strong><span>For example: "No image files. Every motion loops every two minutes. Several looks you can switch live." Constraints like these shape the code more than the subject does.</span></li>
+      <li><strong>Set the rules</strong><span>For example: "No image files. Every motion loops every 60 seconds. Several looks you can switch live." Constraints like these shape the code more than the subject does.</span></li>
       <li><strong>Pick the engine</strong><span>Pixel art: a tiny canvas, say 480×270, drawn pixel by pixel in JavaScript and scaled up 4× to fill a 1080p screen. 3D: a shader, a small program the graphics card runs once for every pixel.</span></li>
       <li><strong>Render frozen frames</strong><span>A script opens the page in headless Chromium and saves screenshots of each look. A setting in the address such as <code>?t=30</code> freezes the animation at second 30, so every screenshot is repeatable.</span></li>
       <li><strong>Look and fix</strong><span>Claude reads its own screenshots and names problems a person would: edges look jagged, a colour is too dull, small details are too faint to see. Then it edits and renders again.</span></li>
@@ -253,7 +253,7 @@ const hue    = r() * 360;      // in the same order</pre>
     <div class="head"><span class="kicker">Steering the choices</span><h2>Can a skill fix taste?</h2></div>
     <div class="demo-grid" style="align-items:center">
       <div class="prose">
-        <p>A language model tends to produce what is most likely, given everything it has read. For a creative request, "most likely" means the middle of everything already made: the synthwave sunset poster, the mountain lake, the coffee shop called Daily Grind. It feels right because it's familiar.</p>
+        <p>A language model tends to produce what is most likely, given everything it has read. For a creative request, "most likely" means the middle of everything already made: the synthwave sunset poster, the mountain lake, the coffee shop called Common Grounds. It feels right because it's familiar.</p>
         <p><a href="https://github.com/mankidev/antialgorithm">antialgorithm</a> is a community-made Claude Code skill that tries to push the model off that peak. It doesn't add talent. It adds a procedure:</p>
         <ol>
           <li><b>Name the default.</b> "The default here is X." Then avoid X unless the brief demands it.</li>
@@ -284,8 +284,8 @@ const hue    = r() * 360;      // in the same order</pre>
     <div class="table-scroll"><table>
       <thead><tr><th>Time</th><th>What happens</th></tr></thead>
       <tbody>
-        <tr><td>Before class</td><td>The instructor reads the skill's files and checks it runs on a test machine. Every laptop runs the setup script (below).</td></tr>
-        <tr><td>5 min</td><td>Pairs pick two prompts and write down a predicted winner for each.</td></tr>
+        <tr><td>Before class</td><td>The instructor reads the skill's files and runs the setup on a test machine.</td></tr>
+        <tr><td>5 min</td><td>Everyone runs the setup script (below). Pairs pick two prompts and write down a predicted winner for each.</td></tr>
         <tr><td>20 min</td><td>Both partners run both prompts. Then each partner runs one of the two prompts twice more.</td></tr>
         <tr><td>10 min</td><td>Judge each pair of results with the table, scoring before reading Claude's explanations.</td></tr>
         <tr><td>15 min</td><td>Pool the tallies on the board and discuss.</td></tr>
@@ -445,6 +445,10 @@ void main() {
   const rc = document.getElementById('ridge'), rx = rc.getContext('2d');
   const seedv = document.getElementById('seedv'), seedn = document.getElementById('seedn');
   const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+  const hslRgb = (h, s, l) => { // HSL to [r, g, b], so the canvas gets a colour every browser understands
+    const f = (n) => { const k = (n + h / 30) % 12, a = s * Math.min(l, 1 - l); return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))); };
+    return [f(0), f(8), f(4)];
+  };
   const drawRidge = (seed) => {
     const r = rng(seed), W = rc.width, H = rc.height;
     const hueA = r() * 360, hueB = (hueA + 140 + r() * 80) % 360;
@@ -465,7 +469,7 @@ void main() {
       }
       rx.lineTo(W, H); rx.closePath();
       const c = mix(far, near, Math.pow(k, 0.8));
-      rx.fillStyle = `color-mix(in oklab, rgb(${c}) 82%, hsl(${hueA} 50% 30%))`;
+      rx.fillStyle = `rgb(${mix(hslRgb(hueA, 0.5, 0.3), c, 0.82)})`;
       rx.fill();
     }
   };
